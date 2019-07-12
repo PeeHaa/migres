@@ -1,0 +1,39 @@
+{
+    "name": "peehaa/migres",
+    "description": "Postgresql migration tool",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Pieter Hordijk",
+            "email": "info@pieterhordijk.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": "^7.4",
+        "ext-pdo": "*",
+        "league/climate": "^3.5"
+    },
+    "require-dev": {
+        "maglnet/composer-require-checker": "^2.0.0",
+        "phpstan/phpstan": "^0.11.8",
+        "phpunit/phpunit": "^8.2.3",
+        "slevomat/coding-standard": "^5.0.4",
+        "squizlabs/php_codesniffer": "^3.4.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "PeeHaa\\Migres\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PeeHaa\\MigresTest\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

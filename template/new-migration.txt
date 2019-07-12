@@ -1,0 +1,13 @@
+<?php declare(strict_types=1);
+
+namespace %s;
+
+use PeeHaa\Migres\MigrationSpecification;
+
+class %s extends MigrationSpecification
+{
+    public function change(): void
+    {
+
+    }
+}
