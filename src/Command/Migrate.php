@@ -4,6 +4,7 @@ namespace PeeHaa\Migres\Command;
 
 use PeeHaa\Migres\Action\Action;
 use PeeHaa\Migres\Configuration\Configuration;
+use PeeHaa\Migres\Exception\InvalidFilename;
 use PeeHaa\Migres\Migration;
 use PeeHaa\Migres\Migration\MigrationActions;
 use PeeHaa\Migres\MigrationSpecification;
@@ -98,7 +99,7 @@ final class Migrate implements Command
         preg_match('~^\d{14}_(?P<className>[_a-z0-9]+)\.php$~', $filename, $matches);
 
         if (!isset($matches['className'])) {
-            throw new \Exception('Invalid filename.');
+            throw new InvalidFilename($filename);
         }
 
         $classNameParts = explode('_', $matches['className']);
@@ -128,7 +129,7 @@ final class Migrate implements Command
         preg_match('~^(?P<timestamp>\d{14})_[_a-z0-9]+\.php$~', $filename, $matches);
 
         if (!isset($matches['timestamp'])) {
-            throw new \Exception('Invalid filename.');
+            throw new InvalidFilename($filename);
         }
 
         return \DateTimeImmutable::createFromFormat('YmdHis', $matches['timestamp']);
