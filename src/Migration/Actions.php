@@ -13,9 +13,15 @@ final class Actions implements \Iterator
     /** @var array<Action> */
     private array $actions = [];
 
-    public function __construct(string $tableName)
+    public function __construct(string $tableName, Action ...$actions)
     {
         $this->tableName = $tableName;
+        $this->actions   = $actions;
+    }
+
+    public function reverse(): self
+    {
+        return new self($this->tableName, ...array_reverse($this->actions));
     }
 
     public function prepend(Action $action): void

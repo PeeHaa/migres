@@ -23,4 +23,9 @@ final class TableActions
     {
         return $this->actions;
     }
+
+    public function reverse(): self
+    {
+        return new self($this->tableName, $this->actions->reverse());
+    }
 }

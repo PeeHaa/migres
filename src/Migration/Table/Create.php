@@ -30,6 +30,6 @@ final class Create implements Migration
      */
     public function down(): Actions
     {
-        return (new DropTable())->toQueries($this->tableName);
+        return new Actions($this->tableName, new DropTable());
     }
 }

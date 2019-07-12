@@ -2,6 +2,15 @@
 
 namespace PeeHaa\Migres\Migration\Table;
 
+use PeeHaa\Migres\Action\Action;
+use PeeHaa\Migres\Action\AddColumn;
+use PeeHaa\Migres\Action\AddConstraint;
+use PeeHaa\Migres\Action\AddIndex;
+use PeeHaa\Migres\Action\AddPrimaryKey;
+use PeeHaa\Migres\Action\RemoveColumn;
+use PeeHaa\Migres\Action\RemoveConstraint;
+use PeeHaa\Migres\Action\RemoveIndex;
+use PeeHaa\Migres\Exception\IrreversibleAction;
 use PeeHaa\Migres\Migration\Actions;
 
 final class Change implements Migration
@@ -31,16 +40,16 @@ final class Change implements Migration
     {
         $reversedActions = $this->actions->reverse();
 
-        $queries = new Queries();
+        $actions = new Actions($this->tableName);
 
         foreach ($reversedActions as $action) {
-            $queries->merge($this->getReversedAction($action, $reversedActions)->toQueries($this->tableName));
+            $actions->add($this->getReversedAction($action));
         }
 
-        return $queries;
+        return $actions;
     }
 
-    private function getReversedAction(Action $action, Queue $actions): Action
+    private function getReversedAction(Action $action): Action
     {
         if ($action instanceof AddColumn) {
             return new RemoveColumn($action->getColumn()->getName());
@@ -58,19 +67,14 @@ final class Change implements Migration
             return new RemoveConstraint($action->getCombinedPrimaryKey()->getName());
         }
 
-        if ($action instanceof RemoveColumn) {
-            return new AddColumn($this->findColumnBeforeDeletion($action, $actions));
-        }
+        //if ($action instanceof RemoveColumn) {
+        //    return new AddColumn($this->findColumnBeforeDeletion($action, $actions));
+        //}
 
-        if ($action instanceof RenameColumn) {
-            return new RenameColumn($action->getNewName(), $action->getOldName());
-        }
-
-        throw new \Exception('Action could not be reversed.');
-    }
-
-    private function findColumnBeforeDeletion(Action $action, Queue $actions): Column
-    {
-        return $actions->findColumnBeforeAction($action);
+        //if ($action instanceof RenameColumn) {
+        //    return new RenameColumn($action->getNewName(), $action->getOldName());
+        //}
+var_dump($action);
+        throw new IrreversibleAction(get_class($action));
     }
 }

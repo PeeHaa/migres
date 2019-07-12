@@ -7,6 +7,7 @@ use League\CLImate\CLImate;
 use PeeHaa\Migres\Command\CreateNewMigration;
 use PeeHaa\Migres\Command\Initialize;
 use PeeHaa\Migres\Command\Migrate;
+use PeeHaa\Migres\Command\Rollback;
 use PeeHaa\Migres\Configuration\Configuration;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -71,7 +72,10 @@ if ($argv[1] === 'migrate') {
 }
 
 if ($argv[1] === 'rollback') {
-    // implement rollback
+    (new Rollback(
+        Configuration::fromArray(require getcwd() . '/migres.php'),
+        createDatabaseConnectionFromConfiguration(require getcwd() . '/migres.php'),
+    ))->run();
 
     exit(0);
 }

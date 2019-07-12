@@ -35,4 +35,19 @@ abstract class MigrationSpecification
 
         return new MigrationActions(...$actionsToRun);
     }
+
+    /**
+     * @internal
+     */
+    public function down(): MigrationActions
+    {
+        $actionsToRun = [];
+
+        /** @var Table $table */
+        foreach (array_reverse($this->tables) as $table) {
+            $actionsToRun[] = new TableActions($table->getName(), $table->down());
+        }
+
+        return new MigrationActions(...$actionsToRun);
+    }
 }
