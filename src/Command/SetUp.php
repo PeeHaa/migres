@@ -44,6 +44,8 @@ final class SetUp implements Command
 
         $this->climate->info('Set up database connection');
 
+        $this->climate->br();
+
         $this->settings['database']['name']     = $this->askForDatabaseName();
         $this->settings['database']['host']     = $this->askForDatabaseHost();
         $this->settings['database']['port']     = $this->askForDatabasePort();
