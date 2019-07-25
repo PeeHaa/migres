@@ -47,7 +47,6 @@ final class Migrate implements Command
                     /** @var Action $action */
                     foreach ($tableActions->getActions() as $action) {
                         $migrationReversions[] = $this->retrospector->getReverseAction($tableActions->getTableName(), $action);
-                        //var_dump();
 
                         foreach ($action->toQueries($tableActions->getTableName()) as $query) {
                             $this->logger->info(sprintf('%s;' . PHP_EOL, $query));
