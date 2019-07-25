@@ -4,11 +4,11 @@ namespace PeeHaa\Migres\Command;
 
 use League\CLImate\CLImate;
 
-final class Initialize implements Command
+final class SetUp implements Command
 {
     private CLImate $climate;
 
-    private $settings = [
+    private array $settings = [
         'migrationPath' => null,
         'namespace'     => null,
         'database'      => [
@@ -29,11 +29,13 @@ final class Initialize implements Command
     {
         $this->climate->br();
 
-        $this->climate->info('Migres initialization');
+        $this->climate->info('Migres - Configuration wizard');
 
         $this->climate->br();
 
         $this->climate->info('Set up migrations');
+
+        $this->climate->br();
 
         $this->settings['migrationPath'] = $this->askForMigrationPath();
         $this->settings['namespace']     = $this->askForNamespace();
