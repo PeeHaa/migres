@@ -2,7 +2,7 @@
 
 namespace PeeHaa\Migres\DataType;
 
-final class Cird implements Type
+final class Cidr implements Type
 {
     /**
      * @internal

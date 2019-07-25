@@ -9,6 +9,6 @@ final class Path implements Type
      */
     public function toSql(): string
     {
-        return 'lseg';
+        return 'path';
     }
 }

@@ -4,6 +4,7 @@ namespace PeeHaa\Migres\Migration\Table;
 
 use PeeHaa\Migres\Action\DropTable;
 use PeeHaa\Migres\Migration\Actions;
+use PeeHaa\Migres\Migration\Migrations;
 
 final class Create implements Migration
 {
@@ -15,6 +16,14 @@ final class Create implements Migration
     {
         $this->tableName = $tableName;
         $this->actions   = $actions;
+    }
+
+    public function getMigrationActions(): array
+    {
+        return [
+            'up'   => $this->actions,
+            'down' => $this->down(),
+        ];
     }
 
     /**

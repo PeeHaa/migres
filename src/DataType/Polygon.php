@@ -9,6 +9,6 @@ final class Polygon implements Type
      */
     public function toSql(): string
     {
-        return 'lseg';
+        return 'polygon';
     }
 }

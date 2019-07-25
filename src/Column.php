@@ -42,6 +42,6 @@ final class Column
             return $sql;
         }
 
-        return $sql . ' ' . $this->options->toSql();
+        return $sql . ' ' . $this->options->toSql($this);
     }
 }

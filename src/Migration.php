@@ -54,9 +54,4 @@ final class Migration
     {
         return $this->actions;
     }
-
-    public function getReverseActions(): MigrationActions
-    {
-        return $this->actions->reverse();
-    }
 }

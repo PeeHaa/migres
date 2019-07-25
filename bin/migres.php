@@ -9,6 +9,10 @@ use PeeHaa\Migres\Command\Initialize;
 use PeeHaa\Migres\Command\Migrate;
 use PeeHaa\Migres\Command\Rollback;
 use PeeHaa\Migres\Configuration\Configuration;
+use PeeHaa\Migres\Retrospection\ColumnOptionsResolver;
+use PeeHaa\Migres\Retrospection\DataTypeResolver;
+use PeeHaa\Migres\Retrospection\Retrospector;
+use PeeHaa\Migres\Retrospection\Sequence;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -62,10 +66,14 @@ if ($argv[1] === 'create') {
     exit(0);
 }
 
+$dbConnection = createDatabaseConnectionFromConfiguration(require getcwd() . '/migres.php');
+
 if ($argv[1] === 'migrate') {
     (new Migrate(
         Configuration::fromArray(require getcwd() . '/migres.php'),
-        createDatabaseConnectionFromConfiguration(require getcwd() . '/migres.php'),
+        $dbConnection,
+        new Retrospector($dbConnection, new DataTypeResolver(new Sequence()), new ColumnOptionsResolver(new Sequence())),
+        $climate,
     ))->run();
 
     exit(0);
@@ -93,6 +101,7 @@ function createDatabaseConnectionFromConfiguration(array $configuration): \PDO
 
     $dbConnection->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
     $dbConnection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+    $dbConnection->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 
     return $dbConnection;
 }

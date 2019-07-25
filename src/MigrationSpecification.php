@@ -3,6 +3,7 @@
 namespace PeeHaa\Migres;
 
 use PeeHaa\Migres\Migration\MigrationActions;
+use PeeHaa\Migres\Migration\Migrations;
 use PeeHaa\Migres\Migration\TableActions;
 
 abstract class MigrationSpecification
@@ -39,13 +40,13 @@ abstract class MigrationSpecification
     /**
      * @internal
      */
-    public function down(): MigrationActions
+    public function down(Migrations $migrations): MigrationActions
     {
         $actionsToRun = [];
 
         /** @var Table $table */
         foreach (array_reverse($this->tables) as $table) {
-            $actionsToRun[] = new TableActions($table->getName(), $table->down());
+            $actionsToRun[] = new TableActions($table->getName(), $table->down($migrations));
         }
 
         return new MigrationActions(...$actionsToRun);

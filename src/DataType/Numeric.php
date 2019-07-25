@@ -6,13 +6,13 @@ use PeeHaa\Migres\Exception\InvalidDataTypeSpecification;
 
 final class Numeric implements Type
 {
-    private const SPEC_PATTERN = '~(?:numeric|decimal)\s*\(\s*(?P<precision>\d)+\s*(?:,\s*(?P<scale>\d+))?\s*\)~i';
+    private const SPEC_PATTERN = '~(?:numeric|decimal)\s*(\(\s*(?P<precision>\d+)\s*(?:,\s*(?P<scale>\d+))?\s*\))?~i';
 
-    private int $precision;
+    private ?int $precision;
 
-    private int $scale;
+    private ?int $scale;
 
-    public function __construct(int $precision, int $scale = 0)
+    public function __construct(?int $precision = null, ?int $scale = null)
     {
         $this->precision = $precision;
         $this->scale     = $scale;
@@ -24,7 +24,10 @@ final class Numeric implements Type
             throw new InvalidDataTypeSpecification($specification, self::class);
         }
 
-        return new self(isset($matches['precision']) ? (int) $matches['scale'] : 0);
+        return new self(
+            isset($matches['precision']) ? (int) $matches['precision'] : null,
+            isset($matches['scale']) ? (int) $matches['scale'] : null,
+        );
     }
 
     /**
@@ -32,6 +35,14 @@ final class Numeric implements Type
      */
     public function toSql(): string
     {
+        if ($this->precision === null) {
+            return 'numeric';
+        }
+
+        if ($this->scale === null) {
+            return sprintf('numeric(%d)', $this->precision);
+        }
+
         return sprintf('numeric(%d,%d)', $this->precision, $this->scale);
     }
 }

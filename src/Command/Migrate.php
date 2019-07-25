@@ -2,12 +2,15 @@
 
 namespace PeeHaa\Migres\Command;
 
+use League\CLImate\CLImate;
 use PeeHaa\Migres\Action\Action;
 use PeeHaa\Migres\Configuration\Configuration;
 use PeeHaa\Migres\Exception\InvalidFilename;
 use PeeHaa\Migres\Migration;
 use PeeHaa\Migres\Migration\MigrationActions;
+use PeeHaa\Migres\Migration\Migrations;
 use PeeHaa\Migres\MigrationSpecification;
+use PeeHaa\Migres\Retrospection\Retrospector;
 
 final class Migrate implements Command
 {
@@ -15,10 +18,16 @@ final class Migrate implements Command
 
     private \PDO $dbConnection;
 
-    public function __construct(Configuration $configuration, \PDO $dbConnection)
+    private Retrospector $retrospector;
+
+    private CLImate $logger;
+
+    public function __construct(Configuration $configuration, \PDO $dbConnection, Retrospector $retrospector, CLImate $logger)
     {
         $this->configuration = $configuration;
         $this->dbConnection  = $dbConnection;
+        $this->retrospector  = $retrospector;
+        $this->logger        = $logger;
     }
 
     public function run(): void
@@ -28,6 +37,8 @@ final class Migrate implements Command
             foreach ($this->getMigrations() as $migration) {
                 echo sprintf('Starting migration: %s' . PHP_EOL, $migration->getName());
 
+                $migrationReversions = [];
+
                 foreach ($migration->getActions() as $tableActions) {
                     echo sprintf('Starting migration for table: %s' . PHP_EOL, $tableActions->getTableName());
 
@@ -35,12 +46,18 @@ final class Migrate implements Command
 
                     /** @var Action $action */
                     foreach ($tableActions->getActions() as $action) {
+                        $migrationReversions[] = $this->retrospector->getReverseAction($tableActions->getTableName(), $action);
+                        //var_dump();
+
                         foreach ($action->toQueries($tableActions->getTableName()) as $query) {
-                            echo sprintf('%s;' . PHP_EOL, $query);
+                            $this->logger->info(sprintf('%s;' . PHP_EOL, $query));
 
                             $this->dbConnection->exec($query);
                         }
                     }
+
+                    // store rollback actions
+                    var_dump(array_reverse($migrationReversions));
 
                     $this->dbConnection->commit();
                 }
@@ -50,7 +67,7 @@ final class Migrate implements Command
         }
     }
 
-    private function getMigrations(): array
+    private function getMigrations(): Migrations
     {
         $migrations = [];
 
@@ -64,7 +81,7 @@ final class Migrate implements Command
             );
         }
 
-        return $migrations;
+        return new Migrations(...$migrations);
     }
 
     /**

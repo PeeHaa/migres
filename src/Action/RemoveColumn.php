@@ -13,6 +13,11 @@ final class RemoveColumn implements Action
         $this->name = $name;
     }
 
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
     public function toQueries(string $tableName): Queries
     {
         return new Queries(sprintf('ALTER TABLE "%s" DROP COLUMN "%s"', $tableName, $this->name));

@@ -48,7 +48,7 @@ final class ChangeColumn implements Action
             'ALTER TABLE "%s" ALTER COLUMN "%s" SET DEFAULT %s',
             $tableName,
             $this->column->getName(),
-            $options->getDefaultValue(),
+            $options->getDefaultValue($this->column),
         );
     }
 

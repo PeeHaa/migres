@@ -4,6 +4,11 @@ namespace PeeHaa\Migres;
 
 use PeeHaa\Migres\Constraint\ColumnConstraint;
 use PeeHaa\Migres\Constraint\NotNull;
+use PeeHaa\Migres\DataType\Bit;
+use PeeHaa\Migres\DataType\BitVarying;
+use PeeHaa\Migres\DataType\Boolean;
+use PeeHaa\Migres\DataType\Circle;
+use PeeHaa\Migres\DataType\Line;
 use PeeHaa\Migres\Exception\InvalidDefaultValue;
 
 final class ColumnOptions
@@ -33,8 +38,20 @@ final class ColumnOptions
         return $this->defaultValueSet;
     }
 
-    public function getDefaultValue(): string
+    public function getDefaultValue(Column $column): string
     {
+        if ($column->getType() instanceof Bit || $column->getType() instanceof BitVarying) {
+            return $this->getBinaryDefaultValue();
+        }
+
+        if ($column->getType() instanceof Circle) {
+            return $this->getCircleDefaultValue();
+        }
+
+        if ($column->getType() instanceof Line) {
+            return $this->getLineDefaultValue();
+        }
+
         switch (gettype($this->defaultValue)) {
             case 'string':
                 return sprintf("'%s'", $this->defaultValue);
@@ -52,6 +69,49 @@ final class ColumnOptions
             default:
                 throw new InvalidDefaultValue($this->defaultValue);
         }
+    }
+
+    private function getBinaryDefaultValue(): string
+    {
+        if (preg_match('~::bit(\(\d+\))?$~', $this->defaultValue)) {
+            return $this->defaultValue;
+        }
+
+        if (preg_match('~^B\'[01]+\'$~', $this->defaultValue)) {
+            return $this->defaultValue;
+        }
+
+        if (gettype($this->defaultValue) === 'string' && preg_match('~^[01]+$~', $this->defaultValue)) {
+            return sprintf("B'%s'", $this->defaultValue);
+        }
+
+        throw new InvalidDefaultValue($this->defaultValue);
+    }
+
+    private function getCircleDefaultValue(): string
+    {
+        if (preg_match('~::circle$~', $this->defaultValue)) {
+            return $this->defaultValue;
+        }
+
+        if (preg_match('~\'.+\'~', $this->defaultValue)) {
+            return sprintf('%s::circle', $this->defaultValue);
+        }
+
+        return sprintf("'%s'::circle", $this->defaultValue);
+    }
+
+    private function getLineDefaultValue(): string
+    {
+        if (preg_match('~::line$~', $this->defaultValue)) {
+            return $this->defaultValue;
+        }
+
+        if (preg_match('~{.+}~', $this->defaultValue)) {
+            return sprintf("'%s'", $this->defaultValue);
+        }
+
+        return sprintf("'{%s}'", $this->defaultValue);
     }
 
     public function addConstraints(ColumnConstraint ...$constraints): self
@@ -87,12 +147,12 @@ final class ColumnOptions
      * @internal
      * @throws InvalidDefaultValue
      */
-    public function toSql(): string
+    public function toSql(Column $column): string
     {
         $sqlParts = [];
 
         if ($this->defaultValueSet) {
-            $sqlParts[] = 'DEFAULT ' . $this->getDefaultValue();
+            $sqlParts[] = 'DEFAULT ' . $this->getDefaultValue($column);
         }
 
         $constraints = [];

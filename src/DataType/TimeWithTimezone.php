@@ -6,7 +6,7 @@ use PeeHaa\Migres\Exception\InvalidDataTypeSpecification;
 
 final class TimeWithTimezone implements Type
 {
-    private const SPEC_PATTERN = '~time\s*(?:\(\s*(?P<precision>\d+)\s*\))?with time zone~i';
+    private const SPEC_PATTERN = '~time\s*(?:\(\s*(?P<precision>\d+)\s*\))?\s*with time zone~i';
 
     private ?int $precision;
 

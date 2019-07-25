@@ -6,7 +6,7 @@ use PeeHaa\Migres\Exception\InvalidDataTypeSpecification;
 
 final class Character implements Type
 {
-    private const SPEC_PATTERN = '~(?:character|char)\s*\(\s*(?P<length>\d+)?\s*\)~i';
+    private const SPEC_PATTERN = '~(?:character|char)\s*(?:\(\s*(?P<length>\d+)\s*\))?~i';
 
     private ?int $length;
 

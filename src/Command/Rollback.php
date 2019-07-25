@@ -7,6 +7,7 @@ use PeeHaa\Migres\Configuration\Configuration;
 use PeeHaa\Migres\Exception\InvalidFilename;
 use PeeHaa\Migres\Migration;
 use PeeHaa\Migres\Migration\MigrationActions;
+use PeeHaa\Migres\Migration\Migrations;
 use PeeHaa\Migres\MigrationSpecification;
 
 final class Rollback implements Command
@@ -27,7 +28,7 @@ final class Rollback implements Command
             $migrations = $this->getMigrations();
 
             /** @var Migration $migration */
-            foreach ($this->getRollbackMigrations() as $migration) {
+            foreach ($this->getRollbackMigrations($migrations) as $migration) {
                 echo sprintf('Starting rollback of: %s' . PHP_EOL, $migration->getName());
 
                 foreach ($migration->getActions() as $tableActions) {
@@ -54,7 +55,7 @@ final class Rollback implements Command
         }
     }
 
-    private function getMigrations(): array
+    private function getMigrations(): Migrations
     {
         $migrations = [];
 
@@ -68,10 +69,10 @@ final class Rollback implements Command
             );
         }
 
-        return $migrations;
+        return new Migrations(...$migrations);
     }
 
-    private function getRollbackMigrations(): array
+    private function getRollbackMigrations(Migrations $upMigrations): Migrations
     {
         $migrations = [];
 
@@ -81,11 +82,11 @@ final class Rollback implements Command
                 $filePath,
                 $this->getFullyQualifiedName($filename),
                 $this->getTimestamp($filename),
-                $this->getRollbackActions($filePath, $this->getFullyQualifiedName($filename)),
+                $this->getRollbackActions($filePath, $this->getFullyQualifiedName($filename), $upMigrations),
             );
         }
 
-        return $migrations;
+        return new Migrations(...$migrations);
     }
 
     /**
@@ -195,7 +196,7 @@ final class Rollback implements Command
         return $migration->up();
     }
 
-    private function getRollbackActions(string $filename, string $className): MigrationActions
+    private function getRollbackActions(string $filename, string $className, Migrations $migrations): MigrationActions
     {
         require_once $filename;
 
@@ -204,6 +205,6 @@ final class Rollback implements Command
 
         $migration->change();
 
-        return $migration->down();
+        return $migration->down($migrations);
     }
 }

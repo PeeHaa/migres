@@ -4,7 +4,7 @@ namespace PeeHaa\Migres\Migration;
 
 final class MigrationActions implements \Iterator
 {
-    /** @var TableActions<TableActions> */
+    /** @var array<TableActions> */
     private array $actions;
 
     public function __construct(TableActions ...$actions)

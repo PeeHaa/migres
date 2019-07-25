@@ -6,7 +6,7 @@ use PeeHaa\Migres\Exception\InvalidDataTypeSpecification;
 
 final class TimestampWithoutTimezone implements Type
 {
-    private const SPEC_PATTERN = '~timestamp\s*(?:\(\s*(?P<precision>\d+)\s*\))?~i';
+    private const SPEC_PATTERN = '~timestamp\s*(?:\(\s*(?P<precision>\d+)\s*\))?\s*(without time zone)?~i';
 
     private ?int $precision;
 

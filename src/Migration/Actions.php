@@ -5,6 +5,7 @@ namespace PeeHaa\Migres\Migration;
 use PeeHaa\Migres\Action\Action;
 use PeeHaa\Migres\Action\CreateTable;
 use PeeHaa\Migres\Action\RenameTable;
+use PeeHaa\Migres\Column;
 
 final class Actions implements \Iterator
 {
@@ -49,6 +50,11 @@ final class Actions implements \Iterator
         }
 
         array_splice($this->actions, $position, 0, [$action]);
+    }
+
+    public function findColumnStateBeforeAction(Action $action): Column
+    {
+
     }
 
     public function current()

@@ -19,6 +19,8 @@ final class Factory
             $type .= ' ' . $matches['extraType'];
         }
 
+        $type = preg_replace('~\s+~', ' ', $type);
+
         switch ($type) {
             case 'smallint':
                 return new SmallInt();
@@ -72,6 +74,7 @@ final class Factory
                 return TimestampWithTimezone::fromString($specification);
 
             case 'timestamp without time zone':
+            case 'timestamp':
                 return TimestampWithoutTimezone::fromString($specification);
 
             case 'date':
@@ -81,6 +84,7 @@ final class Factory
                 return TimeWithTimezone::fromString($specification);
 
             case 'time without time zone':
+            case 'time':
                 return TimeWithoutTimezone::fromString($specification);
 
             case 'boolean':
@@ -108,7 +112,7 @@ final class Factory
                 return new Circle();
 
             case 'cidr':
-                return new Cird();
+                return new Cidr();
 
             case 'inet':
                 return new Inet();

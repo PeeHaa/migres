@@ -6,7 +6,7 @@ use PeeHaa\Migres\Exception\InvalidDataTypeSpecification;
 
 final class FloatType implements Type
 {
-    private const SPEC_PATTERN = '~float\s*\(\s*(?P<precision>\d+)?\s*\)~i';
+    private const SPEC_PATTERN = '~float\s*(\(\s*(?P<precision>\d+)?\s*\))?~i';
 
     private ?int $precision;
 
