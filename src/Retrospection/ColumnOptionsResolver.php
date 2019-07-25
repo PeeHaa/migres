@@ -41,6 +41,10 @@ final class ColumnOptionsResolver
             return false;
         }
 
+        if ($columnInformation->getColumnDefinition()->getDataType() === 'smallint' && $this->sequence->isColumnUsingSequence($columnInformation)) {
+            return false;
+        }
+
         if ($columnInformation->getColumnDefinition()->getDefaultValue() === null) {
             return false;
         }

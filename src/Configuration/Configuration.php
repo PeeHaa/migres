@@ -10,10 +10,13 @@ final class Configuration
 
     private string $namespace;
 
-    public function __construct(MigrationPath $migrationPath, string $namespace)
+    private Database $databaseConfiguration;
+
+    public function __construct(MigrationPath $migrationPath, string $namespace, Database $databaseConfiguration)
     {
-        $this->migrationPath = $migrationPath;
-        $this->namespace     = $namespace;
+        $this->migrationPath         = $migrationPath;
+        $this->namespace             = $namespace;
+        $this->databaseConfiguration = $databaseConfiguration;
     }
 
     /**
@@ -22,7 +25,11 @@ final class Configuration
      */
     public static function fromArray(array $configuration): self
     {
-        return new self(new MigrationPath($configuration['migrationPath']), $configuration['namespace']);
+        return new self(
+            new MigrationPath($configuration['migrationPath']),
+            $configuration['namespace'],
+            Database::fromArray($configuration['database']),
+        );
     }
 
     public function getMigrationPath(): string
@@ -33,5 +40,10 @@ final class Configuration
     public function getNamespace(): string
     {
         return $this->namespace;
+    }
+
+    public function getDatabaseConfiguration(): Database
+    {
+        return $this->databaseConfiguration;
     }
 }

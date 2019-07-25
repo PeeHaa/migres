@@ -98,7 +98,7 @@ final class Initialize implements Command
         return $response;
     }
 
-    private function askForDatabasePort(): string
+    private function askForDatabasePort(): int
     {
         $response = $this->climate
             ->input('What is the name of the database you want to run migrations on? [5432]')
@@ -110,7 +110,7 @@ final class Initialize implements Command
             return $this->askForDatabasePort();
         }
 
-        return $response;
+        return (int) $response;
     }
 
     private function askForDatabaseUsername(): string

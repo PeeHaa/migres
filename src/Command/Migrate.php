@@ -4,6 +4,7 @@ namespace PeeHaa\Migres\Command;
 
 use League\CLImate\CLImate;
 use PeeHaa\Migres\Action\Action;
+use PeeHaa\Migres\Action\ReverseAction;
 use PeeHaa\Migres\Configuration\Configuration;
 use PeeHaa\Migres\Exception\InvalidFilename;
 use PeeHaa\Migres\Migration;
@@ -33,6 +34,10 @@ final class Migrate implements Command
     public function run(): void
     {
         try {
+            if (!$this->doesMigrationLogExist()) {
+                $this->createMigrationLog();
+            }
+
             /** @var Migration $migration */
             foreach ($this->getMigrations() as $migration) {
                 echo sprintf('Starting migration: %s' . PHP_EOL, $migration->getName());
@@ -56,7 +61,7 @@ final class Migrate implements Command
                     }
 
                     // store rollback actions
-                    var_dump(array_reverse($migrationReversions));
+                    $this->writeToLog($migration, array_reverse($migrationReversions));
 
                     $this->dbConnection->commit();
                 }
@@ -64,6 +69,76 @@ final class Migrate implements Command
         } catch (\Throwable $e) {
             var_dump($e->getMessage());
         }
+    }
+
+    private function doesMigrationLogExist(): bool
+    {
+        $sql = '
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.tables 
+                WHERE table_catalog = :schemaName
+                AND table_name = :tableName
+            );
+        ';
+
+        $statement = $this->dbConnection->prepare($sql);
+
+        $statement->execute([
+            'schemaName' => $this->configuration->getDatabaseConfiguration()->getName(),
+            'tableName'  => 'migres_log',
+        ]);
+
+        return $statement->fetchColumn(0);
+    }
+
+    private function createMigrationLog(): void
+    {
+        $sql = '
+            CREATE TABLE migres_log (
+                id serial PRIMARY KEY,
+                name character varying(255) NOT NULL,
+                filename character varying (255) NOT NULL,
+                fully_qualified_name character varying (255) NOT NULL,
+                "timestamp" timestamp without time zone NOT NULL,
+                execution  timestamp without time zone NOT NULL DEFAULT NOW(),
+                rollback_actions jsonb NOT NULL,
+                UNIQUE (name),
+                UNIQUE (filename),
+                UNIQUE (fully_qualified_name)
+            )
+        ';
+
+        $this->dbConnection->exec($sql);
+    }
+
+    private function writeToLog(Migration $migration, array $rollbackActions): void
+    {
+        $queries = [];
+
+        /** @var ReverseAction $rollbackAction */
+        foreach ($rollbackActions as $rollbackAction) {
+            foreach ($rollbackAction->toQueries() as $query) {
+                $queries[] = $query;
+            }
+        }
+
+        $sql = '
+            INSERT INTO migres_log
+                (name, filename, fully_qualified_name, "timestamp", rollback_actions)
+            VALUES
+                (:name, :filename, :fullyQualifiedName, :timestamp, :rollbackActions)
+        ';
+
+        $statement = $this->dbConnection->prepare($sql);
+
+        $statement->execute([
+            'name'               => $migration->getName(),
+            'filename'           => $migration->getFilename(),
+            'fullyQualifiedName' => $migration->getFullyQualifiedName(),
+            'timestamp'          => $migration->getTimestamp()->format('Y-m-d H:i:s'),
+            'rollbackActions'    => json_encode($queries),
+        ]);
     }
 
     private function getMigrations(): Migrations

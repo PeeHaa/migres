@@ -2,13 +2,7 @@
 
 namespace PeeHaa\Migres\Command;
 
-use PeeHaa\Migres\Action\Action;
 use PeeHaa\Migres\Configuration\Configuration;
-use PeeHaa\Migres\Exception\InvalidFilename;
-use PeeHaa\Migres\Migration;
-use PeeHaa\Migres\Migration\MigrationActions;
-use PeeHaa\Migres\Migration\Migrations;
-use PeeHaa\Migres\MigrationSpecification;
 
 final class Rollback implements Command
 {
@@ -25,186 +19,61 @@ final class Rollback implements Command
     public function run(): void
     {
         try {
-            $migrations = $this->getMigrations();
+            /** @var \PeeHaa\Migres\Rollback $rollback */
+            foreach ($this->getRollbacks() as $rollback) {
+                echo sprintf('Starting rollback of: %s' . PHP_EOL, $rollback->getName());
 
-            /** @var Migration $migration */
-            foreach ($this->getRollbackMigrations($migrations) as $migration) {
-                echo sprintf('Starting rollback of: %s' . PHP_EOL, $migration->getName());
+                $this->dbConnection->beginTransaction();
 
-                foreach ($migration->getActions() as $tableActions) {
-                    echo sprintf('Starting rollback for table: %s' . PHP_EOL, $tableActions->getTableName());
+                foreach ($rollback->getQueries() as $query) {
 
-                    //continue;
+                    echo sprintf('%s;' . PHP_EOL, $query);
 
-                    //$this->dbConnection->beginTransaction();
-
-                    /** @var Action $action */
-                    foreach ($tableActions->getActions() as $action) {
-                        foreach ($action->toQueries($tableActions->getTableName()) as $query) {
-                            echo sprintf('%s;' . PHP_EOL, $query);
-
-                            //$this->dbConnection->exec($query);
-                        }
-                    }
-
-                    //$this->dbConnection->commit();
+                    $this->dbConnection->exec($query);
                 }
+
+                $this->removeLogEntry($rollback);
+
+                $this->dbConnection->commit();
             }
         } catch (\Throwable $e) {
             var_dump($e->getMessage());
         }
     }
 
-    private function getMigrations(): Migrations
-    {
-        $migrations = [];
-
-        foreach ($this->getFiles() as $filePath => $filename) {
-            $migrations[] = new Migration(
-                $this->getName($filename),
-                $filePath,
-                $this->getFullyQualifiedName($filename),
-                $this->getTimestamp($filename),
-                $this->getActions($filePath, $this->getFullyQualifiedName($filename)),
-            );
-        }
-
-        return new Migrations(...$migrations);
-    }
-
-    private function getRollbackMigrations(Migrations $upMigrations): Migrations
-    {
-        $migrations = [];
-
-        foreach ($this->getRollbackFiles() as $filePath => $filename) {
-            $migrations[] = new Migration(
-                $this->getName($filename),
-                $filePath,
-                $this->getFullyQualifiedName($filename),
-                $this->getTimestamp($filename),
-                $this->getRollbackActions($filePath, $this->getFullyQualifiedName($filename), $upMigrations),
-            );
-        }
-
-        return new Migrations(...$migrations);
-    }
-
     /**
-     * @return array<string>
+     * @return array<\PeeHaa\Migres\Rollback>
      */
-    private function getFiles(): array
+    private function getRollbacks(): array
     {
-        $migrationFiles = [];
+        $sql = '
+            SELECT id, name, filename, fully_qualified_name, timestamp, execution, rollback_actions
+            FROM migres_log
+            ORDER BY id DESC
+        ';
 
-        $fileSystemIteratorFlags = \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::SKIP_DOTS;
+        $statement = $this->dbConnection->query($sql);
 
-        /** @var \SplFileInfo $fileInfo */
-        foreach (new \FilesystemIterator($this->configuration->getMigrationPath(), $fileSystemIteratorFlags) as $fileInfo) {
-            if (!$fileInfo->isFile()) {
-                continue;
-            }
+        $rollbacks = [];
 
-            if (!$this->isValidFile($fileInfo)) {
-                continue;
-            }
-
-            $migrationFiles[$this->getFilePath($fileInfo)] = $fileInfo->getFilename();
+        foreach ($statement->fetchAll() as $migration) {
+            $rollbacks[] = \PeeHaa\Migres\Rollback::fromLogRecord($migration);
         }
 
-        ksort($migrationFiles, SORT_NATURAL);
-
-        return $migrationFiles;
+        return $rollbacks;
     }
 
-    /**
-     * @return array<string>
-     */
-    private function getRollbackFiles(): array
+    private function removeLogEntry(\PeeHaa\Migres\Rollback $rollback): void
     {
-        $migrationFiles = [];
+        $sql = '
+            DELETE FROM migres_log
+            WHERE id = :id
+        ';
 
-        $fileSystemIteratorFlags = \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::SKIP_DOTS;
+        $statement = $this->dbConnection->prepare($sql);
 
-        /** @var \SplFileInfo $fileInfo */
-        foreach (new \FilesystemIterator($this->configuration->getMigrationPath(), $fileSystemIteratorFlags) as $fileInfo) {
-            if (!$fileInfo->isFile()) {
-                continue;
-            }
-
-            if (!$this->isValidFile($fileInfo)) {
-                continue;
-            }
-
-            $migrationFiles[$this->getFilePath($fileInfo)] = $fileInfo->getFilename();
-        }
-
-        krsort($migrationFiles, SORT_NATURAL);
-
-        return $migrationFiles;
-    }
-
-    private function getName(string $filename): string
-    {
-        preg_match('~^\d{14}_(?P<className>[_a-z0-9]+)\.php$~', $filename, $matches);
-
-        if (!isset($matches['className'])) {
-            throw new InvalidFilename($filename);
-        }
-
-        $classNameParts = explode('_', $matches['className']);
-
-        $classNameParts = array_map('ucfirst', $classNameParts);
-
-        return implode('', $classNameParts);
-    }
-
-    private function getFullyQualifiedName(string $filename): string
-    {
-        return sprintf('%s\%s', $this->configuration->getNamespace(), $this->getName($filename));
-    }
-
-    private function isValidFile(\SplFileInfo $fileInfo): bool
-    {
-        return (bool) preg_match('~^\d{14}_[_a-z0-9]+\.php$~', $fileInfo->getFilename());
-    }
-
-    private function getFilePath(\SplFileInfo $fileInfo): string
-    {
-        return $fileInfo->getRealPath();
-    }
-
-    private function getTimestamp(string $filename): \DateTimeImmutable
-    {
-        preg_match('~^(?P<timestamp>\d{14})_[_a-z0-9]+\.php$~', $filename, $matches);
-
-        if (!isset($matches['timestamp'])) {
-            throw new InvalidFilename($filename);
-        }
-
-        return \DateTimeImmutable::createFromFormat('YmdHis', $matches['timestamp']);
-    }
-
-    private function getActions(string $filename, string $className): MigrationActions
-    {
-        require_once $filename;
-
-        /** @var MigrationSpecification $migration */
-        $migration = new $className();
-
-        $migration->change();
-
-        return $migration->up();
-    }
-
-    private function getRollbackActions(string $filename, string $className, Migrations $migrations): MigrationActions
-    {
-        require_once $filename;
-
-        /** @var MigrationSpecification $migration */
-        $migration = new $className();
-
-        $migration->change();
-
-        return $migration->down($migrations);
+        $statement->execute([
+            'id' => $rollback->getId(),
+        ]);
     }
 }

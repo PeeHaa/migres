@@ -95,8 +95,6 @@ final class Retrospector
             ColumnDefinition::fromInformationSchemaRecord($columnDefinition)
         );
 
-        //var_dump($columnDefinition);
-
         $dataType = $this->dataTypeResolver->resolve($columnInformation);
 
         return new Column(

@@ -9,6 +9,10 @@ use PeeHaa\Migres\DataType\BitVarying;
 use PeeHaa\Migres\DataType\Boolean;
 use PeeHaa\Migres\DataType\Circle;
 use PeeHaa\Migres\DataType\Line;
+use PeeHaa\Migres\DataType\Money;
+use PeeHaa\Migres\DataType\Path;
+use PeeHaa\Migres\DataType\Point;
+use PeeHaa\Migres\DataType\Polygon;
 use PeeHaa\Migres\Exception\InvalidDefaultValue;
 
 final class ColumnOptions
@@ -40,16 +44,13 @@ final class ColumnOptions
 
     public function getDefaultValue(Column $column): string
     {
+        // handle values with casting, e.g.: '127.0.0.1'::inet
+        if (gettype($this->defaultValue) === 'string' && preg_match('~::[^:]+$~', $this->defaultValue)) {
+            return $this->defaultValue;
+        }
+
         if ($column->getType() instanceof Bit || $column->getType() instanceof BitVarying) {
             return $this->getBinaryDefaultValue();
-        }
-
-        if ($column->getType() instanceof Circle) {
-            return $this->getCircleDefaultValue();
-        }
-
-        if ($column->getType() instanceof Line) {
-            return $this->getLineDefaultValue();
         }
 
         switch (gettype($this->defaultValue)) {
@@ -73,7 +74,7 @@ final class ColumnOptions
 
     private function getBinaryDefaultValue(): string
     {
-        if (preg_match('~::bit(\(\d+\))?$~', $this->defaultValue)) {
+        if (preg_match('~::"?bit(\(\d+\))?"?$~', $this->defaultValue)) {
             return $this->defaultValue;
         }
 
@@ -86,32 +87,6 @@ final class ColumnOptions
         }
 
         throw new InvalidDefaultValue($this->defaultValue);
-    }
-
-    private function getCircleDefaultValue(): string
-    {
-        if (preg_match('~::circle$~', $this->defaultValue)) {
-            return $this->defaultValue;
-        }
-
-        if (preg_match('~\'.+\'~', $this->defaultValue)) {
-            return sprintf('%s::circle', $this->defaultValue);
-        }
-
-        return sprintf("'%s'::circle", $this->defaultValue);
-    }
-
-    private function getLineDefaultValue(): string
-    {
-        if (preg_match('~::line$~', $this->defaultValue)) {
-            return $this->defaultValue;
-        }
-
-        if (preg_match('~{.+}~', $this->defaultValue)) {
-            return sprintf("'%s'", $this->defaultValue);
-        }
-
-        return sprintf("'{%s}'", $this->defaultValue);
     }
 
     public function addConstraints(ColumnConstraint ...$constraints): self
