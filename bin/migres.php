@@ -4,6 +4,9 @@
 namespace PeeHaa\Migres\Bin;
 
 use League\CLImate\CLImate;
+use PeeHaa\Migres\Cli\Binary;
+use PeeHaa\Migres\Cli\Command;
+use PeeHaa\Migres\Cli\Usage;
 use PeeHaa\Migres\Command\CreateNewMigration;
 use PeeHaa\Migres\Command\Initialize;
 use PeeHaa\Migres\Command\Migrate;
@@ -20,35 +23,22 @@ $supportedCommands = ['help', 'init', 'create', 'migrate', 'rollback'];
 
 $climate = new CLImate();
 
-if (!isset($argv[1]) || !in_array($argv[1], $supportedCommands) || $argv[1] === 'help') {
-    $climate->br();
+if (!isset($argv[1]) || in_array($argv[1], ['help', '-h', '--help'], true) || !in_array($argv[1], $supportedCommands)) {
+    $binary = (new Binary($climate, 'Migres - The PostgreSQL migration tool'))
+        ->addUsage(new Usage($climate, 'migres init'))
+        ->addUsage(new Usage($climate, 'migres create MyNewMigration'))
+        ->addUsage(new Usage($climate, 'migres migrate [-t migration]'))
+        ->addUsage(new Usage($climate, 'migres rollback [-t migration]'))
+        ->addCommand(new Command($climate, 'help', 'Shows this help information'))
+        ->addCommand(new Command($climate, 'init', 'Runs the configuration wizard'))
+        ->addCommand(new Command($climate, 'create', 'Creates a new migration'))
+        ->addCommand(new Command($climate, 'migrate', 'Runs migrations'))
+        ->addCommand(new Command($climate, 'rollback', 'Rolls back migrations'))
+    ;
 
-    $climate->info('Migres - The PostgreSQL migration tool');
+    $binary->renderHelp();
 
-    $climate->br();
-
-    $climate->info('Usage:');
-
-    $climate->out('migres init');
-    $climate->out('migres create MyNewMigration');
-    $climate->out('migres migrate [-t migration]');
-    $climate->out('migres rollback [-t migration]');
-
-    $climate->br();
-
-    $climate->info('Commands:');
-    $climate->out('    help, h');
-    $climate->out('        Shows this information');
-    $climate->out('    init');
-    $climate->out('        Runs the configuration wizard');
-    $climate->out('    create');
-    $climate->out('        Creates a new migration');
-    $climate->out('    migrate');
-    $climate->out('        Runs migrations');
-    $climate->out('    rollback');
-    $climate->out('        Rolls back migrations');
-
-    exit(1);
+    exit(0);
 }
 
 if ($argv[1] === 'init') {
