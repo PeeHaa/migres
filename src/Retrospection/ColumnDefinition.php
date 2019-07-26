@@ -40,6 +40,9 @@ final class ColumnDefinition
         $this->numericScale          = $numericScale;
     }
 
+    /**
+     * @param array<string,mixed> $record
+     */
     public static function fromInformationSchemaRecord(array $record): self
     {
         return new self(

@@ -14,7 +14,7 @@ final class Sequence
         return sprintf(
             "nextval('%s_%s_seq'::regclass)",
             $columnInformation->getTableName(),
-            $columnInformation->getColumnName()
+            $columnInformation->getColumnName(),
         );
     }
 }

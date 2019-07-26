@@ -64,6 +64,7 @@ final class Retrospector
         //    return new RenameColumn($action->getNewName(), $action->getOldName());
         //}
         var_dump($action);
+
         throw new IrreversibleAction(get_class($action));
     }
 
@@ -92,7 +93,7 @@ final class Retrospector
         $columnInformation = new ColumnInformation(
             $tableName,
             $columnName,
-            ColumnDefinition::fromInformationSchemaRecord($columnDefinition)
+            ColumnDefinition::fromInformationSchemaRecord($columnDefinition),
         );
 
         $dataType = $this->dataTypeResolver->resolve($columnInformation);

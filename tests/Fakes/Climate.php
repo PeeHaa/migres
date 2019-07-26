@@ -6,6 +6,7 @@ use League\CLImate\CLImate as ClimateImpl;
 
 class Climate extends ClimateImpl
 {
+    // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
     public function info(string $content): self
     {
         return $this;

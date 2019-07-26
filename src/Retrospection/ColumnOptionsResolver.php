@@ -45,11 +45,7 @@ final class ColumnOptionsResolver
             return false;
         }
 
-        if ($columnInformation->getColumnDefinition()->getDefaultValue() === null) {
-            return false;
-        }
-
-        return true;
+        return $columnInformation->getColumnDefinition()->getDefaultValue() !== null;
     }
 
     /**

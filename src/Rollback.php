@@ -33,6 +33,10 @@ final class Rollback
         $this->queries            = $queries;
     }
 
+    /**
+     * @param array<string,mixed> $logRecord
+     * @throws \Exception
+     */
     public static function fromLogRecord(array $logRecord): self
     {
         return new self(
