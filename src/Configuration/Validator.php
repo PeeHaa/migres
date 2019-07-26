@@ -28,7 +28,7 @@ final class Validator
 
     private function validateConfigurationKeys(array $configuration): bool
     {
-        foreach (['version', 'migrationPath', 'namespace', 'database'] as $requiredKey) {
+        foreach (['migrationPath', 'namespace', 'database'] as $requiredKey) {
             if (!array_key_exists($requiredKey, $configuration)) {
                 return false;
             }
