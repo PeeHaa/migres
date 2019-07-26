@@ -6,7 +6,5 @@ use PeeHaa\Migres\Migration\Actions;
 
 interface Migration
 {
-    public function up(): Actions;
-
-    public function down(): Actions;
+    public function getActions(): Actions;
 }

@@ -21,7 +21,6 @@ use PeeHaa\Migres\Constraint\Index;
 use PeeHaa\Migres\Constraint\NotNull;
 use PeeHaa\Migres\DataType\Factory;
 use PeeHaa\Migres\Migration\Actions;
-use PeeHaa\Migres\Migration\Migrations;
 use PeeHaa\Migres\Migration\Table\Change;
 use PeeHaa\Migres\Migration\Table\Create;
 use PeeHaa\Migres\Migration\Table\Migration;
@@ -181,7 +180,7 @@ final class Table
     /**
      * @internal
      */
-    public function up(): Actions
+    public function getActions(): Actions
     {
         if ($this->migration === null) {
             // @todo: log warning
@@ -189,21 +188,7 @@ final class Table
             return new Actions($this->name);
         }
 
-        return $this->migration->up();
-    }
-
-    /**
-     * @internal
-     */
-    public function down(Migrations $migrations): Actions
-    {
-        if ($this->migration === null) {
-            // @todo: log warning
-
-            return new Actions($this->name);
-        }
-
-        return $this->migration->down($migrations);
+        return $this->migration->getActions();
     }
 
     /**

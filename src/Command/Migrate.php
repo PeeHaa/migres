@@ -67,6 +67,7 @@ final class Migrate implements Command
                 }
             }
         } catch (\Throwable $e) {
+            var_dump($e);
             var_dump($e->getMessage());
         }
     }
@@ -235,6 +236,6 @@ final class Migrate implements Command
 
         $migration->change();
 
-        return $migration->up();
+        return $migration->getActions();
     }
 }
