@@ -2,7 +2,9 @@
 
 namespace PeeHaa\Migres\Migration;
 
-final class TableActions
+use PeeHaa\Migres\Action\Action;
+
+final class TableActions implements \Iterator
 {
     private string $tableName;
 
@@ -24,8 +26,28 @@ final class TableActions
         return $this->actions;
     }
 
-    public function reverse(): self
+    public function current(): Action
     {
-        return new self($this->tableName, $this->actions->reverse());
+        return $this->actions->current();
+    }
+
+    public function next(): void
+    {
+        $this->actions->next();
+    }
+
+    public function key(): ?int
+    {
+        return $this->actions->key();
+    }
+
+    public function valid(): bool
+    {
+        return $this->actions->valid();
+    }
+
+    public function rewind(): void
+    {
+        $this->actions->rewind();
     }
 }

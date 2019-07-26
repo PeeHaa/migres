@@ -12,17 +12,6 @@ final class MigrationActions implements \Iterator
         $this->actions = $actions;
     }
 
-    public function reverse(): self
-    {
-        $tableActions = [];
-
-        foreach (array_reverse($this->actions) as $tableAction) {
-            $tableActions[] = $tableAction->reverse();
-        }
-
-        return new self(...$tableActions);
-    }
-
     public function current(): TableActions
     {
         return current($this->actions);

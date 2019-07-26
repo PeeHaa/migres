@@ -20,11 +20,6 @@ final class Actions implements \Iterator
         $this->actions   = $actions;
     }
 
-    public function reverse(): self
-    {
-        return new self($this->tableName, ...array_reverse($this->actions));
-    }
-
     public function prepend(Action $action): void
     {
         array_unshift($this->actions, $action);
@@ -50,11 +45,6 @@ final class Actions implements \Iterator
         }
 
         array_splice($this->actions, $position, 0, [$action]);
-    }
-
-    public function findColumnStateBeforeAction(Action $action): Column
-    {
-
     }
 
     public function current()
