@@ -2,8 +2,6 @@
 
 namespace PeeHaa\Migres\Log;
 
-use PeeHaa\Migres\Rollback;
-
 final class Migration
 {
     private \PDO $dbConnection;
