@@ -51,7 +51,7 @@ final class Migration
             'fullyQualifiedName' => $item->getFullyQualifiedName(),
             'rollbackActions'    => json_encode($item->getRollbackQueries()),
             'createdAt'          => $item->getCreatedAt()->format('Y-m-d H:i:s'),
-            'executedAt'         => $item->getExecutedAt()->format('Y-m-d H:i:s'),
+            'executedAt'         => $item->getExecutedAt()->format('Y-m-d H:i:s.u'),
         ]);
     }
 
