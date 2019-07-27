@@ -11,3 +11,4 @@ Postgresql migration tool
 ## Requirements
 
 - PHP 7.4
+- PostgreSQL 9.5
