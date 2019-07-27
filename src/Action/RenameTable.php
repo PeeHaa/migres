@@ -16,6 +16,16 @@ final class RenameTable implements Action
         $this->newName      = $newName;
     }
 
+    public function getOriginalName(): string
+    {
+        return $this->originalName;
+    }
+
+    public function getNewName(): string
+    {
+        return $this->newName;
+    }
+
     public function toQueries(string $tableName): Queries
     {
         return new Queries(sprintf('ALTER TABLE "%s" RENAME TO "%s"', $this->originalName, $this->newName));

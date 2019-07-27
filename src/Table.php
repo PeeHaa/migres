@@ -29,6 +29,11 @@ final class Table
 {
     private Factory $dataTypeFactory;
 
+    // we need to keep track of the first defined name
+    // note: this might change after we changed the public API
+    // @todo
+    private string $originalName;
+
     private string $name;
 
     private Actions $actions;
@@ -39,8 +44,14 @@ final class Table
     {
         $this->dataTypeFactory = new Factory();
 
-        $this->name    = $name;
-        $this->actions = new Actions($name);
+        $this->originalName = $name;
+        $this->name         = $name;
+        $this->actions      = new Actions($name);
+    }
+
+    public function getOriginalName(): string
+    {
+        return $this->originalName;
     }
 
     public function getName(): string
@@ -167,14 +178,14 @@ final class Table
 
     public function create(): void
     {
-        $this->actions->prepend(new CreateTable());
+        $this->actions->prepend(new CreateTable($this->originalName));
 
-        $this->migration = new Create($this->name, $this->actions);
+        $this->migration = new Create($this->originalName, $this->actions);
     }
 
     public function change(): void
     {
-        $this->migration = new Change($this->name, $this->actions);
+        $this->migration = new Change($this->originalName, $this->actions);
     }
 
     /**

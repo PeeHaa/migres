@@ -14,6 +14,7 @@ use PeeHaa\Migres\Action\RemoveColumn;
 use PeeHaa\Migres\Action\RemoveConstraint;
 use PeeHaa\Migres\Action\RemoveIndex;
 use PeeHaa\Migres\Action\RenameColumn;
+use PeeHaa\Migres\Action\RenameTable;
 use PeeHaa\Migres\Action\ReverseAction;
 use PeeHaa\Migres\Column;
 use PeeHaa\Migres\Exception\IrreversibleAction;
@@ -36,10 +37,10 @@ final class Retrospector
         $this->columnOptionsResolver = $columnOptionsResolver;
     }
 
-    public function getReverseAction(string $tableName, Action $action): ReverseAction
+    public function getReverseAction(string $originalTableName, string $tableName, Action $action): ReverseAction
     {
         if ($action instanceof CreateTable) {
-            return new ReverseAction($tableName, new DropTable());
+            return new ReverseAction($originalTableName, new DropTable());
         }
 
         if ($action instanceof AddColumn) {
@@ -58,6 +59,10 @@ final class Retrospector
             return new ReverseAction($tableName, new RenameColumn($action->getNewName(), $action->getOldName()));
         }
 
+        if ($action instanceof RenameTable) {
+            return new ReverseAction($tableName, new RenameTable($action->getNewName(), $action->getOriginalName()));
+        }
+
         if ($action instanceof AddIndex) {
             return new RemoveIndex($action->getIndex()->getName());
         }
@@ -69,10 +74,6 @@ final class Retrospector
         if ($action instanceof AddPrimaryKey) {
             return new RemoveConstraint($action->getCombinedPrimaryKey()->getName());
         }
-
-        //if ($action instanceof RenameColumn) {
-        //    return new RenameColumn($action->getNewName(), $action->getOldName());
-        //}
         var_dump($action);
 
         throw new IrreversibleAction(get_class($action));

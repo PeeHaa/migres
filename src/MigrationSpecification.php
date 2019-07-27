@@ -30,7 +30,7 @@ abstract class MigrationSpecification
 
         /** @var Table $table */
         foreach ($this->tables as $table) {
-            $actionsToRun[] = new TableActions($table->getName(), $table->getActions());
+            $actionsToRun[] = new TableActions($table->getOriginalName(), $table->getName(), $table->getActions());
         }
 
         return new MigrationActions(...$actionsToRun);

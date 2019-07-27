@@ -6,24 +6,28 @@ use PeeHaa\Migres\Action\Action;
 
 final class TableActions implements \Iterator
 {
+    private string $originalTableName;
+
     private string $tableName;
 
     private Actions $actions;
 
-    public function __construct(string $tableName, Actions $actions)
+    public function __construct(string $originalTableName, string $tableName, Actions $actions)
     {
-        $this->tableName = $tableName;
-        $this->actions   = $actions;
+        //var_dump($tableName . '!!!!!');
+        $this->originalTableName = $originalTableName;
+        $this->tableName         = $tableName;
+        $this->actions           = $actions;
+    }
+
+    public function getOriginalTableName(): string
+    {
+        return $this->originalTableName;
     }
 
     public function getTableName(): string
     {
         return $this->tableName;
-    }
-
-    public function getActions(): Actions
-    {
-        return $this->actions;
     }
 
     public function current(): Action

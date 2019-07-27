@@ -63,7 +63,7 @@ final class Migrate implements Command
 
                     /** @var Action $action */
                     foreach ($tableActions as $action) {
-                        $migrationReversions[] = $this->retrospector->getReverseAction($tableActions->getTableName(), $action);
+                        $migrationReversions[] = $this->retrospector->getReverseAction($tableActions->getOriginalTableName(), $tableActions->getTableName(), $action);
 
                         foreach ($action->toQueries($tableActions->getTableName()) as $query) {
                             $this->output->runQuery($query);
