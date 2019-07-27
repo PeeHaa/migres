@@ -6,6 +6,7 @@ use PeeHaa\Migres\Action\Action;
 use PeeHaa\Migres\Action\AddColumn;
 use PeeHaa\Migres\Action\AddConstraint;
 use PeeHaa\Migres\Action\AddIndex;
+use PeeHaa\Migres\Action\AddIndexByQuery;
 use PeeHaa\Migres\Action\AddPrimaryKey;
 use PeeHaa\Migres\Action\ChangeColumn;
 use PeeHaa\Migres\Action\CreateTable;
@@ -18,6 +19,7 @@ use PeeHaa\Migres\Action\RenameTable;
 use PeeHaa\Migres\Action\ReverseAction;
 use PeeHaa\Migres\Column;
 use PeeHaa\Migres\Constraint\CombinedPrimaryKey;
+use PeeHaa\Migres\Constraint\CombinedUnique;
 use PeeHaa\Migres\Constraint\Constraint;
 use PeeHaa\Migres\Exception\IrreversibleAction;
 
@@ -81,6 +83,10 @@ final class Retrospector
             return new ReverseAction($tableName, $this->getCurrentConstraintDefinition($tableName, $action->getName()));
         }
 
+        if ($action instanceof RemoveIndex) {
+            return new ReverseAction($tableName, $this->getCurrentConstraintDefinition($tableName, $action->getName()));
+        }
+
         var_dump($action);
 
         throw new IrreversibleAction(get_class($action));
@@ -134,8 +140,8 @@ final class Retrospector
                 information_schema.table_constraints
                 JOIN information_schema.key_column_usage ON table_constraints.constraint_name = key_column_usage.constraint_name
                 JOIN information_schema.constraint_column_usage ON constraint_column_usage.constraint_name = table_constraints.constraint_name
-            WHERE table_constraints.table_name = :tableName
-                AND table_constraints.constraint_name = :constraintName
+                WHERE table_constraints.table_name = :tableName
+                    AND table_constraints.constraint_name = :constraintName
         ';
 
         $statement = $this->dbConnection->prepare($sql);
@@ -147,17 +153,11 @@ final class Retrospector
 
         $constraintInfo = $statement->fetchAll();
 
-        if (!$constraintInfo) {
-            throw new \Exception('Could not find current constraint definition');
+        if (isset($constraintInfo[0]) && $constraintInfo[0]['constraint_type']) {
+            return new AddPrimaryKey($this->getPrimaryKeyConstraint($constraintInfo));
         }
 
-        switch ($constraintInfo[0]['constraint_type']) {
-            case 'PRIMARY KEY':
-                return new AddPrimaryKey($this->getPrimaryKeyConstraint($constraintInfo));
-
-            default:
-                throw new \Exception('Unsupported constraint');
-        }
+        return new AddIndexByQuery($this->getIndexQuery($tableName, $constraintName));
     }
 
     private function getPrimaryKeyConstraint(array $constraintInfo): CombinedPrimaryKey
@@ -169,5 +169,41 @@ final class Retrospector
         }
 
         return new CombinedPrimaryKey($constraintInfo[0]['constraint_name'], ...array_unique($columns));
+    }
+
+    private function getIndex(array $constraintInfo): CombinedUnique
+    {
+        $columns = [];
+
+        foreach ($constraintInfo as $constraintRecord) {
+            $columns[] = $constraintRecord['column_name'];
+        }
+
+        return new CombinedUnique($constraintInfo[0]['constraint_name'], ...array_unique($columns));
+    }
+
+    private function getIndexQuery(string $tableName, string $constraintName): string
+    {
+        $sql = '
+            SELECT indexdef
+            FROM pg_indexes
+            WHERE tablename = :tableName
+              AND indexname = :indexName
+        ';
+
+        $statement = $this->dbConnection->prepare($sql);
+
+        $statement->execute([
+            'tableName' => $tableName,
+            'indexName' => $constraintName,
+        ]);
+
+        $indexInformation = $statement->fetchColumn(0);
+
+        if (!$indexInformation) {
+            throw new \Exception('Could not find current constraint definition');
+        }
+
+        return $indexInformation;
     }
 }
