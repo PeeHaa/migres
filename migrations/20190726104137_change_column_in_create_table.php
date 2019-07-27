@@ -11,6 +11,12 @@ class ChangeColumnInCreateTable extends MigrationSpecification
         $this->table('change_column_in_create_table')
             ->addColumn('change_type', 'integer')
             ->changeColumn('change_type', 'bigint')
+            ->addColumn('change_to_not_null', 'integer')
+            ->changeColumn('change_to_not_null', 'integer', ['null' => false])
+            ->addColumn('change_to_null', 'integer', ['null' => false])
+            ->changeColumn('change_to_null', 'integer')
+            ->addColumn('change_to_default', 'integer')
+            ->changeColumn('change_to_default', 'integer', ['default' => 42])
             ->create()
         ;
     }

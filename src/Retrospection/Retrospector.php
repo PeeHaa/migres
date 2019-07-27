@@ -7,6 +7,7 @@ use PeeHaa\Migres\Action\AddColumn;
 use PeeHaa\Migres\Action\AddConstraint;
 use PeeHaa\Migres\Action\AddIndex;
 use PeeHaa\Migres\Action\AddPrimaryKey;
+use PeeHaa\Migres\Action\ChangeColumn;
 use PeeHaa\Migres\Action\CreateTable;
 use PeeHaa\Migres\Action\DropTable;
 use PeeHaa\Migres\Action\RemoveColumn;
@@ -46,6 +47,10 @@ final class Retrospector
 
         if ($action instanceof RemoveColumn) {
             return new ReverseAction($tableName, new AddColumn($this->getCurrentColumnDefinition($tableName, $action->getName())));
+        }
+
+        if ($action instanceof ChangeColumn) {
+            return new ReverseAction($tableName, new ChangeColumn($this->getCurrentColumnDefinition($tableName, $action->getName())));
         }
 
         if ($action instanceof AddIndex) {

@@ -14,9 +14,9 @@ final class ChangeColumn implements Action
         $this->column = $column;
     }
 
-    public function getColumn(): Column
+    public function getName(): string
     {
-        return $this->column;
+        return $this->column->getName();
     }
 
     public function toQueries(string $tableName): Queries
