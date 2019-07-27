@@ -26,7 +26,11 @@ final class VerbosityLevel
     public static function fromCliArguments(array $arguments): self
     {
         foreach (array_reverse($arguments) as $argument) {
-            if (!preg_match('~^-v{1,3}$~', $argument)) {
+            if ($argument === '-q') {
+                return new self(self::VERBOSITY_LEVEL_0);
+            }
+
+            if (!preg_match('~^{1,3}$~', $argument)) {
                 continue;
             }
 
