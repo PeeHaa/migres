@@ -4,10 +4,12 @@ namespace PeeHaa\Migres\Command;
 
 use League\CLImate\CLImate;
 use PeeHaa\Migres\Action\Action;
-use PeeHaa\Migres\Action\ReverseAction;
+use PeeHaa\Migres\Cli\Output;
 use PeeHaa\Migres\Configuration\Configuration;
 use PeeHaa\Migres\Exception\InvalidFilename;
+use PeeHaa\Migres\Log\Item;
 use PeeHaa\Migres\Migration;
+use PeeHaa\Migres\Log\Migration as MigrationLog;
 use PeeHaa\Migres\Migration\MigrationActions;
 use PeeHaa\Migres\Migration\Migrations;
 use PeeHaa\Migres\MigrationSpecification;
@@ -19,14 +21,26 @@ final class Migrate implements Command
 
     private \PDO $dbConnection;
 
+    private Output $output;
+
+    private MigrationLog $migrationLog;
+
     private Retrospector $retrospector;
 
     private CLImate $logger;
 
-    public function __construct(Configuration $configuration, \PDO $dbConnection, Retrospector $retrospector, CLImate $logger)
-    {
+    public function __construct(
+        Configuration $configuration,
+        \PDO $dbConnection,
+        Output $output,
+        MigrationLog $migrationLog,
+        Retrospector $retrospector,
+        CLImate $logger
+    ) {
         $this->configuration = $configuration;
         $this->dbConnection  = $dbConnection;
+        $this->output        = $output;
+        $this->migrationLog  = $migrationLog;
         $this->retrospector  = $retrospector;
         $this->logger        = $logger;
     }
@@ -34,18 +48,16 @@ final class Migrate implements Command
     public function run(): void
     {
         try {
-            if (!$this->doesMigrationLogExist()) {
-                $this->createMigrationLog();
-            }
+            $this->migrationLog->createTableWhenNotExists();
 
             /** @var Migration $migration */
             foreach ($this->getMigrations() as $migration) {
-                echo sprintf('Starting migration: %s' . PHP_EOL, $migration->getName());
+                $this->output->startMigration($migration->getName());
 
                 $migrationReversions = [];
 
                 foreach ($migration->getActions() as $tableActions) {
-                    echo sprintf('Starting migration for table: %s' . PHP_EOL, $tableActions->getTableName());
+                    $this->output->startTableMigration($tableActions->getTableName());
 
                     $this->dbConnection->beginTransaction();
 
@@ -54,92 +66,26 @@ final class Migrate implements Command
                         $migrationReversions[] = $this->retrospector->getReverseAction($tableActions->getTableName(), $action);
 
                         foreach ($action->toQueries($tableActions->getTableName()) as $query) {
-                            $this->logger->info(sprintf('%s;' . PHP_EOL, $query));
+                            $this->output->runQuery($query);
 
                             $this->dbConnection->exec($query);
                         }
                     }
 
-                    // store rollback actions
-                    $this->writeToLog($migration, array_reverse($migrationReversions));
+                    $this->migrationLog->write(Item::fromMigration($migration, ...array_reverse($migrationReversions)));
 
                     $this->dbConnection->commit();
                 }
             }
         } catch (\Throwable $e) {
-            var_dump($e);
-            var_dump($e->getMessage());
-        }
-    }
-
-    private function doesMigrationLogExist(): bool
-    {
-        $sql = '
-            SELECT EXISTS (
-                SELECT 1
-                FROM information_schema.tables 
-                WHERE table_catalog = :schemaName
-                AND table_name = :tableName
-            );
-        ';
-
-        $statement = $this->dbConnection->prepare($sql);
-
-        $statement->execute([
-            'schemaName' => $this->configuration->getDatabaseConfiguration()->getName(),
-            'tableName'  => 'migres_log',
-        ]);
-
-        return $statement->fetchColumn(0);
-    }
-
-    private function createMigrationLog(): void
-    {
-        $sql = '
-            CREATE TABLE migres_log (
-                id serial PRIMARY KEY,
-                name character varying(255) NOT NULL,
-                filename character varying (255) NOT NULL,
-                fully_qualified_name character varying (255) NOT NULL,
-                "timestamp" timestamp without time zone NOT NULL,
-                execution  timestamp without time zone NOT NULL DEFAULT NOW(),
-                rollback_actions jsonb NOT NULL,
-                UNIQUE (name),
-                UNIQUE (filename),
-                UNIQUE (fully_qualified_name)
-            )
-        ';
-
-        $this->dbConnection->exec($sql);
-    }
-
-    private function writeToLog(Migration $migration, array $rollbackActions): void
-    {
-        $queries = [];
-
-        /** @var ReverseAction $rollbackAction */
-        foreach ($rollbackActions as $rollbackAction) {
-            foreach ($rollbackAction->toQueries() as $query) {
-                $queries[] = $query;
+            if ($this->dbConnection->inTransaction()) {
+                $this->dbConnection->rollBack();
             }
+
+            $this->output->error($e->getMessage());
+
+            exit(1);
         }
-
-        $sql = '
-            INSERT INTO migres_log
-                (name, filename, fully_qualified_name, "timestamp", rollback_actions)
-            VALUES
-                (:name, :filename, :fullyQualifiedName, :timestamp, :rollbackActions)
-        ';
-
-        $statement = $this->dbConnection->prepare($sql);
-
-        $statement->execute([
-            'name'               => $migration->getName(),
-            'filename'           => $migration->getFilename(),
-            'fullyQualifiedName' => $migration->getFullyQualifiedName(),
-            'timestamp'          => $migration->getTimestamp()->format('Y-m-d H:i:s'),
-            'rollbackActions'    => json_encode($queries),
-        ]);
     }
 
     private function getMigrations(): Migrations

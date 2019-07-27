@@ -16,33 +16,40 @@ final class Migration
         $sql = '
             CREATE TABLE IF NOT EXISTS "migres_log" (
                 id uuid CONSTRAINT pk_migres_log PRIMARY KEY,
-                name varchar(255) CONSTRAINT uniq_migres_log_name UNIQUE,
+                name character varying(255) NOT NULL CONSTRAINT uniq_migres_log_name UNIQUE,
+                filename character varying (255) NOT NULL CONSTRAINT uniq_migres_log_filename UNIQUE,
+                fully_qualified_name character varying (255) NOT NULL CONSTRAINT uniq_migres_log_fqn UNIQUE,
+                rollback_actions jsonb NOT NULL,
                 created_at timestamp without time zone NOT NULL,
-                executed_at timestamp without time zone NOT NULL,
-                rollback_actions text NOT NULL,
+                executed_at timestamp without time zone NOT NULL DEFAULT NOW(),
                 CONSTRAINT uniq_name_and_created_at UNIQUE (name, created_at)
             )
         ';
 
         $this->dbConnection->exec($sql);
+
+        $this->dbConnection->exec('CREATE INDEX IF NOT EXISTS idx_migres_log_executed_at_asc ON migres_log(executed_at ASC)');
+        $this->dbConnection->exec('CREATE INDEX IF NOT EXISTS idx_migres_log_executed_at_desc ON migres_log(executed_at DESC)');
     }
 
     public function write(Item $item): void
     {
         $sql = '
             INSERT INTO migres_log
-                (id, name, created_at, executed_at, rollback_actions)
+                (id, name, filename, fully_qualified_name, rollback_actions, created_at, executed_at)
             VALUES
-                (:id, :name, :created_at, :executed_at, :rollback_actions)
+                (:id, :name, :filename, :fullyQualifiedName, :rollbackActions, :createdAt, :executedAt)
         ';
 
         $statement = $this->dbConnection->prepare($sql);
         $statement->execute([
-            'id'               => $item->getId(),
-            'name'             => $item->getName(),
-            'created_at'       => $item->getCreatedAt()->format('Y-m-d H:i:s'),
-            'executed_at'      => $item->getExecutedAt()->format('Y-m-d H:i:s'),
-            'rollback_actions' => serialize($item->getRollbackActions()),
+            'id'                 => $item->getId(),
+            'name'               => $item->getName(),
+            'filename'           => $item->getFilename(),
+            'fullyQualifiedName' => $item->getFullyQualifiedName(),
+            'rollbackActions'    => json_encode($item->getRollbackQueries()),
+            'createdAt'          => $item->getCreatedAt()->format('Y-m-d H:i:s'),
+            'executedAt'         => $item->getExecutedAt()->format('Y-m-d H:i:s'),
         ]);
     }
 }

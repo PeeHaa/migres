@@ -6,13 +6,16 @@ namespace PeeHaa\Migres\Bin;
 use League\CLImate\CLImate;
 use PeeHaa\Migres\Cli\Binary;
 use PeeHaa\Migres\Cli\Command;
+use PeeHaa\Migres\Cli\Output;
 use PeeHaa\Migres\Cli\Usage;
+use PeeHaa\Migres\Cli\VerbosityLevel;
 use PeeHaa\Migres\Command\CreateNewMigration;
 use PeeHaa\Migres\Command\SetUp;
 use PeeHaa\Migres\Command\Migrate;
 use PeeHaa\Migres\Command\Rollback;
 use PeeHaa\Migres\Configuration\Configuration;
 use PeeHaa\Migres\Configuration\Validator;
+use PeeHaa\Migres\Log\Migration as MigrationLog;
 use PeeHaa\Migres\Retrospection\ColumnOptionsResolver;
 use PeeHaa\Migres\Retrospection\DataTypeResolver;
 use PeeHaa\Migres\Retrospection\Retrospector;
@@ -72,6 +75,8 @@ if ($argv[1] === 'migrate') {
     (new Migrate(
         Configuration::fromArray(require getcwd() . '/migres.php'),
         $dbConnection,
+        new Output($climate, VerbosityLevel::fromCliArguments($argv)),
+        new MigrationLog($dbConnection),
         new Retrospector($dbConnection, new DataTypeResolver(new Sequence()), new ColumnOptionsResolver(new Sequence())),
         $climate,
     ))->run();

@@ -2,7 +2,8 @@
 
 namespace PeeHaa\Migres\Log;
 
-use PeeHaa\Migres\Migration\Actions;
+use PeeHaa\Migres\Action\ReverseAction;
+use PeeHaa\Migres\Migration;
 
 final class Item
 {
@@ -10,24 +11,61 @@ final class Item
 
     private string $name;
 
+    private string $filename;
+
+    private string $fullyQualifiedName;
+
+    /** @var array<int,string> */
+    private array $rollbackQueries;
+
     private \DateTimeImmutable $createdAt;
 
     private \DateTimeImmutable $executedAt;
 
-    private Actions $rollbackActions = [];
-
-    public function __construct(
+    private function __construct(
         string $id,
         string $name,
+        string $filename,
+        string $fullyQualifiedName,
+        array $rollbackQueries,
         \DateTimeImmutable $createdAt,
-        \DateTimeImmutable $executedAt,
-        Actions $rollbackActions
+        \DateTimeImmutable $executedAt
     ) {
-        $this->id              = $id;
-        $this->name            = $name;
-        $this->createdAt       = $createdAt;
-        $this->executedAt      = $executedAt;
-        $this->rollbackActions = $rollbackActions;
+        $this->id                 = $id;
+        $this->name               = $name;
+        $this->filename           = $filename;
+        $this->fullyQualifiedName = $fullyQualifiedName;
+        $this->rollbackQueries    = $rollbackQueries;
+        $this->createdAt          = $createdAt;
+        $this->executedAt         = $executedAt;
+    }
+
+    public static function fromMigration(Migration $migration, ReverseAction ...$reverseActions): self
+    {
+        $data = random_bytes(16);
+
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
+
+        $id = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+
+        $queries = [];
+
+        foreach ($reverseActions as $reverseAction) {
+            foreach ($reverseAction->toQueries() as $query) {
+                $queries[] = $query;
+            }
+        }
+
+        return new self(
+            $id,
+            $migration->getName(),
+            $migration->getFilename(),
+            $migration->getFullyQualifiedName(),
+            $queries,
+            $migration->getTimestamp(),
+            new \DateTimeImmutable(),
+        );
     }
 
     /**
@@ -54,6 +92,24 @@ final class Item
         return $this->name;
     }
 
+    public function getFilename(): string
+    {
+        return $this->filename;
+    }
+
+    public function getFullyQualifiedName(): string
+    {
+        return $this->fullyQualifiedName;
+    }
+
+    /**
+     * @return array<int,string>
+     */
+    public function getRollbackQueries(): array
+    {
+        return $this->rollbackQueries;
+    }
+
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
@@ -62,10 +118,5 @@ final class Item
     public function getExecutedAt(): \DateTimeImmutable
     {
         return $this->executedAt;
-    }
-
-    public function getRollbackActions(): Actions
-    {
-        return $this->rollbackActions;
     }
 }
