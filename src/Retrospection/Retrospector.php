@@ -11,6 +11,7 @@ use PeeHaa\Migres\Action\AddPrimaryKey;
 use PeeHaa\Migres\Action\ChangeColumn;
 use PeeHaa\Migres\Action\CreateTable;
 use PeeHaa\Migres\Action\DropTable;
+use PeeHaa\Migres\Action\RemoveCheck;
 use PeeHaa\Migres\Action\RemoveColumn;
 use PeeHaa\Migres\Action\RemoveConstraint;
 use PeeHaa\Migres\Action\RemoveIndex;
@@ -18,9 +19,9 @@ use PeeHaa\Migres\Action\RenameColumn;
 use PeeHaa\Migres\Action\RenameTable;
 use PeeHaa\Migres\Action\ReverseAction;
 use PeeHaa\Migres\Column;
+use PeeHaa\Migres\Constraint\Check;
 use PeeHaa\Migres\Constraint\CombinedPrimaryKey;
 use PeeHaa\Migres\Constraint\CombinedUnique;
-use PeeHaa\Migres\Constraint\Constraint;
 use PeeHaa\Migres\Exception\IrreversibleAction;
 
 final class Retrospector
@@ -81,6 +82,10 @@ final class Retrospector
 
         if ($action instanceof RemoveConstraint) {
             return new ReverseAction($tableName, $this->getCurrentConstraintDefinition($tableName, $action->getName()));
+        }
+
+        if ($action instanceof RemoveCheck) {
+            return new ReverseAction($tableName, $this->getCurrentCheckDefinition($tableName, $action->getName()));
         }
 
         if ($action instanceof RemoveIndex) {
@@ -205,5 +210,31 @@ final class Retrospector
         }
 
         return $indexInformation;
+    }
+
+    private function getCurrentCheckDefinition(string $tableName, string $constraintName): AddConstraint
+    {
+        $sql = '
+            SELECT pg_constraint.consrc
+            FROM pg_catalog.pg_constraint
+            INNER JOIN pg_catalog.pg_class ON pg_class.oid = pg_constraint.conrelid
+            WHERE pg_class.relname = :tableName
+                AND pg_constraint.conname = :constraintName;
+        ';
+
+        $statement = $this->dbConnection->prepare($sql);
+
+        $statement->execute([
+            'tableName'      => $tableName,
+            'constraintName' => $constraintName,
+        ]);
+
+        $checkInformation = $statement->fetchColumn(0);
+
+        if (!$checkInformation) {
+            throw new \Exception('Could not find current check definition');
+        }
+
+        return new AddConstraint(new Check($constraintName, $checkInformation));
     }
 }

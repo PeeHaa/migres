@@ -9,6 +9,7 @@ use PeeHaa\Migres\Action\AddPrimaryKey;
 use PeeHaa\Migres\Action\ChangeColumn;
 use PeeHaa\Migres\Action\CreateTable;
 use PeeHaa\Migres\Action\DropTable;
+use PeeHaa\Migres\Action\RemoveCheck;
 use PeeHaa\Migres\Action\RemoveColumn;
 use PeeHaa\Migres\Action\RemoveConstraint;
 use PeeHaa\Migres\Action\RemoveIndex;
@@ -162,9 +163,16 @@ final class Table
         return $this;
     }
 
-    public function removeCheck(string $name): self
+    public function removeConstraint(string $name): self
     {
         $this->actions->add(new RemoveConstraint($name));
+
+        return $this;
+    }
+
+    public function removeCheck(string $name): self
+    {
+        $this->actions->add(new RemoveCheck($name));
 
         return $this;
     }

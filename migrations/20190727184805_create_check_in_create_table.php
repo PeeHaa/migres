@@ -11,6 +11,7 @@ class CreateCheckInCreateTable extends MigrationSpecification
         $this->table('create_check_in_create_table')
             ->addColumn('check', 'integer')
             ->addCheck('bigger_than_10', '"check" > 10')
+            ->removeCheck('bigger_than_10')
             ->create()
         ;
     }
