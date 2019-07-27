@@ -17,6 +17,8 @@ use PeeHaa\Migres\Action\RenameColumn;
 use PeeHaa\Migres\Action\RenameTable;
 use PeeHaa\Migres\Action\ReverseAction;
 use PeeHaa\Migres\Column;
+use PeeHaa\Migres\Constraint\CombinedPrimaryKey;
+use PeeHaa\Migres\Constraint\Constraint;
 use PeeHaa\Migres\Exception\IrreversibleAction;
 
 final class Retrospector
@@ -71,9 +73,14 @@ final class Retrospector
             return new ReverseAction($tableName, new RemoveIndex($action->getIndex()->getName()));
         }
 
-        //if ($action instanceof AddPrimaryKey) {
-        //    return new RemoveConstraint($action->getCombinedPrimaryKey()->getName());
-        //}
+        if ($action instanceof AddPrimaryKey) {
+            return new ReverseAction($tableName, new RemoveConstraint($action->getCombinedPrimaryKey()->getName()));
+        }
+
+        if ($action instanceof RemoveConstraint) {
+            return new ReverseAction($tableName, $this->getCurrentConstraintDefinition($tableName, $action->getName()));
+        }
+
         var_dump($action);
 
         throw new IrreversibleAction(get_class($action));
@@ -114,5 +121,53 @@ final class Retrospector
             $dataType,
             $this->columnOptionsResolver->resolve($dataType, $columnInformation),
         );
+    }
+
+    private function getCurrentConstraintDefinition(string $tableName, string $constraintName): Action
+    {
+        $sql = '
+            SELECT
+                table_constraints.constraint_name, constraint_type, table_constraints.table_name, key_column_usage.column_name, 
+                constraint_column_usage.table_name AS foreign_table_name,
+                constraint_column_usage.column_name AS foreign_column_name 
+            FROM 
+                information_schema.table_constraints
+                JOIN information_schema.key_column_usage ON table_constraints.constraint_name = key_column_usage.constraint_name
+                JOIN information_schema.constraint_column_usage ON constraint_column_usage.constraint_name = table_constraints.constraint_name
+            WHERE table_constraints.table_name = :tableName
+                AND table_constraints.constraint_name = :constraintName
+        ';
+
+        $statement = $this->dbConnection->prepare($sql);
+
+        $statement->execute([
+            'tableName'      => $tableName,
+            'constraintName' => $constraintName,
+        ]);
+
+        $constraintInfo = $statement->fetchAll();
+
+        if (!$constraintInfo) {
+            throw new \Exception('Could not find current constraint definition');
+        }
+
+        switch ($constraintInfo[0]['constraint_type']) {
+            case 'PRIMARY KEY':
+                return new AddPrimaryKey($this->getPrimaryKeyConstraint($constraintInfo));
+
+            default:
+                throw new \Exception('Unsupported constraint');
+        }
+    }
+
+    private function getPrimaryKeyConstraint(array $constraintInfo): CombinedPrimaryKey
+    {
+        $columns = [];
+
+        foreach ($constraintInfo as $constraintRecord) {
+            $columns[] = $constraintRecord['column_name'];
+        }
+
+        return new CombinedPrimaryKey($constraintInfo[0]['constraint_name'], ...array_unique($columns));
     }
 }
