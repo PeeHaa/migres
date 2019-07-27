@@ -90,9 +90,15 @@ final class Migrate implements Command
 
     private function getMigrations(): Migrations
     {
+        $executedMigrations = $this->migrationLog->getExecutedItems();
+
         $migrations = [];
 
         foreach ($this->getFiles() as $filePath => $filename) {
+            if (array_key_exists($filename, $executedMigrations)) {
+                continue;
+            }
+
             $migrations[] = new Migration(
                 $this->getName($filename),
                 $filePath,

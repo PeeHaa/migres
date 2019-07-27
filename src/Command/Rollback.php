@@ -33,7 +33,7 @@ final class Rollback implements Command
     {
         try {
             /** @var Item $rollback */
-            foreach ($this->migrationLog->getRollbacks() as $rollback) {
+            foreach ($this->migrationLog->getExecutedItems() as $rollback) {
                 $this->output->startRollback($rollback->getName());
 
                 $this->dbConnection->beginTransaction();

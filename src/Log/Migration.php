@@ -58,7 +58,7 @@ final class Migration
     /**
      * @return array<Item>
      */
-    public function getRollbacks(): array
+    public function getExecutedItems(): array
     {
         $sql = '
             SELECT id, name, filename, fully_qualified_name, rollback_actions, created_at, executed_at
@@ -71,7 +71,7 @@ final class Migration
         $rollbacks = [];
 
         foreach ($statement->fetchAll() as $record) {
-            $rollbacks[] = Item::fromLogRecord($record);
+            $rollbacks[basename($record['filename'])] = Item::fromLogRecord($record);
         }
 
         return $rollbacks;
