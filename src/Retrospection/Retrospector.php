@@ -63,17 +63,17 @@ final class Retrospector
             return new ReverseAction($tableName, new RenameTable($action->getNewName(), $action->getOriginalName()));
         }
 
-        if ($action instanceof AddIndex) {
-            return new RemoveIndex($action->getIndex()->getName());
-        }
-
         if ($action instanceof AddConstraint) {
-            return new RemoveConstraint($action->getConstraint()->getName());
+            return new ReverseAction($tableName, new RemoveConstraint($action->getConstraint()->getName()));
         }
 
-        if ($action instanceof AddPrimaryKey) {
-            return new RemoveConstraint($action->getCombinedPrimaryKey()->getName());
+        if ($action instanceof AddIndex) {
+            return new ReverseAction($tableName, new RemoveIndex($action->getIndex()->getName()));
         }
+
+        //if ($action instanceof AddPrimaryKey) {
+        //    return new RemoveConstraint($action->getCombinedPrimaryKey()->getName());
+        //}
         var_dump($action);
 
         throw new IrreversibleAction(get_class($action));
