@@ -6,6 +6,7 @@ namespace PeeHaa\Migres\Bin;
 use League\CLImate\CLImate;
 use PeeHaa\Migres\Cli\Binary;
 use PeeHaa\Migres\Cli\Command;
+use PeeHaa\Migres\Cli\Flag;
 use PeeHaa\Migres\Cli\Output;
 use PeeHaa\Migres\Cli\Usage;
 use PeeHaa\Migres\Cli\VerbosityLevel;
@@ -33,11 +34,14 @@ if (!isset($argv[1]) || in_array($argv[1], ['help', '-h', '--help'], true) || !i
         ->addUsage(new Usage($climate, 'migres create MyNewMigration'))
         ->addUsage(new Usage($climate, 'migres migrate [-t migration]'))
         ->addUsage(new Usage($climate, 'migres rollback [-t migration]'))
-        ->addCommand(new Command($climate, 'help', 'Shows this help information'))
         ->addCommand(new Command($climate, 'setup', 'Runs the configuration wizard'))
         ->addCommand(new Command($climate, 'create', 'Creates a new migration'))
-        ->addCommand(new Command($climate, 'migrate', 'Runs migrations'))
-        ->addCommand(new Command($climate, 'rollback', 'Rolls back migrations'))
+        ->addCommand(new Command($climate, 'migrate [-v|-vv|-vvv] [-q]', 'Runs migrations', '<green>-v</green> defines the verbosity level (defaults to 1)', '<green>-q</green> runs silent'))
+        ->addCommand(new Command($climate, 'rollback [-v|-vv|-vvv] [-q]', 'Rolls back migrations', '<green>-v</green> defines the verbosity level (defaults to 1)', '<green>-q</green> runs silent'))
+        ->addFlag(new Flag($climate, '-v', 'Default verbosity level (1)', 'Outputs the start of migrations and rollbacks'))
+        ->addFlag(new Flag($climate, '-vv', 'Verbosity level 2', 'Outputs everything from verbosity level 1 and also outputs the start of table actions inside migrations / rollbacks'))
+        ->addFlag(new Flag($climate, '-vvv', 'Verbosity level 3', 'Outputs everything from verbosity level 2 and also outputs all queries being run'))
+        ->addFlag(new Flag($climate, '-q', 'Silent mode', 'Does not output anything but errors'))
     ;
 
     $binary->renderHelp();

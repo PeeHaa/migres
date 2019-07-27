@@ -16,6 +16,9 @@ final class Binary
     /** @var array<Command> */
     private array $commands = [];
 
+    /** @var array<Flag> */
+    private array $flags = [];
+
     public function __construct(CLImate $climate, string $title)
     {
         $this->climate = $climate;
@@ -36,6 +39,13 @@ final class Binary
         return $this;
     }
 
+    public function addFlag(Flag $flag): self
+    {
+        $this->flags[] = $flag;
+
+        return $this;
+    }
+
     public function renderHelp(): void
     {
         $this->climate->br();
@@ -51,5 +61,11 @@ final class Binary
         $this->climate->br();
 
         array_map(fn(Command $command) => $command->render(), $this->commands);
+
+        $this->climate->br();
+        $this->climate->info('Flags:');
+        $this->climate->br();
+
+        array_map(fn(Flag $flag) => $flag->render(), $this->flags);
     }
 }
