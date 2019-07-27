@@ -13,6 +13,7 @@ use PeeHaa\Migres\Action\DropTable;
 use PeeHaa\Migres\Action\RemoveColumn;
 use PeeHaa\Migres\Action\RemoveConstraint;
 use PeeHaa\Migres\Action\RemoveIndex;
+use PeeHaa\Migres\Action\RenameColumn;
 use PeeHaa\Migres\Action\ReverseAction;
 use PeeHaa\Migres\Column;
 use PeeHaa\Migres\Exception\IrreversibleAction;
@@ -51,6 +52,10 @@ final class Retrospector
 
         if ($action instanceof ChangeColumn) {
             return new ReverseAction($tableName, new ChangeColumn($this->getCurrentColumnDefinition($tableName, $action->getName())));
+        }
+
+        if ($action instanceof RenameColumn) {
+            return new ReverseAction($tableName, new RenameColumn($action->getNewName(), $action->getOldName()));
         }
 
         if ($action instanceof AddIndex) {
