@@ -69,16 +69,18 @@ final class Item
     }
 
     /**
-     * @param array<string,mixed> $record
+     * @param array<string,mixed> $logRecord
      */
-    public function fromRecord(array $record): self
+    public static function fromLogRecord(array $logRecord): self
     {
         return new self(
-            $record['id'],
-            $record['name'],
-            new \DateTimeImmutable($record['created_at']),
-            new \DateTimeImmutable($record['executed_at']),
-            unserialize($record['rollback_actions']),
+            $logRecord['id'],
+            $logRecord['name'],
+            $logRecord['filename'],
+            $logRecord['fully_qualified_name'],
+            json_decode($logRecord['rollback_actions'], true),
+            new \DateTimeImmutable($logRecord['created_at']),
+            new \DateTimeImmutable($logRecord['executed_at']),
         );
     }
 

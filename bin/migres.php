@@ -92,6 +92,8 @@ if ($argv[1] === 'rollback') {
     (new Rollback(
         Configuration::fromArray(require getcwd() . '/migres.php'),
         createDatabaseConnectionFromConfiguration(require getcwd() . '/migres.php'),
+        new Output($climate, VerbosityLevel::fromCliArguments($argv)),
+        new MigrationLog($dbConnection),
     ))->run();
 
     exit(0);

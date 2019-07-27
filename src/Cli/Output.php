@@ -23,7 +23,17 @@ final class Output
         }
 
         $this->climate->br();
-        $this->climate->info(sprintf('Starting migration: %s', $name));
+        $this->climate->info(sprintf('Running migration: %s', $name));
+    }
+
+    public function startRollback(string $name): void
+    {
+        if (!$this->verbosityLevel->hasLevel(VerbosityLevel::VERBOSITY_LEVEL_1)) {
+            return;
+        }
+
+        $this->climate->br();
+        $this->climate->info(sprintf('Running rollback of: %s', $name));
     }
 
     public function startTableMigration(string $name): void
@@ -33,7 +43,7 @@ final class Output
         }
 
         $this->climate->br();
-        $this->climate->info(sprintf('  Starting migration for table: %s', $name));
+        $this->climate->info(sprintf('  Running migration for table: %s', $name));
     }
 
     public function runQuery(string $query): void

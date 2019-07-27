@@ -30,7 +30,7 @@ final class VerbosityLevel
                 return new self(self::VERBOSITY_LEVEL_0);
             }
 
-            if (!preg_match('~^{1,3}$~', $argument)) {
+            if (!preg_match('~^-v{1,3}$~', $argument)) {
                 continue;
             }
 

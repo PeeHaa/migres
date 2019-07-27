@@ -2,6 +2,8 @@
 
 namespace PeeHaa\Migres\Log;
 
+use PeeHaa\Migres\Rollback;
+
 final class Migration
 {
     private \PDO $dbConnection;
@@ -50,6 +52,42 @@ final class Migration
             'rollbackActions'    => json_encode($item->getRollbackQueries()),
             'createdAt'          => $item->getCreatedAt()->format('Y-m-d H:i:s'),
             'executedAt'         => $item->getExecutedAt()->format('Y-m-d H:i:s'),
+        ]);
+    }
+
+    /**
+     * @return array<Item>
+     */
+    public function getRollbacks(): array
+    {
+        $sql = '
+            SELECT id, name, filename, fully_qualified_name, rollback_actions, created_at, executed_at
+            FROM migres_log
+            ORDER BY executed_at DESC
+        ';
+
+        $statement = $this->dbConnection->query($sql);
+
+        $rollbacks = [];
+
+        foreach ($statement->fetchAll() as $record) {
+            $rollbacks[] = Item::fromLogRecord($record);
+        }
+
+        return $rollbacks;
+    }
+
+    public function removeEntry(string $id): void
+    {
+        $sql = '
+            DELETE FROM migres_log
+            WHERE id = :id
+        ';
+
+        $statement = $this->dbConnection->prepare($sql);
+
+        $statement->execute([
+            'id' => $id,
         ]);
     }
 }
