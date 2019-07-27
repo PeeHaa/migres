@@ -86,6 +86,8 @@ final class Migrate implements Command
 
             exit(1);
         }
+
+        $this->output->success('Successfully performed all migrations!');
     }
 
     private function getMigrations(): Migrations

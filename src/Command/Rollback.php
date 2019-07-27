@@ -57,5 +57,7 @@ final class Rollback implements Command
 
             exit(1);
         }
+
+        $this->output->success('Successfully performed all rollbacks!');
     }
 }

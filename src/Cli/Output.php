@@ -56,6 +56,12 @@ final class Output
         $this->climate->darkGray('  ' . $query);
     }
 
+    public function success(string $message): void
+    {
+        $this->climate->br();
+        $this->climate->lightGreen($message);
+    }
+
     public function error(string $message): void
     {
         $this->climate->br();
