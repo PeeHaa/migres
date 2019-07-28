@@ -21,6 +21,15 @@ abstract class MigrationSpecification
         $this->migrationSteps[] = $table;
     }
 
+    public function changeTable(string $name, callable $callback): void
+    {
+        $table = Table::fromChangeTable($name);
+
+        $callback($table);
+
+        $this->migrationSteps[] = $table;
+    }
+
     public function renameTable(string $oldName, string $newName): void
     {
         $this->migrationSteps[] = Table::fromRenameTable($oldName, $newName);

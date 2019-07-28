@@ -47,6 +47,11 @@ final class Table
         return $table;
     }
 
+    public static function fromChangeTable(string $name): self
+    {
+        return new self($name);
+    }
+
     public static function fromRenameTable(string $oldName, string $newName): self
     {
         $table = new self($newName);

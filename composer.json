@@ -16,6 +16,7 @@
         "ext-ctype": "*",
         "ext-json": "*",
         "ext-pdo": "*",
+        "ext-readline": "*",
         "league/climate": "^3.5"
     },
     "require-dev": {
