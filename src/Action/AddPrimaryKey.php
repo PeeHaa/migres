@@ -16,7 +16,7 @@ final class AddPrimaryKey extends TableAction implements Action
         $this->primaryKey = $primaryKey;
     }
 
-    public function getCombinedPrimaryKey(): PrimaryKey
+    public function getPrimaryKey(): PrimaryKey
     {
         return $this->primaryKey;
     }

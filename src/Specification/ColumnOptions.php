@@ -92,6 +92,11 @@ final class ColumnOptions
         return $this->nullable;
     }
 
+    public function hasOptions(): bool
+    {
+        return $this->nullable === false || $this->defaultValueSet;
+    }
+
     /**
      * @internal
      * @throws InvalidDefaultValue

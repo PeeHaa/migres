@@ -60,6 +60,10 @@ final class Column
             return $sql;
         }
 
+        if (!$this->options->hasOptions()) {
+            return $sql;
+        }
+
         return $sql . ' ' . $this->options->toSql($this);
     }
 }

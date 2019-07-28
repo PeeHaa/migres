@@ -86,7 +86,7 @@ final class Retrospector
         }
 
         if ($action instanceof AddPrimaryKey) {
-            return new DropPrimaryKey($action->getTableName(), $action->getCombinedPrimaryKey()->getName());
+            return new DropPrimaryKey($action->getTableName(), $action->getPrimaryKey()->getName());
         }
 
         if ($action instanceof DropPrimaryKey) {
