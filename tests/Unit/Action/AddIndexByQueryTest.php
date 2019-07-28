@@ -19,7 +19,7 @@ class AddIndexByQueryTest extends TestCase
 
         $this->assertSame(
             'CREATE INDEX "index_name" ON "table_name" (column_name)',
-            $queries[0]
+            $queries[0],
         );
     }
 }

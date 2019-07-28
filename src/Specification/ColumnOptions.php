@@ -99,7 +99,6 @@ final class ColumnOptions
 
     /**
      * @internal
-     * @throws InvalidDefaultValue
      */
     public function toSql(Column $column): string
     {

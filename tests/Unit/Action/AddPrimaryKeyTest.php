@@ -29,7 +29,7 @@ class AddPrimaryKeyTest extends TestCase
 
         $this->assertSame(
             'ALTER TABLE "table_name" ADD CONSTRAINT "index_name" PRIMARY KEY ("column_name")',
-            $queries[0]
+            $queries[0],
         );
     }
 }

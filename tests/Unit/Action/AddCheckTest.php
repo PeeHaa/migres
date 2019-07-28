@@ -27,7 +27,7 @@ class AddCheckTest extends TestCase
 
         $this->assertSame(
             'ALTER TABLE "table_name" ADD CONSTRAINT "column_bigger_than_10" CHECK (column > 10)',
-            $queries[0]
+            $queries[0],
         );
     }
 }

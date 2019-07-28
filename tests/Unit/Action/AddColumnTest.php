@@ -29,7 +29,7 @@ class AddColumnTest extends TestCase
 
         $this->assertSame(
             'ALTER TABLE "table_name" ADD COLUMN "column_name" integer',
-            $queries[0]
+            $queries[0],
         );
     }
 
@@ -44,7 +44,7 @@ class AddColumnTest extends TestCase
 
         $this->assertSame(
             'ALTER TABLE "table_name" ADD COLUMN "column_name" integer NOT NULL',
-            $queries[0]
+            $queries[0],
         );
     }
 }
