@@ -2,15 +2,17 @@
 
 namespace PeeHaa\Migres\Action;
 
-use PeeHaa\Migres\Column;
 use PeeHaa\Migres\Migration\Queries;
+use PeeHaa\Migres\Specification\Column;
 
-final class AddColumn implements Action
+final class AddColumn extends TableAction implements Action
 {
     private Column $column;
 
-    public function __construct(Column $column)
+    public function __construct(string $tableName, Column $column)
     {
+        parent::__construct($tableName);
+
         $this->column = $column;
     }
 
@@ -19,8 +21,8 @@ final class AddColumn implements Action
         return $this->column;
     }
 
-    public function toQueries(string $tableName): Queries
+    public function toQueries(): Queries
     {
-        return new Queries(sprintf('ALTER TABLE "%s" ADD COLUMN %s', $tableName, $this->column->toSql()));
+        return new Queries(sprintf('ALTER TABLE "%s" ADD COLUMN %s', $this->tableName, $this->column->toSql()));
     }
 }

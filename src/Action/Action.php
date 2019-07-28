@@ -6,5 +6,5 @@ use PeeHaa\Migres\Migration\Queries;
 
 interface Action
 {
-    public function toQueries(string $tableName): Queries;
+    public function toQueries(): Queries;
 }

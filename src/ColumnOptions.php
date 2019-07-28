@@ -13,6 +13,7 @@ use PeeHaa\Migres\DataType\Money;
 use PeeHaa\Migres\DataType\Path;
 use PeeHaa\Migres\DataType\Point;
 use PeeHaa\Migres\DataType\Polygon;
+use PeeHaa\Migres\Specification\Column;
 use PeeHaa\Migres\Exception\InvalidDefaultValue;
 
 final class ColumnOptions
@@ -87,15 +88,6 @@ final class ColumnOptions
         }
 
         throw new InvalidDefaultValue($this->defaultValue);
-    }
-
-    public function addConstraints(ColumnConstraint ...$constraints): self
-    {
-        foreach ($constraints as $constraint) {
-            $this->addConstraint($constraint);
-        }
-
-        return $this;
     }
 
     public function addConstraint(ColumnConstraint $constraint): self

@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace PeeHaa\Migres\Action;
+namespace PeeHaa\Migres\Action_old;
 
 use PeeHaa\Migres\Migration\Queries;
 
-final class RenameTable extends TableAction implements Action
+final class RenameColumn implements Action
 {
     private string $oldName;
 
@@ -12,8 +12,6 @@ final class RenameTable extends TableAction implements Action
 
     public function __construct(string $oldName, string $newName)
     {
-        parent::__construct($oldName);
-
         $this->oldName = $oldName;
         $this->newName = $newName;
     }
@@ -28,8 +26,10 @@ final class RenameTable extends TableAction implements Action
         return $this->newName;
     }
 
-    public function toQueries(): Queries
+    public function toQueries(string $tableName): Queries
     {
-        return new Queries(sprintf('ALTER TABLE "%s" RENAME TO "%s"', $this->oldName, $this->newName));
+        return new Queries(
+            sprintf('ALTER TABLE "%s" RENAME COLUMN "%s" TO "%s"', $tableName, $this->oldName, $this->newName),
+        );
     }
 }

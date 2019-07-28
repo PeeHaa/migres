@@ -4,17 +4,10 @@ namespace PeeHaa\Migres\Action;
 
 use PeeHaa\Migres\Migration\Queries;
 
-final class CreateTable implements Action
+final class CreateTable extends TableAction implements Action
 {
-    private string $name;
-
-    public function __construct(string $name)
+    public function toQueries(): Queries
     {
-        $this->name = $name;
-    }
-
-    public function toQueries(string $tableName): Queries
-    {
-        return new Queries(sprintf('CREATE TABLE "%s" ()', $this->name));
+        return new Queries(sprintf('CREATE TABLE "%s" ()', $this->tableName));
     }
 }

@@ -6,52 +6,44 @@ use PeeHaa\Migres\Action\Action;
 
 final class TableActions implements \Iterator
 {
-    private string $originalTableName;
+    private string $name;
 
-    private string $tableName;
+    /** @var array<Action> */
+    private array $actions;
 
-    private Actions $actions;
-
-    public function __construct(string $originalTableName, string $tableName, Actions $actions)
+    public function __construct(string $name, Action ...$actions)
     {
-        //var_dump($tableName . '!!!!!');
-        $this->originalTableName = $originalTableName;
-        $this->tableName         = $tableName;
-        $this->actions           = $actions;
+        $this->name    = $name;
+        $this->actions = $actions;
     }
 
-    public function getOriginalTableName(): string
+    public function getName(): string
     {
-        return $this->originalTableName;
-    }
-
-    public function getTableName(): string
-    {
-        return $this->tableName;
+        return $this->name;
     }
 
     public function current(): Action
     {
-        return $this->actions->current();
+        return current($this->actions);
     }
 
     public function next(): void
     {
-        $this->actions->next();
+        next($this->actions);
     }
 
     public function key(): ?int
     {
-        return $this->actions->key();
+        return key($this->actions);
     }
 
     public function valid(): bool
     {
-        return $this->actions->valid();
+        return $this->key() !== null;
     }
 
     public function rewind(): void
     {
-        $this->actions->rewind();
+        reset($this->actions);
     }
 }

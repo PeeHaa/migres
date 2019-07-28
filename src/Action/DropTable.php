@@ -4,10 +4,10 @@ namespace PeeHaa\Migres\Action;
 
 use PeeHaa\Migres\Migration\Queries;
 
-final class DropTable implements Action
+final class DropTable extends TableAction implements Action
 {
-    public function toQueries(string $tableName): Queries
+    public function toQueries(): Queries
     {
-        return new Queries(sprintf('DROP TABLE "%s"', $tableName));
+        return new Queries(sprintf('DROP TABLE "%s"', $this->tableName));
     }
 }

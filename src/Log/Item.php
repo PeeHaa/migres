@@ -2,7 +2,8 @@
 
 namespace PeeHaa\Migres\Log;
 
-use PeeHaa\Migres\Action\ReverseAction;
+use PeeHaa\Migres\Action\Action;
+use PeeHaa\Migres\Action_old\ReverseAction;
 use PeeHaa\Migres\Migration;
 
 final class Item
@@ -40,7 +41,7 @@ final class Item
         $this->executedAt         = $executedAt;
     }
 
-    public static function fromMigration(Migration $migration, ReverseAction ...$reverseActions): self
+    public static function fromMigration(Migration $migration, Action ...$rollbackActions): self
     {
         $data = random_bytes(16);
 
@@ -51,8 +52,8 @@ final class Item
 
         $queries = [];
 
-        foreach ($reverseActions as $reverseAction) {
-            foreach ($reverseAction->toQueries() as $query) {
+        foreach ($rollbackActions as $rollbackAction) {
+            foreach ($rollbackAction->toQueries() as $query) {
                 $queries[] = $query;
             }
         }

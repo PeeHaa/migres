@@ -4,12 +4,14 @@ namespace PeeHaa\Migres\Action;
 
 use PeeHaa\Migres\Migration\Queries;
 
-final class RemoveIndex implements Action
+final class DropIndex extends TableAction implements Action
 {
     private string $name;
 
-    public function __construct(string $name)
+    public function __construct(string $tableName, string $name)
     {
+        parent::__construct($tableName);
+
         $this->name = $name;
     }
 
@@ -18,7 +20,7 @@ final class RemoveIndex implements Action
         return $this->name;
     }
 
-    public function toQueries(string $tableName): Queries
+    public function toQueries(): Queries
     {
         return new Queries(sprintf('DROP INDEX "%s"', $this->name));
     }

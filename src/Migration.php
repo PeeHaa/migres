@@ -2,7 +2,9 @@
 
 namespace PeeHaa\Migres;
 
+use PeeHaa\Migres\Action\Action;
 use PeeHaa\Migres\Migration\MigrationActions;
+use PeeHaa\Migres\Migration\TableActions;
 
 final class Migration
 {
@@ -14,14 +16,18 @@ final class Migration
 
     private \DateTimeImmutable $timestamp;
 
-    private MigrationActions $actions;
+    /** @var array<TableActions> */
+    private array $actions;
 
+    /**
+     * @param array<TableActions> $actions
+     */
     public function __construct(
         string $name,
         string $filename,
         string $fullyQualifiedName,
         \DateTimeImmutable $timestamp,
-        MigrationActions $actions
+        TableActions ...$actions
     ) {
         $this->name               = $name;
         $this->filename           = $filename;
@@ -50,7 +56,10 @@ final class Migration
         return $this->timestamp;
     }
 
-    public function getActions(): MigrationActions
+    /**
+     * @return array<TableActions>
+     */
+    public function getActions(): array
     {
         return $this->actions;
     }

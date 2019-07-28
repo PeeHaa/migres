@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace PeeHaa\Migres\Action;
+namespace PeeHaa\Migres\Action_old;
 
 use PeeHaa\Migres\Migration\Queries;
 
-final class RemoveCheck implements Action
+final class CreateTable implements Action
 {
     private string $name;
 
@@ -13,13 +13,8 @@ final class RemoveCheck implements Action
         $this->name = $name;
     }
 
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
     public function toQueries(string $tableName): Queries
     {
-        return new Queries(sprintf('ALTER TABLE "%s" DROP CONSTRAINT "%s"', $tableName, $this->name));
+        return new Queries(sprintf('CREATE TABLE "%s" ()', $this->name));
     }
 }

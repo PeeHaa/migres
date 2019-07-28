@@ -4,14 +4,16 @@ namespace PeeHaa\Migres\Action;
 
 use PeeHaa\Migres\Migration\Queries;
 
-final class RenameColumn implements Action
+final class RenameColumn extends TableAction implements Action
 {
     private string $oldName;
 
     private string $newName;
 
-    public function __construct(string $oldName, string $newName)
+    public function __construct(string $tableName, string $oldName, string $newName)
     {
+        parent::__construct($tableName);
+
         $this->oldName = $oldName;
         $this->newName = $newName;
     }
@@ -26,10 +28,10 @@ final class RenameColumn implements Action
         return $this->newName;
     }
 
-    public function toQueries(string $tableName): Queries
+    public function toQueries(): Queries
     {
         return new Queries(
-            sprintf('ALTER TABLE "%s" RENAME COLUMN "%s" TO "%s"', $tableName, $this->oldName, $this->newName),
+            sprintf('ALTER TABLE "%s" RENAME COLUMN "%s" TO "%s"', $this->tableName, $this->oldName, $this->newName),
         );
     }
 }

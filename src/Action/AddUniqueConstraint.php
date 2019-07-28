@@ -5,12 +5,14 @@ namespace PeeHaa\Migres\Action;
 use PeeHaa\Migres\Constraint\TableConstraint;
 use PeeHaa\Migres\Migration\Queries;
 
-final class AddConstraint implements Action
+final class AddUniqueConstraint extends TableAction implements Action
 {
     private TableConstraint $constraint;
 
-    public function __construct(TableConstraint $constraint)
+    public function __construct(string $tableName, TableConstraint $constraint)
     {
+        parent::__construct($tableName);
+
         $this->constraint = $constraint;
     }
 
@@ -19,8 +21,8 @@ final class AddConstraint implements Action
         return $this->constraint;
     }
 
-    public function toQueries(string $tableName): Queries
+    public function toQueries(): Queries
     {
-        return new Queries(sprintf('ALTER TABLE "%s" ADD %s', $tableName, $this->constraint->toSql()));
+        return new Queries(sprintf('ALTER TABLE "%s" ADD %s', $this->tableName, $this->constraint->toSql()));
     }
 }

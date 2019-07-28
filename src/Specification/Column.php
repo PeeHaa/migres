@@ -1,7 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace PeeHaa\Migres;
+namespace PeeHaa\Migres\Specification;
 
+use PeeHaa\Migres\ColumnOptions;
+use PeeHaa\Migres\Constraint\NotNull;
 use PeeHaa\Migres\DataType\Type;
 
 final class Column
@@ -27,6 +29,23 @@ final class Column
     public function getType(): Type
     {
         return $this->type;
+    }
+
+    public function notNull(): self
+    {
+        $this->options->addConstraint(new NotNull());
+
+        return $this;
+    }
+
+    /**
+     * @param mixed $defaultValue
+     */
+    public function default($defaultValue): self
+    {
+        $this->options->setDefault($defaultValue);
+
+        return $this;
     }
 
     public function getOptions(): ColumnOptions

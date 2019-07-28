@@ -3,26 +3,30 @@
 namespace PeeHaa\Migres\Retrospection;
 
 use PeeHaa\Migres\Action\Action;
+use PeeHaa\Migres\Action\AddCheck;
+use PeeHaa\Migres\Action\AddCheckByQuery;
 use PeeHaa\Migres\Action\AddColumn;
 use PeeHaa\Migres\Action\AddConstraint;
 use PeeHaa\Migres\Action\AddIndex;
 use PeeHaa\Migres\Action\AddIndexByQuery;
 use PeeHaa\Migres\Action\AddPrimaryKey;
+use PeeHaa\Migres\Action\AddUniqueConstraint;
 use PeeHaa\Migres\Action\ChangeColumn;
 use PeeHaa\Migres\Action\CreateTable;
+use PeeHaa\Migres\Action\DropCheck;
+use PeeHaa\Migres\Action\DropColumn;
+use PeeHaa\Migres\Action\DropIndex;
+use PeeHaa\Migres\Action\DropPrimaryKey;
 use PeeHaa\Migres\Action\DropTable;
-use PeeHaa\Migres\Action\RemoveCheck;
-use PeeHaa\Migres\Action\RemoveColumn;
-use PeeHaa\Migres\Action\RemoveConstraint;
-use PeeHaa\Migres\Action\RemoveIndex;
+use PeeHaa\Migres\Action\DropUniqueConstraint;
 use PeeHaa\Migres\Action\RenameColumn;
+use PeeHaa\Migres\Action\RenamePrimaryKey;
 use PeeHaa\Migres\Action\RenameTable;
-use PeeHaa\Migres\Action\ReverseAction;
-use PeeHaa\Migres\Column;
 use PeeHaa\Migres\Constraint\Check;
-use PeeHaa\Migres\Constraint\CombinedPrimaryKey;
-use PeeHaa\Migres\Constraint\CombinedUnique;
+use PeeHaa\Migres\Constraint\PrimaryKey;
+use PeeHaa\Migres\Constraint\Unique;
 use PeeHaa\Migres\Exception\IrreversibleAction;
+use PeeHaa\Migres\Specification\Column;
 
 final class Retrospector
 {
@@ -42,57 +46,89 @@ final class Retrospector
         $this->columnOptionsResolver = $columnOptionsResolver;
     }
 
-    public function getReverseAction(string $originalTableName, string $tableName, Action $action): ReverseAction
+    public function getReverseAction(Action $action): Action
     {
         if ($action instanceof CreateTable) {
-            return new ReverseAction($originalTableName, new DropTable());
-        }
-
-        if ($action instanceof AddColumn) {
-            return new ReverseAction($tableName, new RemoveColumn($action->getColumn()->getName()));
-        }
-
-        if ($action instanceof RemoveColumn) {
-            return new ReverseAction($tableName, new AddColumn($this->getCurrentColumnDefinition($tableName, $action->getName())));
-        }
-
-        if ($action instanceof ChangeColumn) {
-            return new ReverseAction($tableName, new ChangeColumn($this->getCurrentColumnDefinition($tableName, $action->getName())));
-        }
-
-        if ($action instanceof RenameColumn) {
-            return new ReverseAction($tableName, new RenameColumn($action->getNewName(), $action->getOldName()));
+            return new DropTable($action->getTableName());
         }
 
         if ($action instanceof RenameTable) {
-            return new ReverseAction($tableName, new RenameTable($action->getNewName(), $action->getOriginalName()));
+            return new RenameTable($action->getNewName(), $action->getOldName());
         }
 
-        if ($action instanceof AddConstraint) {
-            return new ReverseAction($tableName, new RemoveConstraint($action->getConstraint()->getName()));
+        if ($action instanceof DropTable) {
+            return new CreateTable($action->getTableName());
         }
 
-        if ($action instanceof AddIndex) {
-            return new ReverseAction($tableName, new RemoveIndex($action->getIndex()->getName()));
+        if ($action instanceof AddColumn) {
+            return new DropColumn($action->getTableName(), $action->getColumn()->getName());
+        }
+
+        if ($action instanceof DropColumn) {
+            return new AddColumn(
+                $action->getTableName(),
+                $this->getCurrentColumnDefinition($action->getTableName(), $action->getName()),
+            );
+        }
+
+        if ($action instanceof RenameColumn) {
+            return new RenameColumn($action->getTableName(), $action->getNewName(), $action->getOldName());
+        }
+
+        if ($action instanceof ChangeColumn) {
+            return new ChangeColumn(
+                $action->getTableName(),
+                $this->getCurrentColumnDefinition($action->getTableName(), $action->getName()),
+            );
         }
 
         if ($action instanceof AddPrimaryKey) {
-            return new ReverseAction($tableName, new RemoveConstraint($action->getCombinedPrimaryKey()->getName()));
+            return new DropPrimaryKey($action->getTableName(), $action->getCombinedPrimaryKey()->getName());
         }
 
-        if ($action instanceof RemoveConstraint) {
-            return new ReverseAction($tableName, $this->getCurrentConstraintDefinition($tableName, $action->getName()));
+        if ($action instanceof DropPrimaryKey) {
+            return new AddPrimaryKey(
+                $action->getTableName(),
+                $this->getCurrentPrimaryKeyDefinition($action->getTableName(), $action->getName())
+            );
         }
 
-        if ($action instanceof RemoveCheck) {
-            return new ReverseAction($tableName, $this->getCurrentCheckDefinition($tableName, $action->getName()));
+        if ($action instanceof RenamePrimaryKey) {
+            return new RenamePrimaryKey($action->getTableName(), $action->getNewName(), $action->getOldName());
         }
 
-        if ($action instanceof RemoveIndex) {
-            return new ReverseAction($tableName, $this->getCurrentConstraintDefinition($tableName, $action->getName()));
+        if ($action instanceof AddUniqueConstraint) {
+            return new DropUniqueConstraint($action->getTableName(), $action->getConstraint()->getName());
         }
 
-        var_dump($action);
+        if ($action instanceof DropUniqueConstraint) {
+            return new AddUniqueConstraint(
+                $action->getTableName(),
+                $this->getCurrentUniqueConstraintDefinition($action->getTableName(), $action->getName())
+            );
+        }
+
+        if ($action instanceof AddIndex) {
+            return new DropIndex($action->getTableName(), $action->getIndex()->getName());
+        }
+
+        if ($action instanceof DropIndex) {
+            return new AddIndexByQuery(
+                $action->getTableName(),
+                $this->getCurrentIndexDefinition($action->getTableName(), $action->getName())
+            );
+        }
+
+        if ($action instanceof AddCheck) {
+            return new DropCheck($action->getTableName(), $action->getCheck()->getName());
+        }
+
+        if ($action instanceof DropCheck) {
+            return new AddCheck(
+                $action->getTableName(),
+                $this->getCurrentCheckDefinition($action->getTableName(), $action->getName()),
+            );
+        }
 
         throw new IrreversibleAction(get_class($action));
     }
@@ -100,7 +136,7 @@ final class Retrospector
     private function getCurrentColumnDefinition(string $tableName, string $columnName): Column
     {
         $sql = '
-            SELECT column_default, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_precision_radix, numeric_scale
+            SELECT column_default, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_scale
             FROM information_schema.columns
             WHERE table_name = :tableName
             AND column_name = :columnName;
@@ -127,11 +163,95 @@ final class Retrospector
 
         $dataType = $this->dataTypeResolver->resolve($columnInformation);
 
-        return new Column(
-            $columnName,
-            $dataType,
-            $this->columnOptionsResolver->resolve($dataType, $columnInformation),
-        );
+        $column = new Column($columnName, $dataType);
+
+        $columnOptions = $this->columnOptionsResolver->resolve($dataType, $columnInformation);
+
+        if ($columnOptions->hasNotNullConstraints()) {
+            $column->notNull();
+        }
+
+        if ($columnOptions->hasDefault()) {
+            $column->default($columnOptions->getDefaultValue($column));
+        }
+
+        return $column;
+    }
+
+    private function getCurrentPrimaryKeyDefinition(string $tableName, string $name): PrimaryKey
+    {
+        $sql = '
+            SELECT
+                table_constraints.constraint_name, table_constraints.constraint_type, table_constraints.table_name, key_column_usage.column_name, 
+                constraint_column_usage.table_name AS foreign_table_name,
+                constraint_column_usage.column_name AS foreign_column_name 
+            FROM 
+                information_schema.table_constraints
+                JOIN information_schema.key_column_usage ON table_constraints.constraint_name = key_column_usage.constraint_name
+                JOIN information_schema.constraint_column_usage ON constraint_column_usage.constraint_name = table_constraints.constraint_name
+                WHERE table_constraints.table_name = :tableName
+                    AND table_constraints.constraint_name = :constraintName
+                    AND table_constraints.constraint_type = \'PRIMARY KEY\'
+        ';
+
+        $statement = $this->dbConnection->prepare($sql);
+
+        $statement->execute([
+            'tableName'      => $tableName,
+            'constraintName' => $name,
+        ]);
+
+        $constraintInfo = $statement->fetchAll();
+
+        if (!$constraintInfo) {
+            throw new \Exception('Could not find current definition of primary key');
+        }
+
+        $columns = [];
+
+        foreach ($constraintInfo as $constraintRecord) {
+            $columns[] = $constraintRecord['column_name'];
+        }
+
+        return new PrimaryKey($name, ...array_unique($columns));
+    }
+
+    private function getCurrentUniqueConstraintDefinition(string $tableName, string $name): Unique
+    {
+        $sql = '
+            SELECT
+                table_constraints.constraint_name, table_constraints.constraint_type, table_constraints.table_name, key_column_usage.column_name, 
+                constraint_column_usage.table_name AS foreign_table_name,
+                constraint_column_usage.column_name AS foreign_column_name 
+            FROM 
+                information_schema.table_constraints
+                JOIN information_schema.key_column_usage ON table_constraints.constraint_name = key_column_usage.constraint_name
+                JOIN information_schema.constraint_column_usage ON constraint_column_usage.constraint_name = table_constraints.constraint_name
+                WHERE table_constraints.table_name = :tableName
+                    AND table_constraints.constraint_name = :constraintName
+                    AND table_constraints.constraint_type = \'UNIQUE\'
+        ';
+
+        $statement = $this->dbConnection->prepare($sql);
+
+        $statement->execute([
+            'tableName'      => $tableName,
+            'constraintName' => $name,
+        ]);
+
+        $constraintInfo = $statement->fetchAll();
+
+        if (!$constraintInfo) {
+            throw new \Exception('Could not find current definition of unique constraint');
+        }
+
+        $columns = [];
+
+        foreach ($constraintInfo as $constraintRecord) {
+            $columns[] = $constraintRecord['column_name'];
+        }
+
+        return new Unique($name, ...array_unique($columns));
     }
 
     private function getCurrentConstraintDefinition(string $tableName, string $constraintName): Action
@@ -165,7 +285,7 @@ final class Retrospector
         return new AddIndexByQuery($this->getIndexQuery($tableName, $constraintName));
     }
 
-    private function getPrimaryKeyConstraint(array $constraintInfo): CombinedPrimaryKey
+    private function getPrimaryKeyConstraint(array $constraintInfo): PrimaryKey
     {
         $columns = [];
 
@@ -173,10 +293,10 @@ final class Retrospector
             $columns[] = $constraintRecord['column_name'];
         }
 
-        return new CombinedPrimaryKey($constraintInfo[0]['constraint_name'], ...array_unique($columns));
+        return new PrimaryKey($constraintInfo[0]['constraint_name'], ...array_unique($columns));
     }
 
-    private function getIndex(array $constraintInfo): CombinedUnique
+    private function getIndex(array $constraintInfo): Unique
     {
         $columns = [];
 
@@ -184,10 +304,10 @@ final class Retrospector
             $columns[] = $constraintRecord['column_name'];
         }
 
-        return new CombinedUnique($constraintInfo[0]['constraint_name'], ...array_unique($columns));
+        return new Unique($constraintInfo[0]['constraint_name'], ...array_unique($columns));
     }
 
-    private function getIndexQuery(string $tableName, string $constraintName): string
+    private function getCurrentIndexDefinition(string $tableName, string $indexName): string
     {
         $sql = '
             SELECT indexdef
@@ -200,7 +320,7 @@ final class Retrospector
 
         $statement->execute([
             'tableName' => $tableName,
-            'indexName' => $constraintName,
+            'indexName' => $indexName,
         ]);
 
         $indexInformation = $statement->fetchColumn(0);
@@ -212,7 +332,7 @@ final class Retrospector
         return $indexInformation;
     }
 
-    private function getCurrentCheckDefinition(string $tableName, string $constraintName): AddConstraint
+    private function getCurrentCheckDefinition(string $tableName, string $checkName): Check
     {
         $sql = '
             SELECT pg_constraint.consrc
@@ -226,7 +346,7 @@ final class Retrospector
 
         $statement->execute([
             'tableName'      => $tableName,
-            'constraintName' => $constraintName,
+            'constraintName' => $checkName,
         ]);
 
         $checkInformation = $statement->fetchColumn(0);
@@ -235,6 +355,6 @@ final class Retrospector
             throw new \Exception('Could not find current check definition');
         }
 
-        return new AddConstraint(new Check($constraintName, $checkInformation));
+        return new Check($checkName, $checkInformation);
     }
 }

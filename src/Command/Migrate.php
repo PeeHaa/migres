@@ -3,15 +3,14 @@
 namespace PeeHaa\Migres\Command;
 
 use League\CLImate\CLImate;
-use PeeHaa\Migres\Action\Action;
 use PeeHaa\Migres\Cli\Output;
 use PeeHaa\Migres\Configuration\Configuration;
 use PeeHaa\Migres\Exception\InvalidFilename;
 use PeeHaa\Migres\Log\Item;
-use PeeHaa\Migres\Migration;
 use PeeHaa\Migres\Log\Migration as MigrationLog;
-use PeeHaa\Migres\Migration\MigrationActions;
+use PeeHaa\Migres\Migration;
 use PeeHaa\Migres\Migration\Migrations;
+use PeeHaa\Migres\Migration\TableActions;
 use PeeHaa\Migres\MigrationSpecification;
 use PeeHaa\Migres\Retrospection\Retrospector;
 
@@ -56,26 +55,26 @@ final class Migrate implements Command
 
                 $migrationReversions = [];
 
+                $this->dbConnection->beginTransaction();
+
+                /** @var TableActions $tableActions */
                 foreach ($migration->getActions() as $tableActions) {
-                    $this->output->startTableMigration($tableActions->getTableName());
+                    $this->output->startTableMigration($tableActions->getName());
 
-                    $this->dbConnection->beginTransaction();
+                    foreach ($tableActions as $tableAction) {
+                        $migrationReversions[] = $this->retrospector->getReverseAction($tableAction);
 
-                    /** @var Action $action */
-                    foreach ($tableActions as $action) {
-                        $migrationReversions[] = $this->retrospector->getReverseAction($tableActions->getOriginalTableName(), $tableActions->getTableName(), $action);
-
-                        foreach ($action->toQueries($tableActions->getTableName()) as $query) {
+                        foreach ($tableAction->toQueries() as $query) {
                             $this->output->runQuery($query);
 
                             $this->dbConnection->exec($query);
                         }
                     }
-
-                    $this->migrationLog->write(Item::fromMigration($migration, ...array_reverse($migrationReversions)));
-
-                    $this->dbConnection->commit();
                 }
+
+                $this->migrationLog->write(Item::fromMigration($migration, ...array_reverse($migrationReversions)));
+
+                $this->dbConnection->commit();
             }
         } catch (\Throwable $e) {
             if ($this->dbConnection->inTransaction()) {
@@ -106,7 +105,7 @@ final class Migrate implements Command
                 $filePath,
                 $this->getFullyQualifiedName($filename),
                 $this->getTimestamp($filename),
-                $this->getActions($filePath, $this->getFullyQualifiedName($filename)),
+                ...$this->getActions($filePath, $this->getFullyQualifiedName($filename)),
             );
         }
 
@@ -181,7 +180,10 @@ final class Migrate implements Command
         return \DateTimeImmutable::createFromFormat('YmdHis', $matches['timestamp']);
     }
 
-    private function getActions(string $filename, string $className): MigrationActions
+    /**
+     * @return array<TableActions>
+     */
+    private function getActions(string $filename, string $className): array
     {
         require_once $filename;
 
@@ -190,6 +192,6 @@ final class Migrate implements Command
 
         $migration->change();
 
-        return $migration->getActions();
+        return $migration->getMigrationSteps();
     }
 }

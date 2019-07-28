@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace PeeHaa\Migres\Action;
+namespace PeeHaa\Migres\Action_old;
 
 use PeeHaa\Migres\Migration\Queries;
 

@@ -2,22 +2,22 @@
 
 namespace PeeHaa\Migres;
 
-use PeeHaa\Migres\Action\AddColumn;
-use PeeHaa\Migres\Action\AddConstraint;
-use PeeHaa\Migres\Action\AddIndex;
-use PeeHaa\Migres\Action\AddPrimaryKey;
-use PeeHaa\Migres\Action\ChangeColumn;
-use PeeHaa\Migres\Action\CreateTable;
-use PeeHaa\Migres\Action\DropTable;
-use PeeHaa\Migres\Action\RemoveCheck;
-use PeeHaa\Migres\Action\RemoveColumn;
-use PeeHaa\Migres\Action\RemoveConstraint;
-use PeeHaa\Migres\Action\RemoveIndex;
-use PeeHaa\Migres\Action\RenameColumn;
-use PeeHaa\Migres\Action\RenameTable;
+use PeeHaa\Migres\Action_old\AddColumn;
+use PeeHaa\Migres\Action_old\AddConstraint;
+use PeeHaa\Migres\Action_old\AddIndex;
+use PeeHaa\Migres\Action_old\AddPrimaryKey;
+use PeeHaa\Migres\Action_old\ChangeColumn;
+use PeeHaa\Migres\Action_old\CreateTable;
+use PeeHaa\Migres\Action_old\DropTable;
+use PeeHaa\Migres\Action_old\RemoveCheck;
+use PeeHaa\Migres\Action_old\RemoveColumn;
+use PeeHaa\Migres\Action_old\RemoveConstraint;
+use PeeHaa\Migres\Action_old\RemoveIndex;
+use PeeHaa\Migres\Action_old\RenameColumn;
+use PeeHaa\Migres\Action_old\RenameTable;
 use PeeHaa\Migres\Constraint\Check;
-use PeeHaa\Migres\Constraint\CombinedPrimaryKey;
-use PeeHaa\Migres\Constraint\CombinedUnique;
+use PeeHaa\Migres\Constraint\PrimaryKey;
+use PeeHaa\Migres\Constraint\Unique;
 use PeeHaa\Migres\Constraint\Index;
 use PeeHaa\Migres\Constraint\NotNull;
 use PeeHaa\Migres\DataType\Factory;
@@ -137,7 +137,7 @@ final class Table
 
     private function addUniqueConstraint(string $name, string ...$columns): self
     {
-        $this->actions->add(new AddConstraint(new CombinedUnique($name, ...$columns)));
+        $this->actions->add(new AddConstraint(new Unique($name, ...$columns)));
 
         return $this;
     }
@@ -151,7 +151,7 @@ final class Table
 
     public function addPrimaryKey(string $name, string ...$columns): self
     {
-        $this->actions->add(new AddPrimaryKey(new CombinedPrimaryKey($name, ...$columns)));
+        $this->actions->add(new AddPrimaryKey(new PrimaryKey($name, ...$columns)));
 
         return $this;
     }

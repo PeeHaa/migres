@@ -2,37 +2,48 @@
 
 namespace PeeHaa\Migres;
 
-use PeeHaa\Migres\Migration\MigrationActions;
 use PeeHaa\Migres\Migration\TableActions;
+use PeeHaa\Migres\Specification\Table;
 
 abstract class MigrationSpecification
 {
     /** @var array<Table> */
-    private array $tables = [];
+    private array $migrationSteps = [];
 
     abstract public function change(): void;
 
-    public function table(string $name): Table
+    public function createTable(string $name, callable $callback): void
     {
-        $table = new Table($name);
+        $table = Table::fromCreateTable($name);
 
-        $this->tables[] = $table;
+        $callback($table);
 
-        return $table;
+        $this->migrationSteps[] = $table;
+    }
+
+    public function renameTable(string $oldName, string $newName): void
+    {
+        $this->migrationSteps[] = Table::fromRenameTable($oldName, $newName);
+    }
+
+    public function dropTable(string $name): void
+    {
+        $this->migrationSteps[] = Table::fromDropTable($name);
     }
 
     /**
      * @internal
+     * @return array<TableActions>
      */
-    public function getActions(): MigrationActions
+    public function getMigrationSteps(): array
     {
-        $actionsToRun = [];
+        $actions = [];
 
         /** @var Table $table */
-        foreach ($this->tables as $table) {
-            $actionsToRun[] = new TableActions($table->getOriginalName(), $table->getName(), $table->getActions());
+        foreach ($this->migrationSteps as $migrationStep) {
+            $actions[] = $migrationStep->getActions();
         }
 
-        return new MigrationActions(...$actionsToRun);
+        return $actions;
     }
 }

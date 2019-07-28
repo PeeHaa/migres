@@ -2,25 +2,27 @@
 
 namespace PeeHaa\Migres\Action;
 
-use PeeHaa\Migres\Constraint\CombinedPrimaryKey;
+use PeeHaa\Migres\Constraint\PrimaryKey;
 use PeeHaa\Migres\Migration\Queries;
 
-final class AddPrimaryKey implements Action
+final class AddPrimaryKey extends TableAction implements Action
 {
-    private CombinedPrimaryKey $primaryKey;
+    private PrimaryKey $primaryKey;
 
-    public function __construct(CombinedPrimaryKey $primaryKey)
+    public function __construct(string $tableName, PrimaryKey $primaryKey)
     {
+        parent::__construct($tableName);
+
         $this->primaryKey = $primaryKey;
     }
 
-    public function getCombinedPrimaryKey(): CombinedPrimaryKey
+    public function getCombinedPrimaryKey(): PrimaryKey
     {
         return $this->primaryKey;
     }
 
-    public function toQueries(string $tableName): Queries
+    public function toQueries(): Queries
     {
-        return new Queries(sprintf('ALTER TABLE "%s" ADD %s', $tableName, $this->primaryKey->toSql()));
+        return new Queries(sprintf('ALTER TABLE "%s" ADD %s', $this->tableName, $this->primaryKey->toSql()));
     }
 }

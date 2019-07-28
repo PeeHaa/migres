@@ -1,18 +1,16 @@
 <?php declare(strict_types=1);
 
-namespace PeeHaa\Migres\Action;
+namespace PeeHaa\Migres\Action_old;
 
+use PeeHaa\Migres\Column;
 use PeeHaa\Migres\Migration\Queries;
-use PeeHaa\Migres\Specification\Column;
 
-final class ChangeColumn extends TableAction implements Action
+final class ChangeColumn implements Action
 {
     private Column $column;
 
-    public function __construct(string $tableName, Column $column)
+    public function __construct(Column $column)
     {
-        parent::__construct($tableName);
-
         $this->column = $column;
     }
 
@@ -21,47 +19,47 @@ final class ChangeColumn extends TableAction implements Action
         return $this->column->getName();
     }
 
-    public function toQueries(): Queries
+    public function toQueries(string $tableName): Queries
     {
         $queries = [];
 
         $queries[] = sprintf(
             'ALTER TABLE "%s" ALTER COLUMN "%s" TYPE %s',
-            $this->tableName,
+            $tableName,
             $this->column->getName(),
             $this->column->getType()->toSql(),
         );
 
-        $queries[] = $this->getSetDefaultQuery();
-        $queries[] = $this->getSetNullQuery();
+        $queries[] = $this->getSetDefaultQuery($tableName);
+        $queries[] = $this->getSetNullQuery($tableName);
 
         return new Queries(...$queries);
     }
 
-    private function getSetDefaultQuery(): string
+    private function getSetDefaultQuery(string $tableName): string
     {
         $options = $this->column->getOptions();
 
         if (!$options->hasDefault()) {
-            return sprintf('ALTER TABLE "%s" ALTER COLUMN "%s" DROP DEFAULT', $this->tableName, $this->column->getName());
+            return sprintf('ALTER TABLE "%s" ALTER COLUMN "%s" DROP DEFAULT', $tableName, $this->column->getName());
         }
 
         return sprintf(
             'ALTER TABLE "%s" ALTER COLUMN "%s" SET DEFAULT %s',
-            $this->tableName,
+            $tableName,
             $this->column->getName(),
             $options->getDefaultValue($this->column),
         );
     }
 
-    public function getSetNullQuery(): string
+    public function getSetNullQuery(string $tableName): string
     {
         $options = $this->column->getOptions();
 
         if (!$options->hasNotNullConstraints()) {
-            return sprintf('ALTER TABLE "%s" ALTER COLUMN "%s" DROP NOT NULL', $this->tableName, $this->column->getName());
+            return sprintf('ALTER TABLE "%s" ALTER COLUMN "%s" DROP NOT NULL', $tableName, $this->column->getName());
         }
 
-        return sprintf('ALTER TABLE "%s" ALTER COLUMN "%s" SET NOT NULL', $this->tableName, $this->column->getName());
+        return sprintf('ALTER TABLE "%s" ALTER COLUMN "%s" SET NOT NULL', $tableName, $this->column->getName());
     }
 }

@@ -10,7 +10,7 @@ final class FloatType implements Type
 
     private ?int $precision;
 
-    public function __construct(?int $precision)
+    public function __construct(?int $precision = null)
     {
         $this->precision = $precision;
     }
