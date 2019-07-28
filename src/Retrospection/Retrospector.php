@@ -23,7 +23,12 @@ use PeeHaa\Migres\Action\RenameTable;
 use PeeHaa\Migres\Constraint\Check;
 use PeeHaa\Migres\Constraint\PrimaryKey;
 use PeeHaa\Migres\Constraint\Unique;
+use PeeHaa\Migres\Exception\CheckDefinitionNotFound;
+use PeeHaa\Migres\Exception\ColumnDefinitionNotFound;
+use PeeHaa\Migres\Exception\IndexDefinitionNotFound;
 use PeeHaa\Migres\Exception\IrreversibleAction;
+use PeeHaa\Migres\Exception\PrimaryKeyDefinitionNotFound;
+use PeeHaa\Migres\Exception\UniqueConstraintDefinitionNotFound;
 use PeeHaa\Migres\Specification\Column;
 
 final class Retrospector
@@ -150,7 +155,7 @@ final class Retrospector
         $columnDefinition = $statement->fetch();
 
         if (!$columnDefinition) {
-            throw new \Exception('Could not find current column definition');
+            throw new ColumnDefinitionNotFound($tableName, $columnName);
         }
 
         $columnInformation = new ColumnInformation(
@@ -179,12 +184,8 @@ final class Retrospector
     private function getCurrentPrimaryKeyDefinition(string $tableName, string $name): PrimaryKey
     {
         $sql = '
-            SELECT
-                table_constraints.constraint_name, table_constraints.constraint_type, table_constraints.table_name, key_column_usage.column_name, 
-                constraint_column_usage.table_name AS foreign_table_name,
-                constraint_column_usage.column_name AS foreign_column_name 
-            FROM 
-                information_schema.table_constraints
+            SELECT key_column_usage.column_name
+            FROM information_schema.table_constraints
                 JOIN information_schema.key_column_usage ON table_constraints.constraint_name = key_column_usage.constraint_name
                 JOIN information_schema.constraint_column_usage ON constraint_column_usage.constraint_name = table_constraints.constraint_name
                 WHERE table_constraints.table_name = :tableName
@@ -202,7 +203,7 @@ final class Retrospector
         $constraintInfo = $statement->fetchAll();
 
         if (!$constraintInfo) {
-            throw new \Exception('Could not find current definition of primary key');
+            throw new PrimaryKeyDefinitionNotFound($tableName, $name);
         }
 
         $columns = [];
@@ -217,12 +218,8 @@ final class Retrospector
     private function getCurrentUniqueConstraintDefinition(string $tableName, string $name): Unique
     {
         $sql = '
-            SELECT
-                table_constraints.constraint_name, table_constraints.constraint_type, table_constraints.table_name, key_column_usage.column_name, 
-                constraint_column_usage.table_name AS foreign_table_name,
-                constraint_column_usage.column_name AS foreign_column_name 
-            FROM 
-                information_schema.table_constraints
+            SELECT key_column_usage.column_name
+            FROM information_schema.table_constraints
                 JOIN information_schema.key_column_usage ON table_constraints.constraint_name = key_column_usage.constraint_name
                 JOIN information_schema.constraint_column_usage ON constraint_column_usage.constraint_name = table_constraints.constraint_name
                 WHERE table_constraints.table_name = :tableName
@@ -240,7 +237,7 @@ final class Retrospector
         $constraintInfo = $statement->fetchAll();
 
         if (!$constraintInfo) {
-            throw new \Exception('Could not find current definition of unique constraint');
+            throw new UniqueConstraintDefinitionNotFound($tableName, $name);
         }
 
         $columns = [];
@@ -271,7 +268,7 @@ final class Retrospector
         $indexInformation = $statement->fetchColumn(0);
 
         if (!$indexInformation) {
-            throw new \Exception('Could not find current constraint definition');
+            throw new IndexDefinitionNotFound($tableName, $indexName);
         }
 
         return $indexInformation;
@@ -297,7 +294,7 @@ final class Retrospector
         $checkInformation = $statement->fetchColumn(0);
 
         if (!$checkInformation) {
-            throw new \Exception('Could not find current check definition');
+            throw new CheckDefinitionNotFound($tableName, $checkName);
         }
 
         return new Check($checkName, $checkInformation);
