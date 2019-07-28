@@ -67,6 +67,7 @@ if (!(new Validator(getcwd() . '/migres.php'))->validate()) {
 if ($argv[1] === 'create') {
     (new CreateNewMigration(
         Configuration::fromArray(require getcwd() . '/migres.php'),
+        new Output($climate, VerbosityLevel::fromCliArguments($argv)),
         $argv[2],
     ))->run();
 

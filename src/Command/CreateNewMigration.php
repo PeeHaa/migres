@@ -2,17 +2,21 @@
 
 namespace PeeHaa\Migres\Command;
 
+use PeeHaa\Migres\Cli\Output;
 use PeeHaa\Migres\Configuration\Configuration;
 
 final class CreateNewMigration implements Command
 {
     private Configuration $configuration;
 
+    private Output $output;
+
     private string $name;
 
-    public function __construct(Configuration $configuration, string $name)
+    public function __construct(Configuration $configuration, Output $output, string $name)
     {
         $this->configuration = $configuration;
+        $this->output        = $output;
         $this->name          = $name;
     }
 
@@ -30,6 +34,8 @@ final class CreateNewMigration implements Command
         );
 
         file_put_contents($filename, $this->getMigrationTemplate());
+
+        $this->output->success(sprintf('Created new migration at %s', $filename));
     }
 
     private function getMigrationTemplate(): string
