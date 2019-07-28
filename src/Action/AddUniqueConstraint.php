@@ -2,21 +2,21 @@
 
 namespace PeeHaa\Migres\Action;
 
-use PeeHaa\Migres\Constraint\TableConstraint;
+use PeeHaa\Migres\Constraint\Unique;
 use PeeHaa\Migres\Migration\Queries;
 
 final class AddUniqueConstraint extends TableAction implements Action
 {
-    private TableConstraint $constraint;
+    private Unique $constraint;
 
-    public function __construct(string $tableName, TableConstraint $constraint)
+    public function __construct(string $tableName, Unique $constraint)
     {
         parent::__construct($tableName);
 
         $this->constraint = $constraint;
     }
 
-    public function getConstraint(): TableConstraint
+    public function getConstraint(): Unique
     {
         return $this->constraint;
     }

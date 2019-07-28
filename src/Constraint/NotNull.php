@@ -2,7 +2,7 @@
 
 namespace PeeHaa\Migres\Constraint;
 
-final class NotNull implements ColumnConstraint
+final class NotNull implements Constraint
 {
     /**
      * @internal

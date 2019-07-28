@@ -2,7 +2,7 @@
 
 namespace PeeHaa\Migres\Constraint;
 
-final class Check extends NamedConstraint implements ColumnConstraint, TableConstraint
+final class Check extends NamedConstraint implements Constraint
 {
     private string $expression;
 

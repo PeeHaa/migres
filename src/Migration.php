@@ -2,8 +2,6 @@
 
 namespace PeeHaa\Migres;
 
-use PeeHaa\Migres\Action\Action;
-use PeeHaa\Migres\Migration\MigrationActions;
 use PeeHaa\Migres\Migration\TableActions;
 
 final class Migration
@@ -19,9 +17,6 @@ final class Migration
     /** @var array<TableActions> */
     private array $actions;
 
-    /**
-     * @param array<TableActions> $actions
-     */
     public function __construct(
         string $name,
         string $filename,

@@ -1,19 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace PeeHaa\Migres;
+namespace PeeHaa\Migres\Specification;
 
-use PeeHaa\Migres\Constraint\ColumnConstraint;
 use PeeHaa\Migres\Constraint\NotNull;
 use PeeHaa\Migres\DataType\Bit;
 use PeeHaa\Migres\DataType\BitVarying;
-use PeeHaa\Migres\DataType\Boolean;
-use PeeHaa\Migres\DataType\Circle;
-use PeeHaa\Migres\DataType\Line;
-use PeeHaa\Migres\DataType\Money;
-use PeeHaa\Migres\DataType\Path;
-use PeeHaa\Migres\DataType\Point;
-use PeeHaa\Migres\DataType\Polygon;
-use PeeHaa\Migres\Specification\Column;
 use PeeHaa\Migres\Exception\InvalidDefaultValue;
 
 final class ColumnOptions
@@ -23,8 +14,7 @@ final class ColumnOptions
     /** @var mixed */
     private $defaultValue;
 
-    /** @var array<ColumnConstraint> */
-    private array $constraints = [];
+    private bool $nullable = true;
 
     /**
      * @param mixed $default
@@ -90,24 +80,16 @@ final class ColumnOptions
         throw new InvalidDefaultValue($this->defaultValue);
     }
 
-    public function addConstraint(ColumnConstraint $constraint): self
+    public function notNull(): self
     {
-        $this->constraints[] = $constraint;
+        $this->nullable = false;
 
         return $this;
     }
 
-    public function hasNotNullConstraints(): bool
+    public function isNullable(): bool
     {
-        foreach ($this->constraints as $constraint) {
-            if (!$constraint instanceof NotNull) {
-                continue;
-            }
-
-            return true;
-        }
-
-        return false;
+        return $this->nullable;
     }
 
     /**
@@ -122,14 +104,9 @@ final class ColumnOptions
             $sqlParts[] = 'DEFAULT ' . $this->getDefaultValue($column);
         }
 
-        $constraints = [];
-
-        /** @var ColumnConstraint $constraint */
-        foreach ($this->constraints as $constraint) {
-            $constraints[] = $constraint->toSql();
+        if (!$this->nullable) {
+            $sqlParts[] = (new NotNull())->toSql();
         }
-
-        $sqlParts[] = implode(' ', $constraints);
 
         return implode(' ', $sqlParts);
     }

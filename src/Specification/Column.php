@@ -2,7 +2,6 @@
 
 namespace PeeHaa\Migres\Specification;
 
-use PeeHaa\Migres\ColumnOptions;
 use PeeHaa\Migres\Constraint\NotNull;
 use PeeHaa\Migres\DataType\Type;
 
@@ -33,7 +32,7 @@ final class Column
 
     public function notNull(): self
     {
-        $this->options->addConstraint(new NotNull());
+        $this->options->notNull();
 
         return $this;
     }

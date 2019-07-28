@@ -2,7 +2,7 @@
 
 namespace PeeHaa\Migres\Constraint;
 
-final class Index extends NamedConstraint
+final class Index extends NamedConstraint implements Constraint
 {
     private string $tableName;
 

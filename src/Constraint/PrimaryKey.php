@@ -2,7 +2,7 @@
 
 namespace PeeHaa\Migres\Constraint;
 
-final class PrimaryKey extends NamedConstraint implements TableConstraint
+final class PrimaryKey extends NamedConstraint implements Constraint
 {
     /** @var array<string> */
     private array $columns;

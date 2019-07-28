@@ -58,7 +58,7 @@ final class ChangeColumn extends TableAction implements Action
     {
         $options = $this->column->getOptions();
 
-        if (!$options->hasNotNullConstraints()) {
+        if ($options->isNullable()) {
             return sprintf('ALTER TABLE "%s" ALTER COLUMN "%s" DROP NOT NULL', $this->tableName, $this->column->getName());
         }
 

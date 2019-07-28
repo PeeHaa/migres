@@ -167,7 +167,7 @@ final class Retrospector
 
         $columnOptions = $this->columnOptionsResolver->resolve($dataType, $columnInformation);
 
-        if ($columnOptions->hasNotNullConstraints()) {
+        if (!$columnOptions->isNullable()) {
             $column->notNull();
         }
 

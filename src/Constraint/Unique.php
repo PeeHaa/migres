@@ -2,10 +2,10 @@
 
 namespace PeeHaa\Migres\Constraint;
 
-final class Unique extends NamedConstraint implements TableConstraint
+final class Unique extends NamedConstraint implements Constraint
 {
     /** @var array<string> */
-    private $columns;
+    private array $columns;
 
     public function __construct(string $name, string ...$columns)
     {

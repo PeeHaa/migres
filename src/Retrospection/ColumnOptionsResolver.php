@@ -2,7 +2,7 @@
 
 namespace PeeHaa\Migres\Retrospection;
 
-use PeeHaa\Migres\ColumnOptions;
+use PeeHaa\Migres\Specification\ColumnOptions;
 use PeeHaa\Migres\Constraint\NotNull;
 use PeeHaa\Migres\DataType\BigSerial;
 use PeeHaa\Migres\DataType\Type;
@@ -21,7 +21,7 @@ final class ColumnOptionsResolver
         $columnOptions = new ColumnOptions();
 
         if (!$internalType instanceof BigSerial && !$columnInformation->getColumnDefinition()->isNullable()) {
-            $columnOptions->addConstraint(new NotNull());
+            $columnOptions->notNull();
         }
 
         if ($this->hasDefaultValue($columnInformation)) {
