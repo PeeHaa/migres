@@ -5,23 +5,23 @@ language: php
 matrix:
   include:
     - name: '[REQUIRE_CHECK] With Locked Dependencies'
-      php: '7.4'
+      php: '7.4snapshot'
       env: require=1
     - name: '[REQUIRE_CHECK] With Lowest Dependencies'
-      php: '7.4'
+      php: '7.4snapshot'
       env: require=1 dependencies=lowest
     - name: '[REQUIRE_CHECK] With Highest Dependencies'
-      php: '7.4'
+      php: '7.4snapshot'
       env: require=1 dependencies=highest
 
     - name: '[CS] PHP 7.4 With Locked Dependencies'
-      php: '7.4'
+      php: '7.4snapshot'
       env: cs=1
     - name: '[CS] PHP 7.4 With Lowest Dependencies'
-      php: '7.4'
+      php: '7.4snapshot'
       env: cs=1 dependencies=lowest
     - name: '[CS] PHP 7.4 With Highest Dependencies'
-      php: '7.4'
+      php: '7.4snapshot'
       env: cs=1 dependencies=highest
     - name: '[CS] PHP Nightly With Locked Dependencies'
       php: nightly
@@ -34,13 +34,13 @@ matrix:
       env: cs=1 dependencies=highest
 
     - name: '[UNIT] PHP 7.4 With Locked Dependencies'
-      php: '7.4'
+      php: '7.4snapshot'
       env: unit=1
     - name: '[UNIT] PHP 7.4 With Lowest Dependencies'
-      php: '7.4'
+      php: '7.4snapshot'
       env: dependencies=lowest unit=1
     - name: '[UNIT] PHP 7.4 With Highest Dependencies'
-      php: '7.4'
+      php: '7.4snapshot'
       env: dependencies=highest unit=1
     - name: '[UNIT] PHP Nightly With Locked Dependencies'
       php: nightly
@@ -53,13 +53,13 @@ matrix:
       env: dependencies=lowest unit=1
 
     - name: '[INTEGRATION] PHP 7.4 With Locked Dependencies'
-      php: '7.4'
+      php: '7.4snapshot'
       env: integration=1
     - name: '[INTEGRATION] PHP 7.4 With Lowest Dependencies'
-      php: '7.4'
+      php: '7.4snapshot'
       env: dependencies=lowest integration=1
     - name: '[INTEGRATION] PHP 7.4 With Highest Dependencies'
-      php: '7.4'
+      php: '7.4snapshot'
       env: dependencies=highest integration=1
     - name: '[INTEGRATION] PHP Nightly With Locked Dependencies'
       php: nightly
@@ -72,13 +72,13 @@ matrix:
       env: dependencies=lowest integration=1
 
     - name: '[PHPSTAN] PHP 7.4 With Locked Dependencies'
-      php: '7.4'
+      php: '7.4snapshot'
       env: phpstan=1
     - name: '[PHPSTAN] PHP 7.4 With Lowest Dependencies'
-      php: '7.4'
+      php: '7.4snapshot'
       env: phpstan=1 dependencies=lowest
     - name: '[PHPSTAN] PHP 7.4 With Highest Dependencies'
-      php: '7.4'
+      php: '7.4snapshot'
       env: phpstan=1 dependencies=highest
     - name: '[PHPSTAN] PHP Nightly With Locked Dependencies'
       php: nightly
@@ -89,6 +89,43 @@ matrix:
     - name: '[PHPSTAN] PHP Nightly With Highest Dependencies'
       php: nightly
       env: phpstan=1 dependencies=highest
+allowed_failures:
+  - name: '[CS] PHP Nightly With Locked Dependencies'
+    php: nightly
+    env: cs=1
+  - name: '[CS] PHP Nightly With Lowest Dependencies'
+    php: nightly
+    env: cs=1 dependencies=lowest
+  - name: '[CS] PHP Nightly With Highest Dependencies'
+    php: nightly
+    env: cs=1 dependencies=highest
+  - name: '[UNIT] PHP Nightly With Locked Dependencies'
+    php: nightly
+    env: unit=1
+  - name: '[UNIT] PHP Nightly With Highest Dependencies'
+    php: nightly
+    env: dependencies=highest unit=1
+  - name: '[UNIT] PHP Nightly With Lowest Dependencies'
+    php: nightly
+    env: dependencies=lowest unit=1
+  - name: '[INTEGRATION] PHP Nightly With Locked Dependencies'
+    php: nightly
+    env: integration=1
+  - name: '[INTEGRATION] PHP Nightly With Highest Dependencies'
+    php: nightly
+    env: dependencies=highest integration=1
+  - name: '[INTEGRATION] PHP Nightly With Lowest Dependencies'
+    php: nightly
+    env: dependencies=lowest integration=1
+  - name: '[PHPSTAN] PHP Nightly With Locked Dependencies'
+    php: nightly
+    env: phpstan=1
+  - name: '[PHPSTAN] PHP Nightly With Lowest Dependencies'
+    php: nightly
+    env: phpstan=1 dependencies=lowest
+  - name: '[PHPSTAN] PHP Nightly With Highest Dependencies'
+    php: nightly
+    env: phpstan=1 dependencies=highest
 
 before_install:
   - phpenv config-rm xdebug.ini || echo "No xdebug config."
