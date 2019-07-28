@@ -4,9 +4,7 @@ namespace PeeHaa\Migres\Retrospection;
 
 use PeeHaa\Migres\Action\Action;
 use PeeHaa\Migres\Action\AddCheck;
-use PeeHaa\Migres\Action\AddCheckByQuery;
 use PeeHaa\Migres\Action\AddColumn;
-use PeeHaa\Migres\Action\AddConstraint;
 use PeeHaa\Migres\Action\AddIndex;
 use PeeHaa\Migres\Action\AddIndexByQuery;
 use PeeHaa\Migres\Action\AddPrimaryKey;
@@ -252,59 +250,6 @@ final class Retrospector
         }
 
         return new Unique($name, ...array_unique($columns));
-    }
-
-    private function getCurrentConstraintDefinition(string $tableName, string $constraintName): Action
-    {
-        $sql = '
-            SELECT
-                table_constraints.constraint_name, constraint_type, table_constraints.table_name, key_column_usage.column_name, 
-                constraint_column_usage.table_name AS foreign_table_name,
-                constraint_column_usage.column_name AS foreign_column_name 
-            FROM 
-                information_schema.table_constraints
-                JOIN information_schema.key_column_usage ON table_constraints.constraint_name = key_column_usage.constraint_name
-                JOIN information_schema.constraint_column_usage ON constraint_column_usage.constraint_name = table_constraints.constraint_name
-                WHERE table_constraints.table_name = :tableName
-                    AND table_constraints.constraint_name = :constraintName
-        ';
-
-        $statement = $this->dbConnection->prepare($sql);
-
-        $statement->execute([
-            'tableName'      => $tableName,
-            'constraintName' => $constraintName,
-        ]);
-
-        $constraintInfo = $statement->fetchAll();
-
-        if (isset($constraintInfo[0]) && $constraintInfo[0]['constraint_type']) {
-            return new AddPrimaryKey($this->getPrimaryKeyConstraint($constraintInfo));
-        }
-
-        return new AddIndexByQuery($this->getIndexQuery($tableName, $constraintName));
-    }
-
-    private function getPrimaryKeyConstraint(array $constraintInfo): PrimaryKey
-    {
-        $columns = [];
-
-        foreach ($constraintInfo as $constraintRecord) {
-            $columns[] = $constraintRecord['column_name'];
-        }
-
-        return new PrimaryKey($constraintInfo[0]['constraint_name'], ...array_unique($columns));
-    }
-
-    private function getIndex(array $constraintInfo): Unique
-    {
-        $columns = [];
-
-        foreach ($constraintInfo as $constraintRecord) {
-            $columns[] = $constraintRecord['column_name'];
-        }
-
-        return new Unique($constraintInfo[0]['constraint_name'], ...array_unique($columns));
     }
 
     private function getCurrentIndexDefinition(string $tableName, string $indexName): string
