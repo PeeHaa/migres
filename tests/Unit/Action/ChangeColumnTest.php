@@ -2,7 +2,6 @@
 
 namespace PeeHaa\MigresTest\Unit\Action;
 
-use PeeHaa\Migres\Action\AddColumn;
 use PeeHaa\Migres\Action\ChangeColumn;
 use PeeHaa\Migres\DataType\IntegerType;
 use PeeHaa\Migres\Specification\Column;
@@ -36,7 +35,7 @@ class ChangeColumnTest extends TestCase
         $this->assertSame(
             'ALTER TABLE "table_name" ALTER COLUMN "column_name" DROP DEFAULT',
             $queries[1],
-         );
+        );
 
         $this->assertSame(
             'ALTER TABLE "table_name" ALTER COLUMN "column_name" DROP NOT NULL',

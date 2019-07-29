@@ -61,8 +61,8 @@ class ItemTest extends TestCase
     {
         $this->assertSame('2019-03-28 14:21:28.984125', $this->item->getExecutedAt()->format('Y-m-d H:i:s.u'));
     }
-    
-    public function testFromMigration(): void 
+
+    public function testFromMigration(): void
     {
         $item = Item::fromMigration(
             new Migration('TheName', 'TheFilename', 'TheFullyQualifiedName', new \DateTimeImmutable('2019-03-26 12:36:18')),
@@ -80,8 +80,8 @@ class ItemTest extends TestCase
         $this->assertSame('2019-03-26 12:36:18', $item->getCreatedAt()->format('Y-m-d H:i:s'));
         $this->assertInstanceOf(\DateTimeImmutable::class, $item->getExecutedAt());
     }
-    
-    public function testFromLogRecord(): void 
+
+    public function testFromLogRecord(): void
     {
         $item = Item::fromLogRecord([
             'id'                   => 'TheId',

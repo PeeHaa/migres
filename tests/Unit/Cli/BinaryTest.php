@@ -20,7 +20,7 @@ class BinaryTest extends TestCase
         $climate
             ->expects($this->exactly(4))
             ->method('info')
-            ->willReturnCallback(function (string $content) use ($climate) {
+            ->willReturnCallback(static function (string $content) use ($climate) {
                 static $i = 0;
 
                 if ($i === 0) {

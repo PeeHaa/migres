@@ -11,9 +11,6 @@ final class TimestampWithoutTimezone implements Type
         $this->precision = $precision;
     }
 
-    /**
-     * @internal
-     */
     public function toSql(): string
     {
         if ($this->precision === null) {

@@ -4,9 +4,6 @@ namespace PeeHaa\Migres\DataType;
 
 final class Uuid implements Type
 {
-    /**
-     * @internal
-     */
     public function toSql(): string
     {
         return 'uuid';

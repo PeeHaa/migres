@@ -11,7 +11,7 @@ class PrimaryKeyTest extends TestCase
     {
         $this->assertSame(
             'CONSTRAINT "table_name_pkey" PRIMARY KEY ("column1")',
-            (new PrimaryKey('table_name_pkey', 'column1'))->toSql()
+            (new PrimaryKey('table_name_pkey', 'column1'))->toSql(),
         );
     }
 
@@ -19,7 +19,7 @@ class PrimaryKeyTest extends TestCase
     {
         $this->assertSame(
             'CONSTRAINT "table_name_pkey" PRIMARY KEY ("column1", "column2")',
-            (new PrimaryKey('table_name_pkey', 'column1', 'column2'))->toSql()
+            (new PrimaryKey('table_name_pkey', 'column1', 'column2'))->toSql(),
         );
     }
 }

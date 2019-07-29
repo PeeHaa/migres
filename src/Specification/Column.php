@@ -2,7 +2,6 @@
 
 namespace PeeHaa\Migres\Specification;
 
-use PeeHaa\Migres\Constraint\NotNull;
 use PeeHaa\Migres\DataType\Type;
 
 final class Column

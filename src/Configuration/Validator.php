@@ -19,13 +19,12 @@ final class Validator
 
         $configuration = require $this->filename;
 
-        if (!$this->validateConfigurationKeys($configuration)) {
-            return false;
-        }
-
-        return true;
+        return $this->validateConfigurationKeys($configuration);
     }
 
+    /**
+     * @param array<string,mixed> $configuration
+     */
     private function validateConfigurationKeys(array $configuration): bool
     {
         foreach (['migrationPath', 'namespace', 'database'] as $requiredKey) {

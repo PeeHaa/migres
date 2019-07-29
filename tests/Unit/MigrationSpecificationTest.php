@@ -14,7 +14,8 @@ class MigrationSpecificationTest extends TestCase
         {
             public function change(): void
             {
-                $this->createTable('table_name', function (Table $table) {
+                // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+                $this->createTable('table_name', static function (Table $table): void {
                 });
             }
         };
@@ -30,7 +31,8 @@ class MigrationSpecificationTest extends TestCase
         {
             public function change(): void
             {
-                $this->changeTable('table_name', function (Table $table) {
+                // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+                $this->changeTable('table_name', static function (Table $table): void {
                 });
             }
         };

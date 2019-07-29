@@ -23,6 +23,9 @@ final class Database
         $this->password = $password;
     }
 
+    /**
+     * @param array<string,string|int> $configuration
+     */
     public static function fromArray(array $configuration): self
     {
         return new self(

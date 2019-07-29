@@ -12,7 +12,7 @@ class MigrationPathTest extends TestCase
     {
         $this->expectException(InvalidMigrationPath::class);
         $this->expectExceptionMessage(
-            'The migration path (`' . DATA_DIRECTORY . '/invalid-migration-path`) is invalid.'
+            'The migration path (`' . DATA_DIRECTORY . '/invalid-migration-path`) is invalid.',
         );
 
         new MigrationPath(DATA_DIRECTORY . '/invalid-migration-path');

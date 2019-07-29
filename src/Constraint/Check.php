@@ -13,9 +13,6 @@ final class Check extends NamedConstraint implements Constraint
         parent::__construct($name);
     }
 
-    /**
-     * @internal
-     */
     public function toSql(): string
     {
         return sprintf('CONSTRAINT "%s" CHECK (%s)', $this->name, $this->expression);

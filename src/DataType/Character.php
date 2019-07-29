@@ -11,9 +11,6 @@ final class Character implements Type
         $this->length = $length;
     }
 
-    /**
-     * @internal
-     */
     public function toSql(): string
     {
         if ($this->length === null) {

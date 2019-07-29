@@ -12,6 +12,9 @@ class InvalidDefaultValue extends Exception
         parent::__construct(sprintf('Default value of type `%s` is not valid.', $this->getType($defaultValue)));
     }
 
+    /**
+     * @param mixed $defaultValue
+     */
     private function getType($defaultValue): string
     {
         if (gettype($defaultValue) !== 'object') {

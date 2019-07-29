@@ -4,9 +4,6 @@ namespace PeeHaa\Migres\DataType;
 
 final class Text implements Type
 {
-    /**
-     * @internal
-     */
     public function toSql(): string
     {
         return 'text';

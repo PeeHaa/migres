@@ -14,9 +14,6 @@ final class PrimaryKey extends NamedConstraint implements Constraint
         parent::__construct($name);
     }
 
-    /**
-     * @internal
-     */
     public function toSql(): string
     {
         $columns = array_reduce($this->columns, static function (array $columns, string $name): array {

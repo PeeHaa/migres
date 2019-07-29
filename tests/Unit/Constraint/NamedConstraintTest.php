@@ -9,7 +9,8 @@ class NamedConstraintTest extends TestCase
 {
     public function testGetName(): void
     {
-        $namedConstraint = new class('ConstraintName') extends NamedConstraint {};
+        $namedConstraint = new class('ConstraintName') extends NamedConstraint {
+        };
 
         $this->assertSame('ConstraintName', $namedConstraint->getName());
     }

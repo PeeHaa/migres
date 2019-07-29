@@ -7,7 +7,7 @@ class UniqueConstraintDefinitionNotFound extends Retrospection
     public function __construct(string $tableName, string $keyName)
     {
         parent::__construct(
-            sprintf('Could not find definition of unique constraint `%s` in table `%s`.', $keyName, $tableName)
+            sprintf('Could not find definition of unique constraint `%s` in table `%s`.', $keyName, $tableName),
         );
     }
 }

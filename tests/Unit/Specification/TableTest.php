@@ -19,7 +19,6 @@ use PeeHaa\Migres\Action\RenameColumn;
 use PeeHaa\Migres\Action\RenamePrimaryKey;
 use PeeHaa\Migres\Action\RenameTable;
 use PeeHaa\Migres\DataType\IntegerType;
-use PeeHaa\Migres\Specification\Column;
 use PeeHaa\Migres\Specification\Table;
 use PHPUnit\Framework\TestCase;
 

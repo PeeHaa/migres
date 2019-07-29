@@ -61,7 +61,7 @@ class ColumnOptionsTest extends TestCase
         $this->assertSame(
             "B'100011'",
             $options->getDefaultValue(new Column('column_name', new Bit())),
-            );
+        );
     }
 
     public function testGetDefaultThrowsOnInvalidBinaryDefault(): void

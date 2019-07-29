@@ -23,7 +23,7 @@ class CreateNewMigrationTest extends TestCase
         $climate
             ->expects($this->once())
             ->method('lightGreen')
-            ->willReturnCallback(function (string $message) use ($climate) {
+            ->willReturnCallback(static function (string $message) use ($climate) {
                 preg_match('~^Created new migration at (?P<filename>.*)~', $message, $matches);
 
                 unlink($matches['filename']);
@@ -47,7 +47,7 @@ class CreateNewMigrationTest extends TestCase
         $command = new CreateNewMigration(
             $configuration,
             new Output($climate, new VerbosityLevel()),
-            'CreateSomeTable'
+            'CreateSomeTable',
         );
 
         $command->run();

@@ -92,7 +92,7 @@ final class Retrospector
         if ($action instanceof DropPrimaryKey) {
             return new AddPrimaryKey(
                 $action->getTableName(),
-                $this->getCurrentPrimaryKeyDefinition($action->getTableName(), $action->getName())
+                $this->getCurrentPrimaryKeyDefinition($action->getTableName(), $action->getName()),
             );
         }
 
@@ -107,7 +107,7 @@ final class Retrospector
         if ($action instanceof DropUniqueConstraint) {
             return new AddUniqueConstraint(
                 $action->getTableName(),
-                $this->getCurrentUniqueConstraintDefinition($action->getTableName(), $action->getName())
+                $this->getCurrentUniqueConstraintDefinition($action->getTableName(), $action->getName()),
             );
         }
 
@@ -118,7 +118,7 @@ final class Retrospector
         if ($action instanceof DropIndex) {
             return new AddIndexByQuery(
                 $action->getTableName(),
-                $this->getCurrentIndexDefinition($action->getTableName(), $action->getName())
+                $this->getCurrentIndexDefinition($action->getTableName(), $action->getName()),
             );
         }
 

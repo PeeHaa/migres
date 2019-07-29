@@ -2,7 +2,6 @@
 
 namespace PeeHaa\MigresTest\Unit\Retrospection;
 
-use PeeHaa\Migres\DataType\BigSerial;
 use PeeHaa\Migres\Retrospection\ColumnDefinition;
 use PeeHaa\Migres\Retrospection\ColumnInformation;
 use PeeHaa\Migres\Retrospection\ColumnOptionsResolver;

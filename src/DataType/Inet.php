@@ -4,9 +4,6 @@ namespace PeeHaa\Migres\DataType;
 
 final class Inet implements Type
 {
-    /**
-     * @internal
-     */
     public function toSql(): string
     {
         return 'inet';

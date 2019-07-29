@@ -4,9 +4,6 @@ namespace PeeHaa\Migres\DataType;
 
 final class Polygon implements Type
 {
-    /**
-     * @internal
-     */
     public function toSql(): string
     {
         return 'polygon';

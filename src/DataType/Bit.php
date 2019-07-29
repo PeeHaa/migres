@@ -11,9 +11,6 @@ final class Bit implements Type
         $this->length = $length;
     }
 
-    /**
-     * @internal
-     */
     public function toSql(): string
     {
         if ($this->length === null) {

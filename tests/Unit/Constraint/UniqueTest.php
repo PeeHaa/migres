@@ -11,7 +11,7 @@ class UniqueTest extends TestCase
     {
         $this->assertSame(
             'CONSTRAINT "table_name_pkey" UNIQUE ("column1")',
-            (new Unique('table_name_pkey', 'column1'))->toSql()
+            (new Unique('table_name_pkey', 'column1'))->toSql(),
         );
     }
 
@@ -19,7 +19,7 @@ class UniqueTest extends TestCase
     {
         $this->assertSame(
             'CONSTRAINT "table_name_pkey" UNIQUE ("column1", "column2")',
-            (new Unique('table_name_pkey', 'column1', 'column2'))->toSql()
+            (new Unique('table_name_pkey', 'column1', 'column2'))->toSql(),
         );
     }
 }

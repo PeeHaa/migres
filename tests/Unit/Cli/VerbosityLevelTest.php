@@ -11,7 +11,7 @@ class VerbosityLevelTest extends TestCase
     {
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessage(
-            'Argument 1 passed to PeeHaa\Migres\Cli\VerbosityLevel::__construct must be one of: 0, 1, 2 or 3'
+            'Argument 1 passed to PeeHaa\Migres\Cli\VerbosityLevel::__construct must be one of: 0, 1, 2 or 3',
         );
 
         new VerbosityLevel(10);

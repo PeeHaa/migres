@@ -22,6 +22,9 @@ final class Item
 
     private \DateTimeImmutable $executedAt;
 
+    /**
+     * @param array<int,string> $rollbackQueries
+     */
     private function __construct(
         string $id,
         string $name,

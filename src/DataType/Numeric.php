@@ -14,9 +14,6 @@ final class Numeric implements Type
         $this->scale     = $scale;
     }
 
-    /**
-     * @internal
-     */
     public function toSql(): string
     {
         if ($this->precision === null) {

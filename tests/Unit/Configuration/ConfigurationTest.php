@@ -49,8 +49,8 @@ class ConfigurationTest extends TestCase
             ],
         ]);
 
-        $this->assertSame(DATA_DIRECTORY . '/migrations', $this->configuration->getMigrationPath());
-        $this->assertSame('Test\Foo\Bar\Migration', $this->configuration->getNamespace());
-        $this->assertInstanceOf(Database::class, $this->configuration->getDatabaseConfiguration());
+        $this->assertSame(DATA_DIRECTORY . '/migrations', $configuration->getMigrationPath());
+        $this->assertSame('Test\Foo\Bar\Migration', $configuration->getNamespace());
+        $this->assertInstanceOf(Database::class, $configuration->getDatabaseConfiguration());
     }
 }

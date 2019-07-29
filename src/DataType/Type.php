@@ -4,8 +4,5 @@ namespace PeeHaa\Migres\DataType;
 
 interface Type
 {
-    /**
-     * @internal
-     */
     public function toSql(): string;
 }

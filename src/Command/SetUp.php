@@ -93,13 +93,11 @@ final class SetUp implements Command
 
     private function askForDatabaseHost(): string
     {
-        $response = $this->climate
+        return $this->climate
             ->input('What is the host address of your database? [localhost]')
             ->defaultTo('localhost')
             ->prompt()
         ;
-
-        return $response;
     }
 
     private function askForDatabasePort(): int
@@ -258,9 +256,11 @@ final class SetUp implements Command
 
         mkdir($this->settings['migrationPath']);
 
-        if (!is_dir($this->settings['migrationPath'])) {
-            $this->climate->error('Could not create migration directory');
+        if (is_dir($this->settings['migrationPath'])) {
+            return;
         }
+
+        $this->climate->error('Could not create migration directory');
     }
 
     private function createConfigFile(): void

@@ -14,7 +14,8 @@ final class Index extends NamedConstraint implements Constraint
     /**
      * @param array<string> $columns
      */
-    public function __construct(string $name, string $tableName, array $columns, ?string $method = null) {
+    public function __construct(string $name, string $tableName, array $columns, ?string $method = null)
+    {
         $this->tableName = $tableName;
         $this->columns   = $columns;
         $this->method    = $method;

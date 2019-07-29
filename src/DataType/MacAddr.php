@@ -4,9 +4,6 @@ namespace PeeHaa\Migres\DataType;
 
 final class MacAddr implements Type
 {
-    /**
-     * @internal
-     */
     public function toSql(): string
     {
         return 'macaddr';

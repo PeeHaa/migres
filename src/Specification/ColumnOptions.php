@@ -93,9 +93,6 @@ final class ColumnOptions
         return $this->nullable === false || $this->defaultValueSet;
     }
 
-    /**
-     * @internal
-     */
     public function toSql(Column $column): string
     {
         $sqlParts = [];
