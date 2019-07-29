@@ -3,9 +3,6 @@
 namespace PeeHaa\Migres\Retrospection;
 
 use PeeHaa\Migres\Specification\ColumnOptions;
-use PeeHaa\Migres\Constraint\NotNull;
-use PeeHaa\Migres\DataType\BigSerial;
-use PeeHaa\Migres\DataType\Type;
 
 final class ColumnOptionsResolver
 {
@@ -16,11 +13,11 @@ final class ColumnOptionsResolver
         $this->sequence = $sequence;
     }
 
-    public function resolve(Type $internalType, ColumnInformation $columnInformation): ColumnOptions
+    public function resolve(ColumnInformation $columnInformation): ColumnOptions
     {
         $columnOptions = new ColumnOptions();
 
-        if (!$internalType instanceof BigSerial && !$columnInformation->getColumnDefinition()->isNullable()) {
+        if (!$columnInformation->getColumnDefinition()->isNullable()) {
             $columnOptions->notNull();
         }
 
@@ -33,15 +30,21 @@ final class ColumnOptionsResolver
 
     private function hasDefaultValue(ColumnInformation $columnInformation): bool
     {
-        if ($columnInformation->getColumnDefinition()->getDataType() === 'bigint' && $this->sequence->isColumnUsingSequence($columnInformation)) {
+        if ($columnInformation->getColumnDefinition()->getDataType() === 'bigint'
+            && $this->sequence->isColumnUsingSequence($columnInformation)
+        ) {
             return false;
         }
 
-        if ($columnInformation->getColumnDefinition()->getDataType() === 'integer' && $this->sequence->isColumnUsingSequence($columnInformation)) {
+        if ($columnInformation->getColumnDefinition()->getDataType() === 'integer'
+            && $this->sequence->isColumnUsingSequence($columnInformation)
+        ) {
             return false;
         }
 
-        if ($columnInformation->getColumnDefinition()->getDataType() === 'smallint' && $this->sequence->isColumnUsingSequence($columnInformation)) {
+        if ($columnInformation->getColumnDefinition()->getDataType() === 'smallint'
+            && $this->sequence->isColumnUsingSequence($columnInformation)
+        ) {
             return false;
         }
 

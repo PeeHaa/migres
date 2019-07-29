@@ -10,6 +10,7 @@ use PeeHaa\Migres\DataType\Boolean;
 use PeeHaa\Migres\DataType\Box;
 use PeeHaa\Migres\DataType\ByteA;
 use PeeHaa\Migres\DataType\Character;
+use PeeHaa\Migres\DataType\CharacterVarying;
 use PeeHaa\Migres\DataType\Cidr;
 use PeeHaa\Migres\DataType\Circle;
 use PeeHaa\Migres\DataType\Date;
@@ -73,6 +74,9 @@ final class DataTypeResolver
 
             case 'character':
                 return new Character($columnInformation->getColumnDefinition()->getMaximumLength());
+
+            case 'character varying':
+                return new CharacterVarying($columnInformation->getColumnDefinition()->getMaximumLength());
 
             case 'circle':
                 return new Circle();

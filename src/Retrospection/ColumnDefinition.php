@@ -20,7 +20,7 @@ final class ColumnDefinition
     /**
      * @param mixed $defaultValue
      */
-    public function __construct(
+    private function __construct(
         $defaultValue,
         bool $isNullable,
         string $dataType,
