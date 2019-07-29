@@ -1,6 +1,6 @@
 # Migres
 
-The Postgresql migration tool
+The PostgreSQL migration tool
 
 [![Latest Stable Version](https://poser.pugx.org/peehaa/migres/v/stable)](https://packagist.org/packages/peehaa/migres)
 [![Build Status](https://travis-ci.org/PeeHaa/migres.svg?branch=master)](https://travis-ci.org/PeeHaa/migres)
@@ -18,6 +18,8 @@ The Postgresql migration tool
 Note: this is alpha software. Do not use in production (yet).
 
 *Warning: never allow untrusted input in table specifications as all migrations are translated to raw SQL!*
+
+All native PostgreSQL data types are implemented and the list can be found at: https://github.com/PeeHaa/migres/tree/master/src/DataType
 
 ### Creating a table
 
