@@ -2,11 +2,11 @@
 
 namespace PeeHaa\MigresTest\Unit\Cli;
 
-use PeeHaa\Migres\Cli\Command;
+use PeeHaa\Migres\Cli\Flag;
 use PeeHaa\MigresTest\Fakes\Climate;
 use PHPUnit\Framework\TestCase;
 
-class CommandTest extends TestCase
+class FlagTest extends TestCase
 {
     public function testRender(): void
     {
@@ -15,7 +15,7 @@ class CommandTest extends TestCase
         $climate
             ->expects($this->once())
             ->method('info')
-            ->with('  commandName')
+            ->with('  --flag')
         ;
 
         $climate
@@ -29,7 +29,7 @@ class CommandTest extends TestCase
             ->method('br')
         ;
 
-        (new Command($climate, 'commandName', 'helpText'))->render();
+        (new Flag($climate, '--flag', 'helpText'))->render();
     }
 
     public function testRenderWithExtraTexts(): void
@@ -39,7 +39,7 @@ class CommandTest extends TestCase
         $climate
             ->expects($this->once())
             ->method('info')
-            ->with('  commandName')
+            ->with('  --flag')
         ;
 
         $climate
@@ -49,9 +49,9 @@ class CommandTest extends TestCase
         ;
 
         $climate
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('out')
-            ->withConsecutive(['    extraText1'], ['    extraText2'])
+            ->with('    extraText')
         ;
 
         $climate
@@ -59,6 +59,6 @@ class CommandTest extends TestCase
             ->method('br')
         ;
 
-        (new Command($climate, 'commandName', 'helpText', 'extraText1', 'extraText2'))->render();
+        (new Flag($climate, '--flag', 'helpText', 'extraText'))->render();
     }
 }
