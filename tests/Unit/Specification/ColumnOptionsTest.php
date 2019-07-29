@@ -133,6 +133,15 @@ class ColumnOptionsTest extends TestCase
         );
     }
 
+    public function testGetDefaultThrowsExceptionWhenValueIsOfAnUnSupportedType(): void
+    {
+        $options = (new ColumnOptions())->setDefault(new \DateTimeImmutable());
+
+        $this->expectException(InvalidDefaultValue::class);
+
+        $options->getDefaultValue(new Column('column_name', new FloatType()));
+    }
+
     public function testNotNull(): void
     {
         $options = (new ColumnOptions())->notNull();

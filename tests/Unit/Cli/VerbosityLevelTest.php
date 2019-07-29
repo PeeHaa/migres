@@ -59,6 +59,13 @@ class VerbosityLevelTest extends TestCase
         $this->assertSame(1, $verbosityLevel->getLevel());
     }
 
+    public function testFromCliArgumentsDefaultsToLevel1WhenOnlyOtherArgumentsAreProvided(): void
+    {
+        $verbosityLevel = VerbosityLevel::fromCliArguments(['foo']);
+
+        $this->assertSame(1, $verbosityLevel->getLevel());
+    }
+
     public function testHasLevelWhenLevelIsTooLow(): void
     {
         $this->assertFalse(
