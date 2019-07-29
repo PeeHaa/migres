@@ -70,26 +70,16 @@ matrix:
     - name: '[INTEGRATION] PHP Nightly With Lowest Dependencies'
       php: nightly
       env: dependencies=lowest integration=1
-
-    - name: '[PHPSTAN] PHP 7.4 With Locked Dependencies'
-      php: '7.4snapshot'
-      env: phpstan=1
-    - name: '[PHPSTAN] PHP 7.4 With Lowest Dependencies'
-      php: '7.4snapshot'
-      env: phpstan=1 dependencies=lowest
-    - name: '[PHPSTAN] PHP 7.4 With Highest Dependencies'
-      php: '7.4snapshot'
-      env: phpstan=1 dependencies=highest
-    - name: '[PHPSTAN] PHP Nightly With Locked Dependencies'
-      php: nightly
-      env: phpstan=1
-    - name: '[PHPSTAN] PHP Nightly With Lowest Dependencies'
-      php: nightly
-      env: phpstan=1 dependencies=lowest
-    - name: '[PHPSTAN] PHP Nightly With Highest Dependencies'
-      php: nightly
-      env: phpstan=1 dependencies=highest
   allow_failures:
+    - name: '[CS] PHP 7.4 With Locked Dependencies'
+      php: '7.4snapshot'
+      env: cs=1
+    - name: '[CS] PHP 7.4 With Lowest Dependencies'
+      php: '7.4snapshot'
+      env: cs=1 dependencies=lowest
+    - name: '[CS] PHP 7.4 With Highest Dependencies'
+      php: '7.4snapshot'
+      env: cs=1 dependencies=highest
     - name: '[CS] PHP Nightly With Locked Dependencies'
       php: nightly
       env: cs=1
@@ -117,15 +107,6 @@ matrix:
     - name: '[INTEGRATION] PHP Nightly With Lowest Dependencies'
       php: nightly
       env: dependencies=lowest integration=1
-    - name: '[PHPSTAN] PHP Nightly With Locked Dependencies'
-      php: nightly
-      env: phpstan=1
-    - name: '[PHPSTAN] PHP Nightly With Lowest Dependencies'
-      php: nightly
-      env: phpstan=1 dependencies=lowest
-    - name: '[PHPSTAN] PHP Nightly With Highest Dependencies'
-      php: nightly
-      env: phpstan=1 dependencies=highest
 
 before_install:
   - phpenv config-rm xdebug.ini || echo "No xdebug config."
@@ -145,7 +126,6 @@ script:
   - if [ "$integration" = 1 ]; then phpdbg -qrr vendor/bin/phpunit --testsuite PeeHaaMigresIntegrationTestSuite --coverage-text --coverage-clover build/logs/clover.xml; fi;
   - if [ "$cs" = 1 ]; then vendor/bin/phpcs -s; fi;
   - if [ "$require" = 1 ]; then vendor/bin/composer-require-checker check; fi;
-  - if [ "$phpstan" = 1 ]; then vendor/bin/phpstan analyse src --level max; fi;
 
 after_success:
   - if [ "$unit" = 1 ]; then travis_retry php php-coveralls.phar; fi;
