@@ -141,8 +141,8 @@ before_script:
   - if [ "$dependencies" = "highest" ]; then travis_retry composer update -n; fi;
 
 script:
-  - if [ "$unit" = 1 ]; then phpdbg -qrr vendor/bin/phpunit --testsuite PeeHaaFeedMeUnitTestSuite --coverage-text --coverage-clover build/logs/clover.xml; fi;
-  - if [ "$integration" = 1 ]; then phpdbg -qrr vendor/bin/phpunit --testsuite PeeHaaFeedMeIntegrationTestSuite --coverage-text --coverage-clover build/logs/clover.xml; fi;
+  - if [ "$unit" = 1 ]; then phpdbg -qrr vendor/bin/phpunit --testsuite PeeHaaMigresUnitTestSuite --coverage-text --coverage-clover build/logs/clover.xml; fi;
+  - if [ "$integration" = 1 ]; then phpdbg -qrr vendor/bin/phpunit --testsuite PeeHaaMigresIntegrationTestSuite --coverage-text --coverage-clover build/logs/clover.xml; fi;
   - if [ "$cs" = 1 ]; then vendor/bin/phpcs -s; fi;
   - if [ "$require" = 1 ]; then vendor/bin/composer-require-checker check; fi;
   - if [ "$phpstan" = 1 ]; then vendor/bin/phpstan analyse src --level max; fi;
