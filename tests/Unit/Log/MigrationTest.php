@@ -96,6 +96,5 @@ class MigrationTest extends TestCase
         ;
 
         (new Log($dbConnection))->removeEntry('TheId');
-
     }
 }
