@@ -36,6 +36,7 @@ use PeeHaa\Migres\DataType\TimestampWithoutTimezone;
 use PeeHaa\Migres\DataType\TimestampWithTimezone;
 use PeeHaa\Migres\DataType\TimeWithoutTimezone;
 use PeeHaa\Migres\DataType\TimeWithTimezone;
+use PeeHaa\Migres\DataType\Uuid;
 use PeeHaa\Migres\Exception\UnsupportedDataType;
 use PeeHaa\Migres\Retrospection\ColumnDefinition;
 use PeeHaa\Migres\Retrospection\ColumnInformation;
@@ -824,6 +825,24 @@ class DataTypeResolverTest extends TestCase
         );
 
         $this->assertInstanceOf(TimeWithTimezone::class, $this->resolver->resolve($columnInformation));
+    }
+
+    public function testResolveResolvesUuid(): void
+    {
+        $columnInformation = new ColumnInformation(
+            'table_name',
+            'column_name',
+            ColumnDefinition::fromInformationSchemaRecord([
+                'column_default'           => null,
+                'is_nullable'              => 'NO',
+                'data_type'                => 'uuid',
+                'character_maximum_length' => null,
+                'numeric_precision'        => null,
+                'numeric_scale'            => null,
+            ]),
+        );
+
+        $this->assertInstanceOf(Uuid::class, $this->resolver->resolve($columnInformation));
     }
 
     public function testResolveThrowsOnUnsupportedDataType(): void

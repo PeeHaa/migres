@@ -238,7 +238,7 @@ class TableTest extends TestCase
     {
         $table = Table::fromChangeTable('table_name');
 
-        $table->addGinIndex('name', 'column_name');
+        $table->addGistIndex('name', 'column_name');
 
         $this->assertCount(1, $table->getActions());
 
