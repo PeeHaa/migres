@@ -65,10 +65,6 @@ final class ColumnOptions
 
     private function getBinaryDefaultValue(): string
     {
-        if (preg_match('~::"?bit(\(\d+\))?"?$~', $this->defaultValue)) {
-            return $this->defaultValue;
-        }
-
         if (preg_match('~^B\'[01]+\'$~', $this->defaultValue)) {
             return $this->defaultValue;
         }

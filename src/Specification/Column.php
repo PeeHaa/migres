@@ -56,10 +56,6 @@ final class Column
     {
         $sql = sprintf('"%s" %s', $this->name, $this->type->toSql());
 
-        if (!$this->options) {
-            return $sql;
-        }
-
         if (!$this->options->hasOptions()) {
             return $sql;
         }
