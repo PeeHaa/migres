@@ -3,7 +3,6 @@
 namespace PeeHaa\Migres\Log;
 
 use PeeHaa\Migres\Action\Action;
-use PeeHaa\Migres\Action_old\ReverseAction;
 use PeeHaa\Migres\Migration;
 
 final class Item
@@ -71,6 +70,7 @@ final class Item
 
     /**
      * @param array<string,mixed> $logRecord
+     * @throws \Exception
      */
     public static function fromLogRecord(array $logRecord): self
     {
