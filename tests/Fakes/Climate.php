@@ -10,43 +10,75 @@ use League\CLImate\CLImate as ClimateImpl;
 class Climate extends ClimateImpl
 {
     // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-    public function info(string $content): self
+    public function info(string $content): \League\CLImate\CLImate
     {
         return $this;
     }
 
-    public function br(): self
-    {
-        return $this;
-    }
-
-    // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-    public function darkGray(string $content): self
+    public function br(): \League\CLImate\CLImate
     {
         return $this;
     }
 
     // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-    public function white(string $content): self
+    public function darkGray(string $content): \League\CLImate\CLImate
     {
         return $this;
     }
 
     // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-    public function out(string $content): self
+    public function white(string $content): \League\CLImate\CLImate
     {
         return $this;
     }
 
     // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-    public function lightGreen(string $content): self
+    public function out(string $content): \League\CLImate\CLImate
     {
         return $this;
     }
 
     // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-    public function error(string $content): self
+    public function lightGreen(string $content): \League\CLImate\CLImate
     {
         return $this;
+    }
+
+    // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+    public function error(string $content): \League\CLImate\CLImate
+    {
+        return $this;
+    }
+
+    // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+    public function input(string $content): \League\CLImate\CLImate
+    {
+        return $this;
+    }
+
+    // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+    public function password(string $content): \League\CLImate\CLImate
+    {
+        return $this;
+    }
+
+    // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+    public function defaultTo(string $content): \League\CLImate\CLImate
+    {
+        return $this;
+    }
+
+    // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+    public function accept(array $accept): \League\CLImate\CLImate
+    {
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function prompt()
+    {
+        return '';
     }
 }

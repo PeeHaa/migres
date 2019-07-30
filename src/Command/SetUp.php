@@ -233,6 +233,11 @@ final class SetUp implements Command
                 break;
 
             case '6':
+                $this->settings['database']['username'] = $this->askForDatabaseUsername();
+                $this->verifySettings();
+                break;
+
+            case '7':
                 $this->settings['database']['password'] = $this->askForDatabasePassword();
                 $this->verifySettings();
                 break;
