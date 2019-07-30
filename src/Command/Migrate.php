@@ -26,22 +26,18 @@ final class Migrate implements Command
 
     private Retrospector $retrospector;
 
-    private CLImate $logger;
-
     public function __construct(
         Configuration $configuration,
         \PDO $dbConnection,
         Output $output,
         MigrationLog $migrationLog,
-        Retrospector $retrospector,
-        CLImate $logger
+        Retrospector $retrospector
     ) {
         $this->configuration = $configuration;
         $this->dbConnection  = $dbConnection;
         $this->output        = $output;
         $this->migrationLog  = $migrationLog;
         $this->retrospector  = $retrospector;
-        $this->logger        = $logger;
     }
 
     public function run(): void
@@ -81,9 +77,7 @@ final class Migrate implements Command
                 $this->dbConnection->rollBack();
             }
 
-            $this->output->error($e->getMessage());
-
-            exit(1);
+            throw $e;
         }
 
         $this->output->success('Successfully performed all migrations!');
@@ -143,10 +137,6 @@ final class Migrate implements Command
     {
         preg_match('~^\d{14}_(?P<className>[_a-z0-9]+)\.php$~', $filename, $matches);
 
-        if (!isset($matches['className'])) {
-            throw new InvalidFilename($filename);
-        }
-
         $classNameParts = explode('_', $matches['className']);
 
         $classNameParts = array_map('ucfirst', $classNameParts);
@@ -172,10 +162,6 @@ final class Migrate implements Command
     private function getTimestamp(string $filename): \DateTimeImmutable
     {
         preg_match('~^(?P<timestamp>\d{14})_[_a-z0-9]+\.php$~', $filename, $matches);
-
-        if (!isset($matches['timestamp'])) {
-            throw new InvalidFilename($filename);
-        }
 
         return \DateTimeImmutable::createFromFormat('YmdHis', $matches['timestamp']);
     }
