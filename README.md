@@ -15,7 +15,7 @@ The PostgreSQL migration tool
 
 ## Usage
 
-Note: this is alpha software. Do not use in production (yet).
+Note: this is alpha software. Do not use in production (yet). I would appreciate if you could test it and provide feedback in [GitHub issues](https://github.com/PeeHaa/migres/issues/new). <3
 
 *__Warning: never allow untrusted input in table specifications as all migrations are translated to raw SQL!__*
 
