@@ -49,6 +49,11 @@ All native PostgreSQL data types are implemented and the list can be found at: h
   - [dropIndex](#tabledropindexstring-indexname)
   - [addCheck](#tableaddcheckstring-checkname-string-expression)
   - [dropCheck](#tabledropcheckstring-checkname)
+- [Command line](#command-line)
+  - [Setup](#setup)
+  - [Create new migration](#create-new-migration)
+  - [Run migrations](#run-migrations)
+  - [Run rollbacks](#run-rollbacks)
 
 ### Creating a table
 
@@ -326,7 +331,7 @@ This will create a new migration and writes the file to the migrations directory
 
 Run the migrations
 
-#### Run migrations
+#### Run rollbacks
 
 ```shell script
 ./vendor/bin/migres rollback [-v[v][v]]
