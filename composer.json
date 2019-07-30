@@ -37,6 +37,9 @@
             "PeeHaa\\MigresTest\\": "tests/"
         }
     },
+    "bin": [
+        "bin/migres"
+    ],
     "config": {
         "sort-packages": true
     }
