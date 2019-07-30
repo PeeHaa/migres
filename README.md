@@ -299,3 +299,37 @@ $table->addCheck('bigger_than_10_chk', 'column_name > 10');
 ```php
 $table->dropCheck('bigger_than_10_chk');
 ```
+
+### Command line
+
+#### Setup
+
+```shell script
+./vendor/bin/migres setup
+```
+
+This will run the setup wizard which guides you through the process of setting up the configuration.
+
+#### Create new migration
+
+```shell script
+./vendor/bin/migres create NewMigrationName
+```
+
+This will create a new migration and writes the file to the migrations directory.
+
+#### Run migrations
+
+```shell script
+./vendor/bin/migres migrate [-v[v][v]]
+```
+
+Run the migrations
+
+#### Run migrations
+
+```shell script
+./vendor/bin/migres rollback [-v[v][v]]
+```
+
+Rolls back the migrations
