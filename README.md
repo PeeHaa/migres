@@ -21,7 +21,7 @@ Note: this is alpha software. Do not use in production (yet). I would appreciate
 
 - Add the project using composer `composer install peehaa/migres`
 - Run the setup `./vendor/bin/migres setup`
-- Run without arguments to view the available commands `./vendor/bin/migres setup`
+- Run without arguments to view the available commands `./vendor/bin/migres`
 
 All native PostgreSQL data types are implemented and the list can be found at: https://github.com/PeeHaa/migres/tree/master/src/DataType
 
