@@ -25,6 +25,31 @@ Note: this is alpha software. Do not use in production (yet).
 
 All native PostgreSQL data types are implemented and the list can be found at: https://github.com/PeeHaa/migres/tree/master/src/DataType
 
+### TOC
+
+- [Creating a table](#creating-a-table)
+- [Renaming a table](#renaming-a-table)
+- [Dropping a table](#dropping-a-table)
+- [Table methods](#table-methods)
+  - [addColumn](#tableaddcolumnstring-name-migresdatatypetype-datatype)
+  - [dropColumn](#tabledropcolumnstring-name)
+  - [renameColumn](#tablerenamecolumnstring-oldname-string-newname)
+  - [changeColumn](#tablechangecolumnstring-name-migresdatatypetype-datatype)
+  - [primaryKey](#tableprimarykeystring-column-string-columns)
+  - [namedPrimaryKey](#tablenamedprimarykeystring-name-string-column-string-columns)
+  - [dropPrimaryKey](#tabledropprimarykeystring-name)
+  - [renamePrimaryKey](#tablerenameprimarykeystring-oldname-string-newname)
+  - [addUniqueConstraint](#tableadduniqueconstraintstring-constraintname-string-column-string-columns)
+  - [dropUniqueConstraint](#tabledropuniqueconstraintstring-constraintname)
+  - [addIndex](#tableaddindexstring-indexname-string-column-string-columns)
+  - [addBtreeIndex](#tableaddbtreeindexstring-indexname-string-column-string-columns)
+  - [addHashIndex](#tableaddhashindexstring-indexname-string-column-string-columns)
+  - [addGistIndex](#tableaddgistindexstring-indexname-string-column-string-columns)
+  - [addGinIndex](#tableaddginindexstring-indexname-string-column-string-columns)
+  - [dropIndex](#tabledropindexstring-indexname)
+  - [addCheck](#tableaddcheckstring-checkname-string-expression)
+  - [dropCheck](#tabledropcheckstring-checkname)
+
 ### Creating a table
 
 ```php
