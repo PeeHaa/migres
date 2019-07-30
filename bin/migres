@@ -5,16 +5,18 @@ namespace PeeHaa\Migres\Bin;
 
 use League\CLImate\CLImate;
 use PeeHaa\Migres\Cli\Binary;
-use PeeHaa\Migres\Cli\Command;
+use PeeHaa\Migres\Cli\Command as CliCommand;
 use PeeHaa\Migres\Cli\Flag;
 use PeeHaa\Migres\Cli\Output;
 use PeeHaa\Migres\Cli\Usage;
 use PeeHaa\Migres\Cli\VerbosityLevel;
+use PeeHaa\Migres\Command\Command;
 use PeeHaa\Migres\Command\CreateNewMigration;
 use PeeHaa\Migres\Command\SetUp;
 use PeeHaa\Migres\Command\Migrate;
 use PeeHaa\Migres\Command\Rollback;
 use PeeHaa\Migres\Configuration\Configuration;
+use PeeHaa\Migres\Configuration\Database;
 use PeeHaa\Migres\Configuration\Validator;
 use PeeHaa\Migres\Log\Migration as MigrationLog;
 use PeeHaa\Migres\Retrospection\ColumnOptionsResolver;
@@ -34,10 +36,10 @@ if (!isset($argv[1]) || in_array($argv[1], ['help', '-h', '--help'], true) || !i
         ->addUsage(new Usage($climate, 'migres create MyNewMigration'))
         ->addUsage(new Usage($climate, 'migres migrate [-t migration]'))
         ->addUsage(new Usage($climate, 'migres rollback [-t migration]'))
-        ->addCommand(new Command($climate, 'setup', 'Runs the configuration wizard'))
-        ->addCommand(new Command($climate, 'create', 'Creates a new migration'))
-        ->addCommand(new Command($climate, 'migrate [-v|-vv|-vvv] [-q]', 'Runs migrations', '<green>-v</green> defines the verbosity level (defaults to 1)', '<green>-q</green> runs silent'))
-        ->addCommand(new Command($climate, 'rollback [-v|-vv|-vvv] [-q]', 'Rolls back migrations', '<green>-v</green> defines the verbosity level (defaults to 1)', '<green>-q</green> runs silent'))
+        ->addCommand(new CliCommand($climate, 'setup', 'Runs the configuration wizard'))
+        ->addCommand(new CliCommand($climate, 'create', 'Creates a new migration'))
+        ->addCommand(new CliCommand($climate, 'migrate [-v|-vv|-vvv] [-q]', 'Runs migrations', '<green>-v</green> defines the verbosity level (defaults to 1)', '<green>-q</green> runs silent'))
+        ->addCommand(new CliCommand($climate, 'rollback [-v|-vv|-vvv] [-q]', 'Rolls back migrations', '<green>-v</green> defines the verbosity level (defaults to 1)', '<green>-q</green> runs silent'))
         ->addFlag(new Flag($climate, '-v', 'Default verbosity level (1)', 'Outputs the start of migrations and rollbacks'))
         ->addFlag(new Flag($climate, '-vv', 'Verbosity level 2', 'Outputs everything from verbosity level 1 and also outputs the start of table actions inside migrations / rollbacks'))
         ->addFlag(new Flag($climate, '-vvv', 'Verbosity level 3', 'Outputs everything from verbosity level 2 and also outputs all queries being run'))
@@ -64,56 +66,62 @@ if (!(new Validator(getcwd() . '/migres.php'))->validate()) {
     exit(1);
 }
 
+$configuration = Configuration::fromArray(require getcwd() . '/migres.php');
+$output        = new Output($climate, VerbosityLevel::fromCliArguments($argv));
+
 if ($argv[1] === 'create') {
-    (new CreateNewMigration(
-        Configuration::fromArray(require getcwd() . '/migres.php'),
-        new Output($climate, VerbosityLevel::fromCliArguments($argv)),
-        $argv[2],
-    ))->run();
+    (new CreateNewMigration($configuration, $output, $argv[2]))->run();
 
     exit(0);
 }
 
-$dbConnection = createDatabaseConnectionFromConfiguration(require getcwd() . '/migres.php');
+$dbConnection = createDatabaseConnectionFromConfiguration($configuration->getDatabaseConfiguration());
 
 if ($argv[1] === 'migrate') {
-    (new Migrate(
-        Configuration::fromArray(require getcwd() . '/migres.php'),
+    $command = new Migrate(
+        $configuration,
         $dbConnection,
-        new Output($climate, VerbosityLevel::fromCliArguments($argv)),
+        $output,
         new MigrationLog($dbConnection),
         new Retrospector($dbConnection, new DataTypeResolver(new Sequence()), new ColumnOptionsResolver(new Sequence())),
-        $climate,
-    ))->run();
+    );
 
-    exit(0);
+    executeCommand($command, $output);
 }
 
 if ($argv[1] === 'rollback') {
-    (new Rollback(
-        Configuration::fromArray(require getcwd() . '/migres.php'),
-        createDatabaseConnectionFromConfiguration(require getcwd() . '/migres.php'),
-        new Output($climate, VerbosityLevel::fromCliArguments($argv)),
-        new MigrationLog($dbConnection),
-    ))->run();
+    $command = new Rollback($configuration, $dbConnection, $output, new MigrationLog($dbConnection));
 
-    exit(0);
+    executeCommand($command, $output);
 }
 
-function createDatabaseConnectionFromConfiguration(array $configuration): \PDO
+function createDatabaseConnectionFromConfiguration(Database $configuration): \PDO
 {
     $dsn = sprintf(
         'pgsql:dbname=%s;host=%s;port=%s',
-        $configuration['database']['name'],
-        $configuration['database']['host'],
-        $configuration['database']['port']
+        $configuration->getName(),
+        $configuration->getHost(),
+        $configuration->getPort(),
     );
 
-    $dbConnection = new \PDO($dsn, $configuration['database']['username'], $configuration['database']['password']);
+    $dbConnection = new \PDO($dsn, $configuration->getUsername(), $configuration->getPassword());
 
     $dbConnection->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
     $dbConnection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
     $dbConnection->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 
     return $dbConnection;
+}
+
+function executeCommand(Command $command, Output $output): void
+{
+    try {
+        $command->run();
+    } catch (\Throwable $exception) {
+        $output->error($exception->getMessage());
+
+        exit(1);
+    }
+
+    exit(0);
 }
