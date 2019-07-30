@@ -53,9 +53,7 @@ final class Rollback implements Command
                 $this->dbConnection->rollBack();
             }
 
-            $this->output->error($e->getMessage());
-
-            exit(1);
+            throw $e;
         }
 
         $this->output->success('Successfully performed all rollbacks!');
