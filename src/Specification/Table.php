@@ -5,6 +5,7 @@ namespace PeeHaa\Migres\Specification;
 use PeeHaa\Migres\Action\Action;
 use PeeHaa\Migres\Action\AddCheck;
 use PeeHaa\Migres\Action\AddColumn;
+use PeeHaa\Migres\Action\AddForeignKey;
 use PeeHaa\Migres\Action\AddIndex;
 use PeeHaa\Migres\Action\AddPrimaryKey;
 use PeeHaa\Migres\Action\AddUniqueConstraint;
@@ -12,6 +13,7 @@ use PeeHaa\Migres\Action\ChangeColumn;
 use PeeHaa\Migres\Action\CreateTable;
 use PeeHaa\Migres\Action\DropCheck;
 use PeeHaa\Migres\Action\DropColumn;
+use PeeHaa\Migres\Action\DropForeignKey;
 use PeeHaa\Migres\Action\DropIndex;
 use PeeHaa\Migres\Action\DropPrimaryKey;
 use PeeHaa\Migres\Action\DropTable;
@@ -20,6 +22,7 @@ use PeeHaa\Migres\Action\RenameColumn;
 use PeeHaa\Migres\Action\RenamePrimaryKey;
 use PeeHaa\Migres\Action\RenameTable;
 use PeeHaa\Migres\Constraint\Check;
+use PeeHaa\Migres\Constraint\ForeignKey;
 use PeeHaa\Migres\Constraint\Index;
 use PeeHaa\Migres\Constraint\PrimaryKey;
 use PeeHaa\Migres\Constraint\Unique;
@@ -172,6 +175,20 @@ final class Table
     public function dropCheck(string $name): void
     {
         $this->actions[] = new DropCheck($this->name, $name);
+    }
+
+    public function addForeignKey(string $name, string $column, string ...$columns): ForeignKey
+    {
+        $foreignKey = new ForeignKey($name, ...array_merge([$column], $columns));
+
+        $this->actions[] = new AddForeignKey($this->name, $foreignKey);
+
+        return $foreignKey;
+    }
+
+    public function dropForeignKey(string $name): void
+    {
+        $this->actions[] = new DropForeignKey($this->name, $name);
     }
 
     public function getActions(): TableActions

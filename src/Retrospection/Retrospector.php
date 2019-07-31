@@ -5,6 +5,8 @@ namespace PeeHaa\Migres\Retrospection;
 use PeeHaa\Migres\Action\Action;
 use PeeHaa\Migres\Action\AddCheck;
 use PeeHaa\Migres\Action\AddColumn;
+use PeeHaa\Migres\Action\AddForeignByQuery;
+use PeeHaa\Migres\Action\AddForeignKey;
 use PeeHaa\Migres\Action\AddIndex;
 use PeeHaa\Migres\Action\AddIndexByQuery;
 use PeeHaa\Migres\Action\AddPrimaryKey;
@@ -13,6 +15,7 @@ use PeeHaa\Migres\Action\ChangeColumn;
 use PeeHaa\Migres\Action\CreateTable;
 use PeeHaa\Migres\Action\DropCheck;
 use PeeHaa\Migres\Action\DropColumn;
+use PeeHaa\Migres\Action\DropForeignKey;
 use PeeHaa\Migres\Action\DropIndex;
 use PeeHaa\Migres\Action\DropPrimaryKey;
 use PeeHaa\Migres\Action\DropTable;
@@ -21,10 +24,12 @@ use PeeHaa\Migres\Action\RenameColumn;
 use PeeHaa\Migres\Action\RenamePrimaryKey;
 use PeeHaa\Migres\Action\RenameTable;
 use PeeHaa\Migres\Constraint\Check;
+use PeeHaa\Migres\Constraint\ForeignKey;
 use PeeHaa\Migres\Constraint\PrimaryKey;
 use PeeHaa\Migres\Constraint\Unique;
 use PeeHaa\Migres\Exception\CheckDefinitionNotFound;
 use PeeHaa\Migres\Exception\ColumnDefinitionNotFound;
+use PeeHaa\Migres\Exception\ForeignKeyDefinitionNotFound;
 use PeeHaa\Migres\Exception\IndexDefinitionNotFound;
 use PeeHaa\Migres\Exception\IrreversibleAction;
 use PeeHaa\Migres\Exception\PrimaryKeyDefinitionNotFound;
@@ -131,6 +136,14 @@ final class Retrospector
                 $action->getTableName(),
                 $this->getCurrentCheckDefinition($action->getTableName(), $action->getName()),
             );
+        }
+
+        if ($action instanceof AddForeignKey) {
+            return new DropForeignKey($action->getTableName(), $action->getForeignKey()->getName());
+        }
+
+        if ($action instanceof DropForeignKey) {
+            return $this->getCurrentForeignKeyDefinition($action->getTableName(), $action->getName());
         }
 
         throw new IrreversibleAction(get_class($action));
@@ -298,5 +311,30 @@ final class Retrospector
         }
 
         return new Check($checkName, $checkInformation);
+    }
+
+    private function getCurrentForeignKeyDefinition(string $tableName, string $name): AddForeignByQuery
+    {
+        $sql = '
+            SELECT conrelid::regclass AS table_from, pg_get_constraintdef(pg_constraint.oid)
+            FROM pg_constraint
+            JOIN pg_namespace ON pg_namespace.oid = pg_constraint.connamespace
+            WHERE contype = \'f\'
+                AND conname = :constraintName;
+        ';
+
+        $statement = $this->dbConnection->prepare($sql);
+
+        $statement->execute([
+            'constraintName' => $name,
+        ]);
+
+        $constraintInfo = $statement->fetch();
+
+        if (!$constraintInfo) {
+            throw new ForeignKeyDefinitionNotFound($name);
+        }
+
+        return new AddForeignByQuery($tableName, $constraintInfo['pg_get_constraintdef']);
     }
 }
