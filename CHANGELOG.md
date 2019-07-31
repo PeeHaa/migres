@@ -51,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **The binary now correctly finds the composer autoloader when added to a project**
+- The binary now correctly finds the composer autoloader when added to a project
 
 ### Security
 
