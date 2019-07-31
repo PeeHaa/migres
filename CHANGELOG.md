@@ -35,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Experimental API for foreign keys**
+- **Experimental** API for foreign keys
 
 ### Changed
 
