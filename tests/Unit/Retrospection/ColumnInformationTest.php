@@ -4,6 +4,7 @@ namespace PeeHaa\MigresTest\Unit\Retrospection;
 
 use PeeHaa\Migres\Retrospection\ColumnDefinition;
 use PeeHaa\Migres\Retrospection\ColumnInformation;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class ColumnInformationTest extends TestCase
@@ -13,8 +14,8 @@ class ColumnInformationTest extends TestCase
     public function setUp(): void
     {
         $this->information = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => 'TheDefault',
                 'is_nullable'              => 'YES',
@@ -28,12 +29,12 @@ class ColumnInformationTest extends TestCase
 
     public function testGetTableName(): void
     {
-        $this->assertSame('table_name', $this->information->getTableName());
+        $this->assertSame('table_name', $this->information->getTableName()->toString());
     }
 
     public function testGetColumnName(): void
     {
-        $this->assertSame('column_name', $this->information->getColumnName());
+        $this->assertSame('column_name', $this->information->getColumnName()->toString());
     }
 
     public function testGetColumnDefinition(): void

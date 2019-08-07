@@ -4,19 +4,20 @@ namespace PeeHaa\Migres\Action;
 
 use PeeHaa\Migres\Migration\Queries;
 use PeeHaa\Migres\Specification\Column;
+use PeeHaa\Migres\Specification\Label;
 
 final class ChangeColumn extends TableAction implements Action
 {
     private Column $column;
 
-    public function __construct(string $tableName, Column $column)
+    public function __construct(Label $tableName, Column $column)
     {
         parent::__construct($tableName);
 
         $this->column = $column;
     }
 
-    public function getName(): string
+    public function getName(): Label
     {
         return $this->column->getName();
     }
@@ -27,8 +28,8 @@ final class ChangeColumn extends TableAction implements Action
 
         $queries[] = sprintf(
             'ALTER TABLE "%s" ALTER COLUMN "%s" TYPE %s',
-            $this->tableName,
-            $this->column->getName(),
+            $this->tableName->toString(),
+            $this->column->getName()->toString(),
             $this->column->getType()->toSql(),
         );
 
@@ -43,13 +44,17 @@ final class ChangeColumn extends TableAction implements Action
         $options = $this->column->getOptions();
 
         if (!$options->hasDefault()) {
-            return sprintf('ALTER TABLE "%s" ALTER COLUMN "%s" DROP DEFAULT', $this->tableName, $this->column->getName());
+            return sprintf(
+                'ALTER TABLE "%s" ALTER COLUMN "%s" DROP DEFAULT',
+                $this->tableName->toString(),
+                $this->column->getName()->toString(),
+            );
         }
 
         return sprintf(
             'ALTER TABLE "%s" ALTER COLUMN "%s" SET DEFAULT %s',
-            $this->tableName,
-            $this->column->getName(),
+            $this->tableName->toString(),
+            $this->column->getName()->toString(),
             $options->getDefaultValue($this->column),
         );
     }
@@ -59,9 +64,17 @@ final class ChangeColumn extends TableAction implements Action
         $options = $this->column->getOptions();
 
         if ($options->isNullable()) {
-            return sprintf('ALTER TABLE "%s" ALTER COLUMN "%s" DROP NOT NULL', $this->tableName, $this->column->getName());
+            return sprintf(
+                'ALTER TABLE "%s" ALTER COLUMN "%s" DROP NOT NULL',
+                $this->tableName->toString(),
+                $this->column->getName()->toString(),
+            );
         }
 
-        return sprintf('ALTER TABLE "%s" ALTER COLUMN "%s" SET NOT NULL', $this->tableName, $this->column->getName());
+        return sprintf(
+            'ALTER TABLE "%s" ALTER COLUMN "%s" SET NOT NULL',
+            $this->tableName->toString(),
+            $this->column->getName()->toString(),
+        );
     }
 }

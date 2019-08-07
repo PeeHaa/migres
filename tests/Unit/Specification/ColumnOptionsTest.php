@@ -9,6 +9,7 @@ use PeeHaa\Migres\DataType\IntegerType;
 use PeeHaa\Migres\Exception\InvalidDefaultValue;
 use PeeHaa\Migres\Specification\Column;
 use PeeHaa\Migres\Specification\ColumnOptions;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class ColumnOptionsTest extends TestCase
@@ -17,7 +18,10 @@ class ColumnOptionsTest extends TestCase
     {
         $options = (new ColumnOptions())->setDefault('TheDefault');
 
-        $this->assertSame("'TheDefault'", $options->getDefaultValue(new Column('column_name', new CharacterVarying())));
+        $this->assertSame(
+            "'TheDefault'",
+            $options->getDefaultValue(new Column(new Label('column_name'), new CharacterVarying())),
+        );
     }
 
     public function testHasDefaultWhenDefaultIsSet(): void
@@ -40,7 +44,7 @@ class ColumnOptionsTest extends TestCase
 
         $this->assertSame(
             "'TheDefault'::string",
-            $options->getDefaultValue(new Column('column_name', new CharacterVarying())),
+            $options->getDefaultValue(new Column(new Label('column_name'), new CharacterVarying())),
         );
     }
 
@@ -50,7 +54,7 @@ class ColumnOptionsTest extends TestCase
 
         $this->assertSame(
             "B'100011'",
-            $options->getDefaultValue(new Column('column_name', new Bit())),
+            $options->getDefaultValue(new Column(new Label('column_name'), new Bit())),
         );
     }
 
@@ -60,7 +64,7 @@ class ColumnOptionsTest extends TestCase
 
         $this->assertSame(
             "B'100011'",
-            $options->getDefaultValue(new Column('column_name', new Bit())),
+            $options->getDefaultValue(new Column(new Label('column_name'), new Bit())),
         );
     }
 
@@ -70,7 +74,7 @@ class ColumnOptionsTest extends TestCase
 
         $this->expectException(InvalidDefaultValue::class);
 
-        $options->getDefaultValue(new Column('column_name', new Bit()));
+        $options->getDefaultValue(new Column(new Label('column_name'), new Bit()));
     }
 
     public function testGetDefaultReturnsFormattedStringWhenTypeIsString(): void
@@ -79,7 +83,7 @@ class ColumnOptionsTest extends TestCase
 
         $this->assertSame(
             "'TheDefault'",
-            $options->getDefaultValue(new Column('column_name', new CharacterVarying())),
+            $options->getDefaultValue(new Column(new Label('column_name'), new CharacterVarying())),
         );
     }
 
@@ -89,7 +93,7 @@ class ColumnOptionsTest extends TestCase
 
         $this->assertSame(
             "'true'",
-            $options->getDefaultValue(new Column('column_name', new CharacterVarying())),
+            $options->getDefaultValue(new Column(new Label('column_name'), new CharacterVarying())),
         );
     }
 
@@ -99,7 +103,7 @@ class ColumnOptionsTest extends TestCase
 
         $this->assertSame(
             "'false'",
-            $options->getDefaultValue(new Column('column_name', new CharacterVarying())),
+            $options->getDefaultValue(new Column(new Label('column_name'), new CharacterVarying())),
         );
     }
 
@@ -109,7 +113,7 @@ class ColumnOptionsTest extends TestCase
 
         $this->assertSame(
             '12',
-            $options->getDefaultValue(new Column('column_name', new IntegerType())),
+            $options->getDefaultValue(new Column(new Label('column_name'), new IntegerType())),
         );
     }
 
@@ -119,7 +123,7 @@ class ColumnOptionsTest extends TestCase
 
         $this->assertSame(
             '12.3',
-            $options->getDefaultValue(new Column('column_name', new FloatType())),
+            $options->getDefaultValue(new Column(new Label('column_name'), new FloatType())),
         );
     }
 
@@ -129,7 +133,7 @@ class ColumnOptionsTest extends TestCase
 
         $this->assertSame(
             'NULL',
-            $options->getDefaultValue(new Column('column_name', new FloatType())),
+            $options->getDefaultValue(new Column(new Label('column_name'), new FloatType())),
         );
     }
 
@@ -139,7 +143,7 @@ class ColumnOptionsTest extends TestCase
 
         $this->expectException(InvalidDefaultValue::class);
 
-        $options->getDefaultValue(new Column('column_name', new FloatType()));
+        $options->getDefaultValue(new Column(new Label('column_name'), new FloatType()));
     }
 
     public function testNotNull(): void
@@ -173,7 +177,7 @@ class ColumnOptionsTest extends TestCase
     {
         $this->assertSame(
             '',
-            (new ColumnOptions())->toSql(new Column('column_name', new IntegerType())),
+            (new ColumnOptions())->toSql(new Column(new Label('column_name'), new IntegerType())),
         );
     }
 
@@ -181,7 +185,7 @@ class ColumnOptionsTest extends TestCase
     {
         $this->assertSame(
             'NOT NULL',
-            (new ColumnOptions())->notNull()->toSql(new Column('column_name', new IntegerType())),
+            (new ColumnOptions())->notNull()->toSql(new Column(new Label('column_name'), new IntegerType())),
         );
     }
 
@@ -189,7 +193,7 @@ class ColumnOptionsTest extends TestCase
     {
         $this->assertSame(
             'DEFAULT 12',
-            (new ColumnOptions())->setDefault(12)->toSql(new Column('column_name', new IntegerType())),
+            (new ColumnOptions())->setDefault(12)->toSql(new Column(new Label('column_name'), new IntegerType())),
         );
     }
 
@@ -197,7 +201,7 @@ class ColumnOptionsTest extends TestCase
     {
         $this->assertSame(
             'DEFAULT 12 NOT NULL',
-            (new ColumnOptions())->notNull()->setDefault(12)->toSql(new Column('column_name', new IntegerType())),
+            (new ColumnOptions())->notNull()->setDefault(12)->toSql(new Column(new Label('column_name'), new IntegerType())),
         );
     }
 }

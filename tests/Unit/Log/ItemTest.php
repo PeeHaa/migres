@@ -6,6 +6,7 @@ use PeeHaa\Migres\Action\DropColumn;
 use PeeHaa\Migres\Action\DropTable;
 use PeeHaa\Migres\Log\Item;
 use PeeHaa\Migres\Migration;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class ItemTest extends TestCase
@@ -66,8 +67,8 @@ class ItemTest extends TestCase
     {
         $item = Item::fromMigration(
             new Migration('TheName', 'TheFilename', 'TheFullyQualifiedName', new \DateTimeImmutable('2019-03-26 12:36:18')),
-            new DropColumn('table_name', 'column_name'),
-            new DropTable('table_name'),
+            new DropColumn(new Label('table_name'), new Label('column_name')),
+            new DropTable(new Label('table_name')),
         );
 
         $this->assertRegExp('~^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$~i', $item->getId());

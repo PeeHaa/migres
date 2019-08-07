@@ -5,23 +5,24 @@ namespace PeeHaa\MigresTest\Unit\Action;
 use PeeHaa\Migres\Action\AddColumn;
 use PeeHaa\Migres\DataType\IntegerType;
 use PeeHaa\Migres\Specification\Column;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class AddColumnTest extends TestCase
 {
     public function testGetColumn(): void
     {
-        $column = new Column('column_name', new IntegerType());
+        $column = new Column(new Label('column_name'), new IntegerType());
 
-        $action = new AddColumn('table_name', $column);
+        $action = new AddColumn(new Label('table_name'), $column);
 
         $this->assertSame($column, $action->getColumn());
     }
 
     public function testToQueries(): void
     {
-        $column  = new Column('column_name', new IntegerType());
-        $queries = (new AddColumn('table_name', $column))->toQueries();
+        $column  = new Column(new Label('column_name'), new IntegerType());
+        $queries = (new AddColumn(new Label('table_name'), $column))->toQueries();
 
         $queries = iterator_to_array($queries);
 
@@ -35,8 +36,8 @@ class AddColumnTest extends TestCase
 
     public function testToQueriesWithOptions(): void
     {
-        $column  = (new Column('column_name', new IntegerType()))->notNull();
-        $queries = (new AddColumn('table_name', $column))->toQueries();
+        $column  = (new Column(new Label('column_name'), new IntegerType()))->notNull();
+        $queries = (new AddColumn(new Label('table_name'), $column))->toQueries();
 
         $queries = iterator_to_array($queries);
 

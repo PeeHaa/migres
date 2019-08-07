@@ -4,12 +4,13 @@ namespace PeeHaa\Migres\Action;
 
 use PeeHaa\Migres\Constraint\Check;
 use PeeHaa\Migres\Migration\Queries;
+use PeeHaa\Migres\Specification\Label;
 
 final class AddCheck extends TableAction implements Action
 {
     private Check $check;
 
-    public function __construct(string $tableName, Check $check)
+    public function __construct(Label $tableName, Check $check)
     {
         parent::__construct($tableName);
 
@@ -23,6 +24,6 @@ final class AddCheck extends TableAction implements Action
 
     public function toQueries(): Queries
     {
-        return new Queries(sprintf('ALTER TABLE "%s" ADD %s', $this->tableName, $this->check->toSql()));
+        return new Queries(sprintf('ALTER TABLE "%s" ADD %s', $this->tableName->toString(), $this->check->toSql()));
     }
 }

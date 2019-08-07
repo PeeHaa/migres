@@ -2,16 +2,18 @@
 
 namespace PeeHaa\Migres\Constraint;
 
+use PeeHaa\Migres\Specification\Label;
+
 abstract class NamedConstraint
 {
-    protected string $name;
+    protected Label $name;
 
-    public function __construct(string $name)
+    public function __construct(Label $name)
     {
         $this->name = $name;
     }
 
-    public function getName(): string
+    public function getName(): Label
     {
         return $this->name;
     }

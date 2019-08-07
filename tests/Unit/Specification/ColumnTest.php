@@ -4,27 +4,28 @@ namespace PeeHaa\MigresTest\Unit\Specification;
 
 use PeeHaa\Migres\DataType\IntegerType;
 use PeeHaa\Migres\Specification\Column;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class ColumnTest extends TestCase
 {
     public function testGetName(): void
     {
-        $column = new Column('column_name', new IntegerType());
+        $column = new Column(new Label('column_name'), new IntegerType());
 
-        $this->assertSame('column_name', $column->getName());
+        $this->assertSame('column_name', $column->getName()->toString());
     }
 
     public function testGetType(): void
     {
-        $column = new Column('column_name', new IntegerType());
+        $column = new Column(new Label('column_name'), new IntegerType());
 
         $this->assertInstanceOf(IntegerType::class, $column->getType());
     }
 
     public function testNotNull(): void
     {
-        $column = (new Column('column_name', new IntegerType()))
+        $column = (new Column(new Label('column_name'), new IntegerType()))
             ->notNull()
         ;
 
@@ -33,7 +34,7 @@ class ColumnTest extends TestCase
 
     public function testDefault(): void
     {
-        $column = (new Column('column_name', new IntegerType()))
+        $column = (new Column(new Label('column_name'), new IntegerType()))
             ->default(12)
         ;
 
@@ -42,14 +43,14 @@ class ColumnTest extends TestCase
 
     public function testToSqlWithoutOptions(): void
     {
-        $column = new Column('column_name', new IntegerType());
+        $column = new Column(new Label('column_name'), new IntegerType());
 
         $this->assertSame('"column_name" integer', $column->toSql());
     }
 
     public function testToSqlWithNotNullOption(): void
     {
-        $column = (new Column('column_name', new IntegerType()))
+        $column = (new Column(new Label('column_name'), new IntegerType()))
             ->notNull()
         ;
 
@@ -58,7 +59,7 @@ class ColumnTest extends TestCase
 
     public function testToSqlWithDefaultOption(): void
     {
-        $column = (new Column('column_name', new IntegerType()))
+        $column = (new Column(new Label('column_name'), new IntegerType()))
             ->default(12)
         ;
 
@@ -67,7 +68,7 @@ class ColumnTest extends TestCase
 
     public function testToSqlWithNotNullAndDefaultOption(): void
     {
-        $column = (new Column('column_name', new IntegerType()))
+        $column = (new Column(new Label('column_name'), new IntegerType()))
             ->notNull()
             ->default(12)
         ;

@@ -3,27 +3,30 @@
 namespace PeeHaa\MigresTest\Unit\Action;
 
 use PeeHaa\Migres\Action\RenamePrimaryKey;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class RenamePrimaryKeyTest extends TestCase
 {
     public function testGetOldName(): void
     {
-        $action = new RenamePrimaryKey('table_name', 'old_name_pkey', 'new_name_pkey');
+        $action = new RenamePrimaryKey(new Label('table_name'), new Label('old_name_pkey'), new Label('new_name_pkey'));
 
-        $this->assertSame('old_name_pkey', $action->getOldName());
+        $this->assertSame('old_name_pkey', $action->getOldName()->toString());
     }
 
     public function testGetNewName(): void
     {
-        $action = new RenamePrimaryKey('table_name', 'old_name_pkey', 'new_name_pkey');
+        $action = new RenamePrimaryKey(new Label('table_name'), new Label('old_name_pkey'), new Label('new_name_pkey'));
 
-        $this->assertSame('new_name_pkey', $action->getNewName());
+        $this->assertSame('new_name_pkey', $action->getNewName()->toString());
     }
 
     public function testGetQueries(): void
     {
-        $queries = (new RenamePrimaryKey('table_name', 'old_name_pkey', 'new_name_pkey'))->toQueries();
+        $queries = (new RenamePrimaryKey(new Label('table_name'), new Label('old_name_pkey'), new Label('new_name_pkey')))
+            ->toQueries()
+        ;
 
         $queries = iterator_to_array($queries);
 

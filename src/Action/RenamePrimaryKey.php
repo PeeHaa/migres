@@ -3,14 +3,15 @@
 namespace PeeHaa\Migres\Action;
 
 use PeeHaa\Migres\Migration\Queries;
+use PeeHaa\Migres\Specification\Label;
 
 final class RenamePrimaryKey extends TableAction implements Action
 {
-    private string $oldName;
+    private Label $oldName;
 
-    private string $newName;
+    private Label $newName;
 
-    public function __construct(string $tableName, string $oldName, string $newName)
+    public function __construct(Label $tableName, Label $oldName, Label $newName)
     {
         parent::__construct($tableName);
 
@@ -18,12 +19,12 @@ final class RenamePrimaryKey extends TableAction implements Action
         $this->newName = $newName;
     }
 
-    public function getOldName(): string
+    public function getOldName(): Label
     {
         return $this->oldName;
     }
 
-    public function getNewName(): string
+    public function getNewName(): Label
     {
         return $this->newName;
     }
@@ -31,7 +32,7 @@ final class RenamePrimaryKey extends TableAction implements Action
     public function toQueries(): Queries
     {
         return new Queries(
-            sprintf('ALTER INDEX "%s" RENAME TO "%s"', $this->oldName, $this->newName),
+            sprintf('ALTER INDEX "%s" RENAME TO "%s"', $this->oldName->toString(), $this->newName->toString()),
         );
     }
 }

@@ -5,6 +5,7 @@ namespace PeeHaa\MigresTest\Unit\Retrospection;
 use PeeHaa\Migres\Retrospection\ColumnDefinition;
 use PeeHaa\Migres\Retrospection\ColumnInformation;
 use PeeHaa\Migres\Retrospection\Sequence;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class SequenceTest extends TestCase
@@ -12,8 +13,8 @@ class SequenceTest extends TestCase
     public function testIsColumnUsingSequenceReturnsFalse(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -30,8 +31,8 @@ class SequenceTest extends TestCase
     public function testIsColumnUsingSequenceReturnsTrue(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => "nextval('table_name_column_name_seq'::regclass)",
                 'is_nullable'              => 'NO',

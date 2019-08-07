@@ -3,13 +3,14 @@
 namespace PeeHaa\MigresTest\Unit\Action;
 
 use PeeHaa\Migres\Action\AddIndexByQuery;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class AddIndexByQueryTest extends TestCase
 {
     public function testToQueries(): void
     {
-        $queries = (new AddIndexByQuery('table_name', 'CREATE INDEX "index_name" ON "table_name" (column_name)'))
+        $queries = (new AddIndexByQuery(new Label('table_name'), 'CREATE INDEX "index_name" ON "table_name" (column_name)'))
             ->toQueries()
         ;
 

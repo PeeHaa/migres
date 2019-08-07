@@ -3,6 +3,7 @@
 namespace PeeHaa\MigresTest\Unit\Constraint;
 
 use PeeHaa\Migres\Constraint\Check;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class CheckTest extends TestCase
@@ -11,7 +12,7 @@ class CheckTest extends TestCase
     {
         $this->assertSame(
             'CONSTRAINT "check_name" CHECK (1 = 1)',
-            (new Check('check_name', '1 = 1'))->toSql(),
+            (new Check(new Label('check_name'), '1 = 1'))->toSql(),
         );
     }
 }

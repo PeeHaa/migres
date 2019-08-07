@@ -24,7 +24,6 @@ use PeeHaa\Migres\Action\RenameColumn;
 use PeeHaa\Migres\Action\RenamePrimaryKey;
 use PeeHaa\Migres\Action\RenameTable;
 use PeeHaa\Migres\Constraint\Check;
-use PeeHaa\Migres\Constraint\ForeignKey;
 use PeeHaa\Migres\Constraint\PrimaryKey;
 use PeeHaa\Migres\Constraint\Unique;
 use PeeHaa\Migres\Exception\CheckDefinitionNotFound;
@@ -35,6 +34,7 @@ use PeeHaa\Migres\Exception\IrreversibleAction;
 use PeeHaa\Migres\Exception\PrimaryKeyDefinitionNotFound;
 use PeeHaa\Migres\Exception\UniqueConstraintDefinitionNotFound;
 use PeeHaa\Migres\Specification\Column;
+use PeeHaa\Migres\Specification\Label;
 
 final class Retrospector
 {
@@ -149,7 +149,7 @@ final class Retrospector
         throw new IrreversibleAction(get_class($action));
     }
 
-    private function getCurrentColumnDefinition(string $tableName, string $columnName): Column
+    private function getCurrentColumnDefinition(Label $tableName, Label $columnName): Column
     {
         $sql = '
             SELECT column_default, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_scale
@@ -161,14 +161,14 @@ final class Retrospector
         $statement = $this->dbConnection->prepare($sql);
 
         $statement->execute([
-            'tableName'  => $tableName,
-            'columnName' => $columnName,
+            'tableName'  => $tableName->toString(),
+            'columnName' => $columnName->toString(),
         ]);
 
         $columnDefinition = $statement->fetch();
 
         if (!$columnDefinition) {
-            throw new ColumnDefinitionNotFound($tableName, $columnName);
+            throw new ColumnDefinitionNotFound($tableName->toString(), $columnName->toString());
         }
 
         $columnInformation = new ColumnInformation(
@@ -194,7 +194,7 @@ final class Retrospector
         return $column;
     }
 
-    private function getCurrentPrimaryKeyDefinition(string $tableName, string $name): PrimaryKey
+    private function getCurrentPrimaryKeyDefinition(Label $tableName, Label $name): PrimaryKey
     {
         $sql = '
             SELECT key_column_usage.column_name
@@ -209,14 +209,14 @@ final class Retrospector
         $statement = $this->dbConnection->prepare($sql);
 
         $statement->execute([
-            'tableName'      => $tableName,
-            'constraintName' => $name,
+            'tableName'      => $tableName->toString(),
+            'constraintName' => $name->toString(),
         ]);
 
         $constraintInfo = $statement->fetchAll();
 
         if (!$constraintInfo) {
-            throw new PrimaryKeyDefinitionNotFound($tableName, $name);
+            throw new PrimaryKeyDefinitionNotFound($tableName->toString(), $name->toString());
         }
 
         $columns = [];
@@ -225,10 +225,10 @@ final class Retrospector
             $columns[] = $constraintRecord['column_name'];
         }
 
-        return new PrimaryKey($name, ...array_unique($columns));
+        return new PrimaryKey($name, ...array_map(fn (string $column) => new Label($column), array_unique($columns)));
     }
 
-    private function getCurrentUniqueConstraintDefinition(string $tableName, string $name): Unique
+    private function getCurrentUniqueConstraintDefinition(Label $tableName, Label $name): Unique
     {
         $sql = '
             SELECT key_column_usage.column_name
@@ -243,14 +243,14 @@ final class Retrospector
         $statement = $this->dbConnection->prepare($sql);
 
         $statement->execute([
-            'tableName'      => $tableName,
-            'constraintName' => $name,
+            'tableName'      => $tableName->toString(),
+            'constraintName' => $name->toString(),
         ]);
 
         $constraintInfo = $statement->fetchAll();
 
         if (!$constraintInfo) {
-            throw new UniqueConstraintDefinitionNotFound($tableName, $name);
+            throw new UniqueConstraintDefinitionNotFound($tableName->toString(), $name->toString());
         }
 
         $columns = [];
@@ -259,10 +259,10 @@ final class Retrospector
             $columns[] = $constraintRecord['column_name'];
         }
 
-        return new Unique($name, ...array_unique($columns));
+        return new Unique($name, ...array_map(fn (string $column) => new Label($column), array_unique($columns)));
     }
 
-    private function getCurrentIndexDefinition(string $tableName, string $indexName): string
+    private function getCurrentIndexDefinition(Label $tableName, Label $indexName): string
     {
         $sql = '
             SELECT indexdef
@@ -274,20 +274,20 @@ final class Retrospector
         $statement = $this->dbConnection->prepare($sql);
 
         $statement->execute([
-            'tableName' => $tableName,
-            'indexName' => $indexName,
+            'tableName' => $tableName->toString(),
+            'indexName' => $indexName->toString(),
         ]);
 
         $indexInformation = $statement->fetchColumn(0);
 
         if (!$indexInformation) {
-            throw new IndexDefinitionNotFound($tableName, $indexName);
+            throw new IndexDefinitionNotFound($tableName->toString(), $indexName->toString());
         }
 
         return $indexInformation;
     }
 
-    private function getCurrentCheckDefinition(string $tableName, string $checkName): Check
+    private function getCurrentCheckDefinition(Label $tableName, Label $checkName): Check
     {
         $sql = '
             SELECT pg_constraint.consrc
@@ -300,20 +300,20 @@ final class Retrospector
         $statement = $this->dbConnection->prepare($sql);
 
         $statement->execute([
-            'tableName'      => $tableName,
-            'constraintName' => $checkName,
+            'tableName'      => $tableName->toString(),
+            'constraintName' => $checkName->toString(),
         ]);
 
         $checkInformation = $statement->fetchColumn(0);
 
         if (!$checkInformation) {
-            throw new CheckDefinitionNotFound($tableName, $checkName);
+            throw new CheckDefinitionNotFound($tableName->toString(), $checkName->toString());
         }
 
         return new Check($checkName, $checkInformation);
     }
 
-    private function getCurrentForeignKeyDefinition(string $tableName, string $name): AddForeignByQuery
+    private function getCurrentForeignKeyDefinition(Label $tableName, Label $name): AddForeignByQuery
     {
         $sql = '
             SELECT conrelid::regclass AS table_from, pg_get_constraintdef(pg_constraint.oid)
@@ -326,13 +326,13 @@ final class Retrospector
         $statement = $this->dbConnection->prepare($sql);
 
         $statement->execute([
-            'constraintName' => $name,
+            'constraintName' => $name->toString(),
         ]);
 
         $constraintInfo = $statement->fetch();
 
         if (!$constraintInfo) {
-            throw new ForeignKeyDefinitionNotFound($name);
+            throw new ForeignKeyDefinitionNotFound($name->toString());
         }
 
         return new AddForeignByQuery($tableName, $constraintInfo['pg_get_constraintdef']);

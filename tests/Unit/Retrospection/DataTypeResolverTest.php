@@ -42,6 +42,7 @@ use PeeHaa\Migres\Retrospection\ColumnDefinition;
 use PeeHaa\Migres\Retrospection\ColumnInformation;
 use PeeHaa\Migres\Retrospection\DataTypeResolver;
 use PeeHaa\Migres\Retrospection\Sequence;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class DataTypeResolverTest extends TestCase
@@ -56,8 +57,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesBigSerial(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => 'nextval(\'table_name_column_name_seq\'::regclass)',
                 'is_nullable'              => 'NO',
@@ -74,8 +75,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesSerial(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => 'nextval(\'table_name_column_name_seq\'::regclass)',
                 'is_nullable'              => 'NO',
@@ -92,8 +93,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesSmallSerial(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => 'nextval(\'table_name_column_name_seq\'::regclass)',
                 'is_nullable'              => 'NO',
@@ -110,8 +111,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesBigInt(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -128,8 +129,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesInteger(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -146,8 +147,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesSmallInt(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -164,8 +165,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesBit(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -182,8 +183,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesBitWithLength(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -200,8 +201,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesBitVarying(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -218,8 +219,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesBitVaryingWithLength(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -236,8 +237,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesBoolean(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -254,8 +255,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesBox(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -272,8 +273,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesByteA(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -290,8 +291,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesCharacter(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -308,8 +309,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesCharacterWithMaximumLength(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -326,8 +327,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesCharacterVarying(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -344,8 +345,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesCharacterVaryingWithMaximumLength(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -362,8 +363,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesCircle(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -380,8 +381,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesCidr(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -398,8 +399,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesDate(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -416,8 +417,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesDoublePrecision(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -434,8 +435,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesReal(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -452,8 +453,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesRealWithPrecision(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -470,8 +471,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesInet(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -488,8 +489,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesJson(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -506,8 +507,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesJsonB(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -524,8 +525,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesLine(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -542,8 +543,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesLseg(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -560,8 +561,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesMacAddr(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -578,8 +579,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesMoney(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -593,11 +594,11 @@ class DataTypeResolverTest extends TestCase
         $this->assertInstanceOf(Money::class, $this->resolver->resolve($columnInformation));
     }
 
-    public function testResolveResolvesNUmeric(): void
+    public function testResolveResolvesNumeric(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -614,8 +615,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesPath(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -632,8 +633,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesPoint(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -650,8 +651,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesPolygon(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -668,8 +669,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesText(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -686,8 +687,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesTimestampWithoutTimezone(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -704,8 +705,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesTimestampWithoutTimezoneWithPrecision(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -722,8 +723,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesTimestampWithTimezone(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -740,8 +741,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesTimestampWithTimezoneWithPrecision(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -758,8 +759,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesTimeWithoutTimezone(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -776,8 +777,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesTimeWithoutTimezoneWithPrecision(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -794,8 +795,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesTimeWithTimezone(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -812,8 +813,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesTimeWithTimezoneWithPrecision(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -830,8 +831,8 @@ class DataTypeResolverTest extends TestCase
     public function testResolveResolvesUuid(): void
     {
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',
@@ -851,8 +852,8 @@ class DataTypeResolverTest extends TestCase
         $this->expectExceptionMessage('Unsupported data type (`unsupported`) from specification information_schema');
 
         $columnInformation = new ColumnInformation(
-            'table_name',
-            'column_name',
+            new Label('table_name'),
+            new Label('column_name'),
             ColumnDefinition::fromInformationSchemaRecord([
                 'column_default'           => null,
                 'is_nullable'              => 'NO',

@@ -5,6 +5,7 @@ namespace PeeHaa\MigresTest\Unit\Migration;
 use PeeHaa\Migres\Action\DropColumn;
 use PeeHaa\Migres\Action\DropTable;
 use PeeHaa\Migres\Migration\TableActions;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class TableActionsTest extends TestCase
@@ -13,8 +14,8 @@ class TableActionsTest extends TestCase
     {
         $tableActions = new TableActions(
             'TheName',
-            new DropColumn('table_name', 'column_name'),
-            new DropTable('table_name'),
+            new DropColumn(new Label('table_name'), new Label('column_name')),
+            new DropTable(new Label('table_name')),
         );
 
         $this->assertSame('TheName', $tableActions->getName());
@@ -24,8 +25,8 @@ class TableActionsTest extends TestCase
     {
         $tableActions = new TableActions(
             'TheName',
-            new DropColumn('table_name', 'column_name'),
-            new DropTable('table_name'),
+            new DropColumn(new Label('table_name'), new Label('column_name')),
+            new DropTable(new Label('table_name')),
         );
 
         $expectedResults = [

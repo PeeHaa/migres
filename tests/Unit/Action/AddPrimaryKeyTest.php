@@ -4,24 +4,25 @@ namespace PeeHaa\MigresTest\Unit\Action;
 
 use PeeHaa\Migres\Action\AddPrimaryKey;
 use PeeHaa\Migres\Constraint\PrimaryKey;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class AddPrimaryKeyTest extends TestCase
 {
     public function testGetIndex(): void
     {
-        $primaryKey = new PrimaryKey('index_name', 'column_name');
+        $primaryKey = new PrimaryKey(new Label('index_name'), new Label('column_name'));
 
-        $action = new AddPrimaryKey('table_name', $primaryKey);
+        $action = new AddPrimaryKey(new Label('table_name'), $primaryKey);
 
         $this->assertSame($primaryKey, $action->getPrimaryKey());
     }
 
     public function testToQueries(): void
     {
-        $primaryKey = new PrimaryKey('index_name', 'column_name');
+        $primaryKey = new PrimaryKey(new Label('index_name'), new Label('column_name'));
 
-        $queries = (new AddPrimaryKey('table_name', $primaryKey))->toQueries();
+        $queries = (new AddPrimaryKey(new Label('table_name'), $primaryKey))->toQueries();
 
         $queries = iterator_to_array($queries);
 

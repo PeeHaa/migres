@@ -5,23 +5,24 @@ namespace PeeHaa\MigresTest\Unit\Action;
 use PeeHaa\Migres\Action\ChangeColumn;
 use PeeHaa\Migres\DataType\IntegerType;
 use PeeHaa\Migres\Specification\Column;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class ChangeColumnTest extends TestCase
 {
     public function testGetName(): void
     {
-        $column = new Column('column_name', new IntegerType());
+        $column = new Column(new Label('column_name'), new IntegerType());
 
-        $action = new ChangeColumn('table_name', $column);
+        $action = new ChangeColumn(new Label('table_name'), $column);
 
-        $this->assertSame('column_name', $action->getName());
+        $this->assertSame('column_name', $action->getName()->toString());
     }
 
     public function testToQueriesNullableNoDefault(): void
     {
-        $column  = new Column('column_name', new IntegerType());
-        $queries = (new ChangeColumn('table_name', $column))->toQueries();
+        $column  = new Column(new Label('column_name'), new IntegerType());
+        $queries = (new ChangeColumn(new Label('table_name'), $column))->toQueries();
 
         $queries = iterator_to_array($queries);
 
@@ -45,8 +46,8 @@ class ChangeColumnTest extends TestCase
 
     public function testToQueriesNotNullNoDefault(): void
     {
-        $column  = (new Column('column_name', new IntegerType()))->notNull();
-        $queries = (new ChangeColumn('table_name', $column))->toQueries();
+        $column  = (new Column(new Label('column_name'), new IntegerType()))->notNull();
+        $queries = (new ChangeColumn(new Label('table_name'), $column))->toQueries();
 
         $queries = iterator_to_array($queries);
 
@@ -70,8 +71,8 @@ class ChangeColumnTest extends TestCase
 
     public function testToQueriesNullableWithDefault(): void
     {
-        $column  = (new Column('column_name', new IntegerType()))->default(42);
-        $queries = (new ChangeColumn('table_name', $column))->toQueries();
+        $column  = (new Column(new Label('column_name'), new IntegerType()))->default(42);
+        $queries = (new ChangeColumn(new Label('table_name'), $column))->toQueries();
 
         $queries = iterator_to_array($queries);
 
@@ -95,8 +96,8 @@ class ChangeColumnTest extends TestCase
 
     public function testToQueriesNotNullableWithDefault(): void
     {
-        $column  = (new Column('column_name', new IntegerType()))->notNull()->default(42);
-        $queries = (new ChangeColumn('table_name', $column))->toQueries();
+        $column  = (new Column(new Label('column_name'), new IntegerType()))->notNull()->default(42);
+        $queries = (new ChangeColumn(new Label('table_name'), $column))->toQueries();
 
         $queries = iterator_to_array($queries);
 

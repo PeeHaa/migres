@@ -7,6 +7,7 @@ use PeeHaa\Migres\Action\DropTable;
 use PeeHaa\Migres\Log\Item;
 use PeeHaa\Migres\Log\Migration as Log;
 use PeeHaa\Migres\Migration;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class MigrationTest extends TestCase
@@ -41,8 +42,8 @@ class MigrationTest extends TestCase
 
         (new Log($dbConnection))->write(Item::fromMigration(
             new Migration('TheName', 'TheFilename', 'TheFullyQualifiedName', new \DateTimeImmutable()),
-            new DropColumn('table_name', 'column_name'),
-            new DropTable('table_name'),
+            new DropColumn(new Label('table_name'), new Label('column_name')),
+            new DropTable(new Label('table_name')),
         ));
     }
 
