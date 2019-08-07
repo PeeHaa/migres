@@ -3,20 +3,21 @@
 namespace PeeHaa\MigresTest\Unit\Action;
 
 use PeeHaa\Migres\Action\DropUniqueConstraint;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class DropUniqueConstraintTest extends TestCase
 {
     public function testGetName(): void
     {
-        $action = new DropUniqueConstraint('table_name', 'column_name_unique');
+        $action = new DropUniqueConstraint(new Label('table_name'), new Label('column_name_unique'));
 
-        $this->assertSame('column_name_unique', $action->getName());
+        $this->assertSame('column_name_unique', $action->getName()->toString());
     }
 
     public function testGetQueries(): void
     {
-        $queries = (new DropUniqueConstraint('table_name', 'column_name_unique'))->toQueries();
+        $queries = (new DropUniqueConstraint(new Label('table_name'), new Label('column_name_unique')))->toQueries();
 
         $queries = iterator_to_array($queries);
 

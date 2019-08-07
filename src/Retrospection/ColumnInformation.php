@@ -2,27 +2,29 @@
 
 namespace PeeHaa\Migres\Retrospection;
 
+use PeeHaa\Migres\Specification\Label;
+
 final class ColumnInformation
 {
-    private string $tableName;
+    private Label $tableName;
 
-    private string $columnName;
+    private Label $columnName;
 
     private ColumnDefinition $columnDefinition;
 
-    public function __construct(string $tableName, string $columnName, ColumnDefinition $columnDefinition)
+    public function __construct(Label $tableName, Label $columnName, ColumnDefinition $columnDefinition)
     {
         $this->tableName        = $tableName;
         $this->columnName       = $columnName;
         $this->columnDefinition = $columnDefinition;
     }
 
-    public function getTableName(): string
+    public function getTableName(): Label
     {
         return $this->tableName;
     }
 
-    public function getColumnName(): string
+    public function getColumnName(): Label
     {
         return $this->columnName;
     }

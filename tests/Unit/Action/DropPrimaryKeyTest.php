@@ -3,20 +3,21 @@
 namespace PeeHaa\MigresTest\Unit\Action;
 
 use PeeHaa\Migres\Action\DropPrimaryKey;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class DropPrimaryKeyTest extends TestCase
 {
     public function testGetName(): void
     {
-        $action = new DropPrimaryKey('table_name', 'table_name_pkey');
+        $action = new DropPrimaryKey(new Label('table_name'), new Label('table_name_pkey'));
 
-        $this->assertSame('table_name_pkey', $action->getName());
+        $this->assertSame('table_name_pkey', $action->getName()->toString());
     }
 
     public function testGetQueries(): void
     {
-        $queries = (new DropPrimaryKey('table_name', 'table_name_pkey'))->toQueries();
+        $queries = (new DropPrimaryKey(new Label('table_name'), new Label('table_name_pkey')))->toQueries();
 
         $queries = iterator_to_array($queries);
 

@@ -3,12 +3,13 @@
 namespace PeeHaa\Migres\Action;
 
 use PeeHaa\Migres\Migration\Queries;
+use PeeHaa\Migres\Specification\Label;
 
 final class AddForeignByQuery extends TableAction implements Action
 {
     private string $query;
 
-    public function __construct(string $tableName, string $query)
+    public function __construct(Label $tableName, string $query)
     {
         parent::__construct($tableName);
 

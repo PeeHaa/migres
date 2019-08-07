@@ -3,13 +3,14 @@
 namespace PeeHaa\MigresTest\Unit\Action;
 
 use PeeHaa\Migres\Action\DropTable;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class DropTableTest extends TestCase
 {
     public function testGetQueries(): void
     {
-        $queries = (new DropTable('table_name'))->toQueries();
+        $queries = (new DropTable(new Label('table_name')))->toQueries();
 
         $queries = iterator_to_array($queries);
 

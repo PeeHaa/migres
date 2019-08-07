@@ -2,11 +2,13 @@
 
 namespace PeeHaa\Migres\Constraint;
 
+use PeeHaa\Migres\Specification\Label;
+
 final class Check extends NamedConstraint implements Constraint
 {
     private string $expression;
 
-    public function __construct(string $name, string $expression)
+    public function __construct(Label $name, string $expression)
     {
         $this->expression = $expression;
 
@@ -15,6 +17,6 @@ final class Check extends NamedConstraint implements Constraint
 
     public function toSql(): string
     {
-        return sprintf('CONSTRAINT "%s" CHECK (%s)', $this->name, $this->expression);
+        return sprintf('CONSTRAINT "%s" CHECK (%s)', $this->name->toString(), $this->expression);
     }
 }

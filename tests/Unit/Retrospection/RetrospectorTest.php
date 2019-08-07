@@ -37,6 +37,7 @@ use PeeHaa\Migres\Retrospection\DataTypeResolver;
 use PeeHaa\Migres\Retrospection\Retrospector;
 use PeeHaa\Migres\Retrospection\Sequence;
 use PeeHaa\Migres\Specification\Column;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -60,29 +61,31 @@ class RetrospectorTest extends TestCase
 
     public function testGetReverseActionForCreateTable(): void
     {
-        $reverseAction = $this->retrospector->getReverseAction(new CreateTable('table_name'));
+        $reverseAction = $this->retrospector->getReverseAction(new CreateTable(new Label('table_name')));
 
         $this->assertInstanceOf(DropTable::class, $reverseAction);
     }
 
     public function testGetReverseActionForRenameTable(): void
     {
-        $reverseAction = $this->retrospector->getReverseAction(new RenameTable('old_name', 'new_name'));
+        $reverseAction = $this->retrospector->getReverseAction(
+            new RenameTable(new Label('old_name'), new Label('new_name')),
+        );
 
         $this->assertInstanceOf(RenameTable::class, $reverseAction);
     }
 
     public function testGetReverseActionForDropTable(): void
     {
-        $reverseAction = $this->retrospector->getReverseAction(new DropTable('table_name'));
+        $reverseAction = $this->retrospector->getReverseAction(new DropTable(new Label('table_name')));
 
         $this->assertInstanceOf(CreateTable::class, $reverseAction);
     }
 
     public function testGetReverseActionForAddColumn(): void
     {
-        $reverseAction = $this->retrospector->getReverseAction(new AddColumn('table_name', new Column(
-            'column_name',
+        $reverseAction = $this->retrospector->getReverseAction(new AddColumn(new Label('table_name'), new Column(
+            new Label('column_name'),
             new IntegerType(),
         )));
 
@@ -112,7 +115,9 @@ class RetrospectorTest extends TestCase
 
         $this->expectException(ColumnDefinitionNotFound::class);
 
-        $this->retrospector->getReverseAction(new DropColumn('table_name', 'column_name'));
+        $this->retrospector->getReverseAction(
+            new DropColumn(new Label('table_name'), new Label('column_name')),
+        );
     }
 
     public function testGetReverseActionForDropColumn(): void
@@ -143,7 +148,9 @@ class RetrospectorTest extends TestCase
             ->willReturn($statement)
         ;
 
-        $reverseAction = $this->retrospector->getReverseAction(new DropColumn('table_name', 'column_name'));
+        $reverseAction = $this->retrospector->getReverseAction(
+            new DropColumn(new Label('table_name'), new Label('column_name')),
+        );
 
         $this->assertInstanceOf(AddColumn::class, $reverseAction);
     }
@@ -176,7 +183,9 @@ class RetrospectorTest extends TestCase
             ->willReturn($statement)
         ;
 
-        $reverseAction = $this->retrospector->getReverseAction(new DropColumn('table_name', 'column_name'));
+        $reverseAction = $this->retrospector->getReverseAction(
+            new DropColumn(new Label('table_name'), new Label('column_name')),
+        );
 
         $this->assertInstanceOf(AddColumn::class, $reverseAction);
     }
@@ -209,14 +218,18 @@ class RetrospectorTest extends TestCase
             ->willReturn($statement)
         ;
 
-        $reverseAction = $this->retrospector->getReverseAction(new DropColumn('table_name', 'column_name'));
+        $reverseAction = $this->retrospector->getReverseAction(
+            new DropColumn(new Label('table_name'), new Label('column_name')),
+        );
 
         $this->assertInstanceOf(AddColumn::class, $reverseAction);
     }
 
     public function testGetReverseActionForRenameColumn(): void
     {
-        $reverseAction = $this->retrospector->getReverseAction(new RenameColumn('table_name', 'old_name', 'new_name'));
+        $reverseAction = $this->retrospector->getReverseAction(
+            new RenameColumn(new Label('table_name'), new Label('old_name'), new Label('new_name')),
+        );
 
         $this->assertInstanceOf(RenameColumn::class, $reverseAction);
     }
@@ -244,8 +257,8 @@ class RetrospectorTest extends TestCase
 
         $this->expectException(ColumnDefinitionNotFound::class);
 
-        $this->retrospector->getReverseAction(new ChangeColumn('table_name', new Column(
-            'column_name',
+        $this->retrospector->getReverseAction(new ChangeColumn(new Label('table_name'), new Column(
+            new Label('column_name'),
             new IntegerType(),
         )));
     }
@@ -278,8 +291,8 @@ class RetrospectorTest extends TestCase
             ->willReturn($statement)
         ;
 
-        $reverseAction = $this->retrospector->getReverseAction(new ChangeColumn('table_name', new Column(
-            'column_name',
+        $reverseAction = $this->retrospector->getReverseAction(new ChangeColumn(new Label('table_name'), new Column(
+            new Label('column_name'),
             new IntegerType(),
         )));
 
@@ -314,8 +327,8 @@ class RetrospectorTest extends TestCase
             ->willReturn($statement)
         ;
 
-        $reverseAction = $this->retrospector->getReverseAction(new ChangeColumn('table_name', new Column(
-            'column_name',
+        $reverseAction = $this->retrospector->getReverseAction(new ChangeColumn(new Label('table_name'), new Column(
+            new Label('column_name'),
             new IntegerType(),
         )));
 
@@ -350,8 +363,8 @@ class RetrospectorTest extends TestCase
             ->willReturn($statement)
         ;
 
-        $reverseAction = $this->retrospector->getReverseAction(new ChangeColumn('table_name', new Column(
-            'column_name',
+        $reverseAction = $this->retrospector->getReverseAction(new ChangeColumn(new Label('table_name'), new Column(
+            new Label('column_name'),
             new IntegerType(),
         )));
 
@@ -361,7 +374,10 @@ class RetrospectorTest extends TestCase
     public function testGetReverseActionForAddPrimaryKey(): void
     {
         $reverseAction = $this->retrospector->getReverseAction(
-            new AddPrimaryKey('table_name', new PrimaryKey('table_name_pkey', 'column_name')),
+            new AddPrimaryKey(
+                new Label('table_name'),
+                new PrimaryKey(new Label('table_name_pkey'), new Label('column_name')),
+            ),
         );
 
         $this->assertInstanceOf(DropPrimaryKey::class, $reverseAction);
@@ -390,7 +406,9 @@ class RetrospectorTest extends TestCase
 
         $this->expectException(PrimaryKeyDefinitionNotFound::class);
 
-        $this->retrospector->getReverseAction(new DropPrimaryKey('table_name', 'table_name_pkey'));
+        $this->retrospector->getReverseAction(
+            new DropPrimaryKey(new Label('table_name'), new Label('table_name_pkey')),
+        );
     }
 
     public function testGetReverseActionForDropPrimaryKey(): void
@@ -418,7 +436,9 @@ class RetrospectorTest extends TestCase
             ->willReturn($statement)
         ;
 
-        $reverseAction = $this->retrospector->getReverseAction(new DropPrimaryKey('table_name', 'table_name_pkey'));
+        $reverseAction = $this->retrospector->getReverseAction(
+            new DropPrimaryKey(new Label('table_name'), new Label('table_name_pkey')),
+        );
 
         $this->assertInstanceOf(AddPrimaryKey::class, $reverseAction);
     }
@@ -426,7 +446,7 @@ class RetrospectorTest extends TestCase
     public function testGetReverseActionForRenamePrimaryKey(): void
     {
         $reverseAction = $this->retrospector->getReverseAction(
-            new RenamePrimaryKey('table_name', 'old_name', 'new_name'),
+            new RenamePrimaryKey(new Label('table_name'), new Label('old_name'), new Label('new_name')),
         );
 
         $this->assertInstanceOf(RenamePrimaryKey::class, $reverseAction);
@@ -435,7 +455,7 @@ class RetrospectorTest extends TestCase
     public function testGetReverseActionForAddUniqueConstraint(): void
     {
         $reverseAction = $this->retrospector->getReverseAction(
-            new AddUniqueConstraint('table_name', new Unique('unique', 'column_name')),
+            new AddUniqueConstraint(new Label('table_name'), new Unique(new Label('unique'), new Label('column_name'))),
         );
 
         $this->assertInstanceOf(DropUniqueConstraint::class, $reverseAction);
@@ -464,7 +484,7 @@ class RetrospectorTest extends TestCase
 
         $this->expectException(UniqueConstraintDefinitionNotFound::class);
 
-        $this->retrospector->getReverseAction(new DropUniqueConstraint('table_name', 'unique'));
+        $this->retrospector->getReverseAction(new DropUniqueConstraint(new Label('table_name'), new Label('unique')));
     }
 
     public function testGetReverseActionForDropUniqueConstraint(): void
@@ -492,7 +512,9 @@ class RetrospectorTest extends TestCase
             ->willReturn($statement)
         ;
 
-        $reverseAction = $this->retrospector->getReverseAction(new DropUniqueConstraint('table_name', 'unique'));
+        $reverseAction = $this->retrospector->getReverseAction(
+            new DropUniqueConstraint(new Label('table_name'), new Label('unique')),
+        );
 
         $this->assertInstanceOf(AddUniqueConstraint::class, $reverseAction);
     }
@@ -500,7 +522,10 @@ class RetrospectorTest extends TestCase
     public function testGetReverseActionForAddIndex(): void
     {
         $reverseAction = $this->retrospector->getReverseAction(
-            new AddIndex('table_name', new Index('index_name', 'table_name', ['column_name'])),
+            new AddIndex(
+                new Label('table_name'),
+                new Index(new Label('index_name'), new Label('table_name'), ['column_name']),
+            ),
         );
 
         $this->assertInstanceOf(DropIndex::class, $reverseAction);
@@ -530,7 +555,7 @@ class RetrospectorTest extends TestCase
         $this->expectException(IndexDefinitionNotFound::class);
 
         $this->retrospector->getReverseAction(
-            new DropIndex('table_name', 'index_name'),
+            new DropIndex(new Label('table_name'), new Label('index_name')),
         );
     }
 
@@ -556,7 +581,7 @@ class RetrospectorTest extends TestCase
         ;
 
         $reverseAction = $this->retrospector->getReverseAction(
-            new DropIndex('table_name', 'index_name'),
+            new DropIndex(new Label('table_name'), new Label('index_name')),
         );
 
         $this->assertInstanceOf(AddIndexByQuery::class, $reverseAction);
@@ -565,7 +590,7 @@ class RetrospectorTest extends TestCase
     public function testGetReverseActionForAddCheck(): void
     {
         $reverseAction = $this->retrospector->getReverseAction(
-            new AddCheck('table_name', new Check('check_name', 'column_name > 10')),
+            new AddCheck(new Label('table_name'), new Check(new Label('check_name'), 'column_name > 10')),
         );
 
         $this->assertInstanceOf(DropCheck::class, $reverseAction);
@@ -595,7 +620,7 @@ class RetrospectorTest extends TestCase
         $this->expectException(CheckDefinitionNotFound::class);
 
         $this->retrospector->getReverseAction(
-            new DropCheck('table_name', 'check_name'),
+            new DropCheck(new Label('table_name'), new Label('check_name')),
         );
     }
 
@@ -621,7 +646,7 @@ class RetrospectorTest extends TestCase
         ;
 
         $reverseAction = $this->retrospector->getReverseAction(
-            new DropCheck('table_name', 'check_name'),
+            new DropCheck(new Label('table_name'), new Label('check_name')),
         );
 
         $this->assertInstanceOf(AddCheck::class, $reverseAction);

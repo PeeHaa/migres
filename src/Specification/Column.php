@@ -6,20 +6,20 @@ use PeeHaa\Migres\DataType\Type;
 
 final class Column
 {
-    private string $name;
+    private Label $name;
 
     private Type $type;
 
     private ColumnOptions $options;
 
-    public function __construct(string $name, Type $type)
+    public function __construct(Label $name, Type $type)
     {
         $this->name    = $name;
         $this->type    = $type;
         $this->options = new ColumnOptions();
     }
 
-    public function getName(): string
+    public function getName(): Label
     {
         return $this->name;
     }
@@ -53,7 +53,7 @@ final class Column
 
     public function toSql(): string
     {
-        $sql = sprintf('"%s" %s', $this->name, $this->type->toSql());
+        $sql = sprintf('"%s" %s', $this->name->toString(), $this->type->toSql());
 
         if (!$this->options->hasOptions()) {
             return $sql;

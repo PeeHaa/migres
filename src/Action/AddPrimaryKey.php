@@ -4,12 +4,13 @@ namespace PeeHaa\Migres\Action;
 
 use PeeHaa\Migres\Constraint\PrimaryKey;
 use PeeHaa\Migres\Migration\Queries;
+use PeeHaa\Migres\Specification\Label;
 
 final class AddPrimaryKey extends TableAction implements Action
 {
     private PrimaryKey $primaryKey;
 
-    public function __construct(string $tableName, PrimaryKey $primaryKey)
+    public function __construct(Label $tableName, PrimaryKey $primaryKey)
     {
         parent::__construct($tableName);
 
@@ -23,6 +24,6 @@ final class AddPrimaryKey extends TableAction implements Action
 
     public function toQueries(): Queries
     {
-        return new Queries(sprintf('ALTER TABLE "%s" ADD %s', $this->tableName, $this->primaryKey->toSql()));
+        return new Queries(sprintf('ALTER TABLE "%s" ADD %s', $this->tableName->toString(), $this->primaryKey->toSql()));
     }
 }

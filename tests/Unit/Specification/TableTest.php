@@ -19,6 +19,7 @@ use PeeHaa\Migres\Action\RenameColumn;
 use PeeHaa\Migres\Action\RenamePrimaryKey;
 use PeeHaa\Migres\Action\RenameTable;
 use PeeHaa\Migres\DataType\IntegerType;
+use PeeHaa\Migres\Specification\Label;
 use PeeHaa\Migres\Specification\Table;
 use PHPUnit\Framework\TestCase;
 
@@ -26,7 +27,7 @@ class TableTest extends TestCase
 {
     public function testFromCreateTable(): void
     {
-        $table = Table::fromCreateTable('table_name');
+        $table = Table::fromCreateTable(new Label('table_name'));
 
         $this->assertCount(1, $table->getActions());
 
@@ -37,14 +38,14 @@ class TableTest extends TestCase
 
     public function testFromChangeTable(): void
     {
-        $table = Table::fromChangeTable('table_name');
+        $table = Table::fromChangeTable(new Label('table_name'));
 
         $this->assertCount(0, $table->getActions());
     }
 
     public function testFromRenameTable(): void
     {
-        $table = Table::fromRenameTable('old_name', 'name_name');
+        $table = Table::fromRenameTable(new Label('old_name'), new Label('name_name'));
 
         $this->assertCount(1, $table->getActions());
 
@@ -55,7 +56,7 @@ class TableTest extends TestCase
 
     public function testFromDropTable(): void
     {
-        $table = Table::fromDropTable('table_name');
+        $table = Table::fromDropTable(new Label('table_name'));
 
         $this->assertCount(1, $table->getActions());
 
@@ -66,7 +67,7 @@ class TableTest extends TestCase
 
     public function testAddColumn(): void
     {
-        $table = Table::fromChangeTable('table_name');
+        $table = Table::fromChangeTable(new Label('table_name'));
 
         $table->addColumn('column_name', new IntegerType());
 
@@ -79,7 +80,7 @@ class TableTest extends TestCase
 
     public function testDropColumn(): void
     {
-        $table = Table::fromChangeTable('table_name');
+        $table = Table::fromChangeTable(new Label('table_name'));
 
         $table->dropColumn('column_name');
 
@@ -92,7 +93,7 @@ class TableTest extends TestCase
 
     public function testRenameColumn(): void
     {
-        $table = Table::fromChangeTable('table_name');
+        $table = Table::fromChangeTable(new Label('table_name'));
 
         $table->renameColumn('old_name', 'new_name');
 
@@ -105,7 +106,7 @@ class TableTest extends TestCase
 
     public function testChangeColumn(): void
     {
-        $table = Table::fromChangeTable('table_name');
+        $table = Table::fromChangeTable(new Label('table_name'));
 
         $table->changeColumn('column_name', new IntegerType());
 
@@ -118,7 +119,7 @@ class TableTest extends TestCase
 
     public function testPrimaryKey(): void
     {
-        $table = Table::fromChangeTable('table_name');
+        $table = Table::fromChangeTable(new Label('table_name'));
 
         $table->primaryKey('column_name');
 
@@ -131,7 +132,7 @@ class TableTest extends TestCase
 
     public function testNamedPrimaryKey(): void
     {
-        $table = Table::fromChangeTable('table_name');
+        $table = Table::fromChangeTable(new Label('table_name'));
 
         $table->namedPrimaryKey('table_name_pkey', 'column_name');
 
@@ -144,7 +145,7 @@ class TableTest extends TestCase
 
     public function testDropPrimaryKey(): void
     {
-        $table = Table::fromChangeTable('table_name');
+        $table = Table::fromChangeTable(new Label('table_name'));
 
         $table->dropPrimaryKey();
 
@@ -157,7 +158,7 @@ class TableTest extends TestCase
 
     public function testRenamePrimaryKey(): void
     {
-        $table = Table::fromChangeTable('table_name');
+        $table = Table::fromChangeTable(new Label('table_name'));
 
         $table->renamePrimaryKey('old_name', 'new_name');
 
@@ -170,7 +171,7 @@ class TableTest extends TestCase
 
     public function testAddUniqueConstraint(): void
     {
-        $table = Table::fromChangeTable('table_name');
+        $table = Table::fromChangeTable(new Label('table_name'));
 
         $table->addUniqueConstraint('name', 'column_name');
 
@@ -183,7 +184,7 @@ class TableTest extends TestCase
 
     public function testDropUniqueConstraint(): void
     {
-        $table = Table::fromChangeTable('table_name');
+        $table = Table::fromChangeTable(new Label('table_name'));
 
         $table->dropUniqueConstraint('name');
 
@@ -196,7 +197,7 @@ class TableTest extends TestCase
 
     public function testAddIndex(): void
     {
-        $table = Table::fromChangeTable('table_name');
+        $table = Table::fromChangeTable(new Label('table_name'));
 
         $table->addIndex('name', 'column_name');
 
@@ -209,7 +210,7 @@ class TableTest extends TestCase
 
     public function testAddBtreeIndex(): void
     {
-        $table = Table::fromChangeTable('table_name');
+        $table = Table::fromChangeTable(new Label('table_name'));
 
         $table->addBtreeIndex('name', 'column_name');
 
@@ -222,7 +223,7 @@ class TableTest extends TestCase
 
     public function testAddHashIndex(): void
     {
-        $table = Table::fromChangeTable('table_name');
+        $table = Table::fromChangeTable(new Label('table_name'));
 
         $table->addHashIndex('name', 'column_name');
 
@@ -235,7 +236,7 @@ class TableTest extends TestCase
 
     public function testAddGistIndex(): void
     {
-        $table = Table::fromChangeTable('table_name');
+        $table = Table::fromChangeTable(new Label('table_name'));
 
         $table->addGistIndex('name', 'column_name');
 
@@ -248,7 +249,7 @@ class TableTest extends TestCase
 
     public function testAddGinIndex(): void
     {
-        $table = Table::fromChangeTable('table_name');
+        $table = Table::fromChangeTable(new Label('table_name'));
 
         $table->addGinIndex('name', 'column_name');
 
@@ -261,7 +262,7 @@ class TableTest extends TestCase
 
     public function testDropIndex(): void
     {
-        $table = Table::fromChangeTable('table_name');
+        $table = Table::fromChangeTable(new Label('table_name'));
 
         $table->dropIndex('name');
 
@@ -274,7 +275,7 @@ class TableTest extends TestCase
 
     public function testAddCheck(): void
     {
-        $table = Table::fromChangeTable('table_name');
+        $table = Table::fromChangeTable(new Label('table_name'));
 
         $table->addCheck('name', 'column_name > 10');
 
@@ -287,7 +288,7 @@ class TableTest extends TestCase
 
     public function testDropCheck(): void
     {
-        $table = Table::fromChangeTable('table_name');
+        $table = Table::fromChangeTable(new Label('table_name'));
 
         $table->dropCheck('name');
 

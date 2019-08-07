@@ -3,20 +3,21 @@
 namespace PeeHaa\MigresTest\Unit\Action;
 
 use PeeHaa\Migres\Action\DropColumn;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class DropColumnTest extends TestCase
 {
     public function testGetName(): void
     {
-        $action = new DropColumn('table_name', 'column_name');
+        $action = new DropColumn(new Label('table_name'), new Label('column_name'));
 
-        $this->assertSame('column_name', $action->getName());
+        $this->assertSame('column_name', $action->getName()->toString());
     }
 
     public function testGetQueries(): void
     {
-        $queries = (new DropColumn('table_name', 'column_name'))->toQueries();
+        $queries = (new DropColumn(new Label('table_name'), new Label('column_name')))->toQueries();
 
         $queries = iterator_to_array($queries);
 

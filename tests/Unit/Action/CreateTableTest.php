@@ -3,13 +3,14 @@
 namespace PeeHaa\MigresTest\Unit\Action;
 
 use PeeHaa\Migres\Action\CreateTable;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class CreateTableTest extends TestCase
 {
     public function testGetQueries(): void
     {
-        $queries = (new CreateTable('table_name'))->toQueries();
+        $queries = (new CreateTable(new Label('table_name')))->toQueries();
 
         $queries = iterator_to_array($queries);
 

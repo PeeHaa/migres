@@ -3,20 +3,21 @@
 namespace PeeHaa\MigresTest\Unit\Action;
 
 use PeeHaa\Migres\Action\DropIndex;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class DropIndexTest extends TestCase
 {
     public function testGetName(): void
     {
-        $action = new DropIndex('table_name', 'index_name');
+        $action = new DropIndex(new Label('table_name'), new Label('index_name'));
 
-        $this->assertSame('index_name', $action->getName());
+        $this->assertSame('index_name', $action->getName()->toString());
     }
 
     public function testGetQueries(): void
     {
-        $queries = (new DropIndex('table_name', 'index_name'))->toQueries();
+        $queries = (new DropIndex(new Label('table_name'), new Label('index_name')))->toQueries();
 
         $queries = iterator_to_array($queries);
 

@@ -4,22 +4,25 @@ namespace PeeHaa\MigresTest\Unit\Action;
 
 use PeeHaa\Migres\Action\AddCheck;
 use PeeHaa\Migres\Constraint\Check;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class AddCheckTest extends TestCase
 {
     public function testGetCheck(): void
     {
-        $check = new Check('column_bigger_than_10', 'column > 10');
+        $check = new Check(new Label('column_bigger_than_10'), 'column > 10');
 
-        $action = new AddCheck('table_name', $check);
+        $action = new AddCheck(new Label('table_name'), $check);
 
         $this->assertSame($check, $action->getCheck());
     }
 
     public function testToQueries(): void
     {
-        $queries = (new AddCheck('table_name', new Check('column_bigger_than_10', 'column > 10')))->toQueries();
+        $queries = (new AddCheck(new Label('table_name'), new Check(new Label('column_bigger_than_10'), 'column > 10')))
+            ->toQueries()
+        ;
 
         $queries = iterator_to_array($queries);
 

@@ -2,11 +2,13 @@
 
 namespace PeeHaa\Migres\Constraint;
 
+use PeeHaa\Migres\Specification\Label;
+
 final class Index extends NamedConstraint implements Constraint
 {
-    private string $tableName;
+    private Label $tableName;
 
-    /** @var array<string> */
+    /** @var array<Label> */
     private array $columns;
 
     private ?string $method;
@@ -14,7 +16,7 @@ final class Index extends NamedConstraint implements Constraint
     /**
      * @param array<string> $columns
      */
-    public function __construct(string $name, string $tableName, array $columns, ?string $method = null)
+    public function __construct(Label $name, Label $tableName, array $columns, ?string $method = null)
     {
         $this->tableName = $tableName;
         $this->columns   = $columns;
@@ -25,13 +27,13 @@ final class Index extends NamedConstraint implements Constraint
 
     public function toSql(): string
     {
-        $sql = sprintf('CREATE INDEX "%s" ON "%s"', $this->name, $this->tableName);
+        $sql = sprintf('CREATE INDEX "%s" ON "%s"', $this->name->toString(), $this->tableName->toString());
 
         if ($this->method !== null) {
             $sql .= ' USING ' . $this->method;
         }
 
-        $sql .= sprintf(' (%s)', implode(', ', $this->columns));
+        $sql .= sprintf(' (%s)', implode(', ', array_map(fn (Label $column) => $column->toString(), $this->columns)));
 
         return $sql;
     }

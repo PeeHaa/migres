@@ -4,24 +4,25 @@ namespace PeeHaa\MigresTest\Unit\Action;
 
 use PeeHaa\Migres\Action\AddUniqueConstraint;
 use PeeHaa\Migres\Constraint\Unique;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class AddUniqueConstraintTest extends TestCase
 {
     public function testGetCheck(): void
     {
-        $constraint = new Unique('column1_unique', 'column1');
+        $constraint = new Unique(new Label('column1_unique'), new Label('column1'));
 
-        $action = new AddUniqueConstraint('table_name', $constraint);
+        $action = new AddUniqueConstraint(new Label('table_name'), $constraint);
 
         $this->assertSame($constraint, $action->getConstraint());
     }
 
     public function testToQueries(): void
     {
-        $constraint = new Unique('column1_unique', 'column1');
+        $constraint = new Unique(new Label('column1_unique'), new Label('column1'));
 
-        $queries = (new AddUniqueConstraint('table_name', $constraint))->toQueries();
+        $queries = (new AddUniqueConstraint(new Label('table_name'), $constraint))->toQueries();
 
         $queries = iterator_to_array($queries);
 
@@ -35,9 +36,9 @@ class AddUniqueConstraintTest extends TestCase
 
     public function testToQueriesWithMultipleColumns(): void
     {
-        $constraint = new Unique('column1_unique', 'column1', 'column2');
+        $constraint = new Unique(new Label('column1_unique'), new Label('column1'), new Label('column2'));
 
-        $queries = (new AddUniqueConstraint('table_name', $constraint))->toQueries();
+        $queries = (new AddUniqueConstraint(new Label('table_name'), $constraint))->toQueries();
 
         $queries = iterator_to_array($queries);
 

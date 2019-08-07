@@ -8,6 +8,6 @@ final class DropTable extends TableAction implements Action
 {
     public function toQueries(): Queries
     {
-        return new Queries(sprintf('DROP TABLE "%s"', $this->tableName));
+        return new Queries(sprintf('DROP TABLE "%s"', $this->tableName->toString()));
     }
 }

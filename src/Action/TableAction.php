@@ -2,16 +2,18 @@
 
 namespace PeeHaa\Migres\Action;
 
+use PeeHaa\Migres\Specification\Label;
+
 abstract class TableAction
 {
-    protected string $tableName;
+    protected Label $tableName;
 
-    public function __construct(string $tableName)
+    public function __construct(Label $tableName)
     {
         $this->tableName = $tableName;
     }
 
-    public function getTableName(): string
+    public function getTableName(): Label
     {
         return $this->tableName;
     }

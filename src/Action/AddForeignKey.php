@@ -4,12 +4,13 @@ namespace PeeHaa\Migres\Action;
 
 use PeeHaa\Migres\Constraint\ForeignKey;
 use PeeHaa\Migres\Migration\Queries;
+use PeeHaa\Migres\Specification\Label;
 
 final class AddForeignKey extends TableAction implements Action
 {
     private ForeignKey $foreignKey;
 
-    public function __construct(string $tableName, ForeignKey $foreignKey)
+    public function __construct(Label $tableName, ForeignKey $foreignKey)
     {
         parent::__construct($tableName);
 
@@ -23,6 +24,6 @@ final class AddForeignKey extends TableAction implements Action
 
     public function toQueries(): Queries
     {
-        return new Queries(sprintf('ALTER TABLE "%s" ADD %s', $this->tableName, $this->foreignKey->toSql()));
+        return new Queries(sprintf('ALTER TABLE "%s" ADD %s', $this->tableName->toString(), $this->foreignKey->toSql()));
     }
 }

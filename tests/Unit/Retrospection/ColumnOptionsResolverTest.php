@@ -6,6 +6,7 @@ use PeeHaa\Migres\Retrospection\ColumnDefinition;
 use PeeHaa\Migres\Retrospection\ColumnInformation;
 use PeeHaa\Migres\Retrospection\ColumnOptionsResolver;
 use PeeHaa\Migres\Retrospection\Sequence;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class ColumnOptionsResolverTest extends TestCase
@@ -21,8 +22,8 @@ class ColumnOptionsResolverTest extends TestCase
     {
         $options = $this->resolver->resolve(
             new ColumnInformation(
-                'table_name',
-                'column_name',
+                new Label('table_name'),
+                new Label('column_name'),
                 ColumnDefinition::fromInformationSchemaRecord([
                     'column_default'           => null,
                     'is_nullable'              => 'NO',
@@ -41,8 +42,8 @@ class ColumnOptionsResolverTest extends TestCase
     {
         $options = $this->resolver->resolve(
             new ColumnInformation(
-                'table_name',
-                'column_name',
+                new Label('table_name'),
+                new Label('column_name'),
                 ColumnDefinition::fromInformationSchemaRecord([
                     'column_default'           => 'nextval(\'table_name_column_name_seq\'::regclass)',
                     'is_nullable'              => 'NO',
@@ -61,8 +62,8 @@ class ColumnOptionsResolverTest extends TestCase
     {
         $options = $this->resolver->resolve(
             new ColumnInformation(
-                'table_name',
-                'column_name',
+                new Label('table_name'),
+                new Label('column_name'),
                 ColumnDefinition::fromInformationSchemaRecord([
                     'column_default'           => 'nextval(\'table_name_column_name_seq\'::regclass)',
                     'is_nullable'              => 'NO',
@@ -81,8 +82,8 @@ class ColumnOptionsResolverTest extends TestCase
     {
         $options = $this->resolver->resolve(
             new ColumnInformation(
-                'table_name',
-                'column_name',
+                new Label('table_name'),
+                new Label('column_name'),
                 ColumnDefinition::fromInformationSchemaRecord([
                     'column_default'           => 'nextval(\'table_name_column_name_seq\'::regclass)',
                     'is_nullable'              => 'NO',
@@ -101,8 +102,8 @@ class ColumnOptionsResolverTest extends TestCase
     {
         $options = $this->resolver->resolve(
             new ColumnInformation(
-                'table_name',
-                'column_name',
+                new Label('table_name'),
+                new Label('column_name'),
                 ColumnDefinition::fromInformationSchemaRecord([
                     'column_default'           => 'TheDefault',
                     'is_nullable'              => 'NO',

@@ -3,20 +3,21 @@
 namespace PeeHaa\MigresTest\Unit\Action;
 
 use PeeHaa\Migres\Action\DropCheck;
+use PeeHaa\Migres\Specification\Label;
 use PHPUnit\Framework\TestCase;
 
 class DropCheckTest extends TestCase
 {
     public function testGetName(): void
     {
-        $action = new DropCheck('table_name', 'check_name');
+        $action = new DropCheck(new Label('table_name'), new Label('check_name'));
 
-        $this->assertSame('check_name', $action->getName());
+        $this->assertSame('check_name', $action->getName()->toString());
     }
 
     public function testGetQueries(): void
     {
-        $queries = (new DropCheck('table_name', 'check_name'))->toQueries();
+        $queries = (new DropCheck(new Label('table_name'), new Label('check_name')))->toQueries();
 
         $queries = iterator_to_array($queries);
 
