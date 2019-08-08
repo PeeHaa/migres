@@ -9,8 +9,11 @@ use PeeHaa\Migres\Action\AddForeignByQuery;
 use PeeHaa\Migres\Action\AddForeignKey;
 use PeeHaa\Migres\Action\AddIndex;
 use PeeHaa\Migres\Action\AddIndexByQuery;
+use PeeHaa\Migres\Action\AddNamedPrimaryKeyByQuery;
 use PeeHaa\Migres\Action\AddPrimaryKey;
+use PeeHaa\Migres\Action\AddPrimaryKeyByQuery;
 use PeeHaa\Migres\Action\AddUniqueConstraint;
+use PeeHaa\Migres\Action\AddUniqueConstraintByQuery;
 use PeeHaa\Migres\Action\ChangeColumn;
 use PeeHaa\Migres\Action\CreateTable;
 use PeeHaa\Migres\Action\DropCheck;
@@ -95,10 +98,7 @@ final class Retrospector
         }
 
         if ($action instanceof DropPrimaryKey) {
-            return new AddPrimaryKey(
-                $action->getTableName(),
-                $this->getCurrentPrimaryKeyDefinition($action->getTableName(), $action->getName()),
-            );
+            return $this->getCurrentPrimaryKeyDefinition($action->getTableName(), $action->getName());
         }
 
         if ($action instanceof RenamePrimaryKey) {
@@ -110,10 +110,7 @@ final class Retrospector
         }
 
         if ($action instanceof DropUniqueConstraint) {
-            return new AddUniqueConstraint(
-                $action->getTableName(),
-                $this->getCurrentUniqueConstraintDefinition($action->getTableName(), $action->getName()),
-            );
+            return $this->getCurrentUniqueConstraintDefinition($action->getTableName(), $action->getName());
         }
 
         if ($action instanceof AddIndex) {
@@ -194,16 +191,16 @@ final class Retrospector
         return $column;
     }
 
-    private function getCurrentPrimaryKeyDefinition(Label $tableName, Label $name): PrimaryKey
+    private function getCurrentPrimaryKeyDefinition(Label $tableName, Label $name): AddNamedPrimaryKeyByQuery
     {
         $sql = '
-            SELECT key_column_usage.column_name
-            FROM information_schema.table_constraints
-                JOIN information_schema.key_column_usage ON table_constraints.constraint_name = key_column_usage.constraint_name
-                JOIN information_schema.constraint_column_usage ON constraint_column_usage.constraint_name = table_constraints.constraint_name
-                WHERE table_constraints.table_name = :tableName
-                    AND table_constraints.constraint_name = :constraintName
-                    AND table_constraints.constraint_type = \'PRIMARY KEY\'
+            SELECT pg_get_constraintdef(pg_constraint.oid) AS definition
+            FROM pg_constraint
+            JOIN pg_namespace ON pg_namespace.oid = pg_constraint.connamespace
+            WHERE pg_namespace.nspname = \'public\'
+                AND conrelid = :tableName::regclass
+                AND contype = \'p\'
+                AND conname = :constraintName
         ';
 
         $statement = $this->dbConnection->prepare($sql);
@@ -213,31 +210,25 @@ final class Retrospector
             'constraintName' => $name->toString(),
         ]);
 
-        $constraintInfo = $statement->fetchAll();
+        $constraintInfo = $statement->fetchColumn(0);
 
         if (!$constraintInfo) {
             throw new PrimaryKeyDefinitionNotFound($tableName->toString(), $name->toString());
         }
 
-        $columns = [];
-
-        foreach ($constraintInfo as $constraintRecord) {
-            $columns[] = $constraintRecord['column_name'];
-        }
-
-        return new PrimaryKey($name, ...array_map(fn (string $column) => new Label($column), array_unique($columns)));
+        return new AddNamedPrimaryKeyByQuery($tableName, $name, $constraintInfo);
     }
 
-    private function getCurrentUniqueConstraintDefinition(Label $tableName, Label $name): Unique
+    private function getCurrentUniqueConstraintDefinition(Label $tableName, Label $name): AddUniqueConstraintByQuery
     {
         $sql = '
-            SELECT key_column_usage.column_name
-            FROM information_schema.table_constraints
-                JOIN information_schema.key_column_usage ON table_constraints.constraint_name = key_column_usage.constraint_name
-                JOIN information_schema.constraint_column_usage ON constraint_column_usage.constraint_name = table_constraints.constraint_name
-                WHERE table_constraints.table_name = :tableName
-                    AND table_constraints.constraint_name = :constraintName
-                    AND table_constraints.constraint_type = \'UNIQUE\'
+            SELECT pg_get_constraintdef(pg_constraint.oid) AS definition
+            FROM pg_constraint
+            JOIN pg_namespace ON pg_namespace.oid = pg_constraint.connamespace
+            WHERE pg_namespace.nspname = \'public\'
+                AND conrelid = :tableName::regclass
+                AND contype = \'u\'
+                AND conname = :constraintName
         ';
 
         $statement = $this->dbConnection->prepare($sql);
@@ -247,19 +238,13 @@ final class Retrospector
             'constraintName' => $name->toString(),
         ]);
 
-        $constraintInfo = $statement->fetchAll();
+        $constraintInfo = $statement->fetchColumn(0);
 
         if (!$constraintInfo) {
             throw new UniqueConstraintDefinitionNotFound($tableName->toString(), $name->toString());
         }
 
-        $columns = [];
-
-        foreach ($constraintInfo as $constraintRecord) {
-            $columns[] = $constraintRecord['column_name'];
-        }
-
-        return new Unique($name, ...array_map(fn (string $column) => new Label($column), array_unique($columns)));
+        return new AddUniqueConstraintByQuery($tableName, $name, $constraintInfo);
     }
 
     private function getCurrentIndexDefinition(Label $tableName, Label $indexName): string
@@ -316,7 +301,7 @@ final class Retrospector
     private function getCurrentForeignKeyDefinition(Label $tableName, Label $name): AddForeignByQuery
     {
         $sql = '
-            SELECT conrelid::regclass AS table_from, pg_get_constraintdef(pg_constraint.oid)
+            SELECT pg_get_constraintdef(pg_constraint.oid)
             FROM pg_constraint
             JOIN pg_namespace ON pg_namespace.oid = pg_constraint.connamespace
             WHERE contype = \'f\'
@@ -329,12 +314,12 @@ final class Retrospector
             'constraintName' => $name->toString(),
         ]);
 
-        $constraintInfo = $statement->fetch();
+        $constraintInfo = $statement->fetchColumn(0);
 
         if (!$constraintInfo) {
             throw new ForeignKeyDefinitionNotFound($name->toString());
         }
 
-        return new AddForeignByQuery($tableName, $constraintInfo['pg_get_constraintdef']);
+        return new AddForeignByQuery($tableName, $name, $constraintInfo);
     }
 }

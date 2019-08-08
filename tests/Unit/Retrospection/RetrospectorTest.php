@@ -7,8 +7,10 @@ use PeeHaa\Migres\Action\AddCheck;
 use PeeHaa\Migres\Action\AddColumn;
 use PeeHaa\Migres\Action\AddIndex;
 use PeeHaa\Migres\Action\AddIndexByQuery;
+use PeeHaa\Migres\Action\AddNamedPrimaryKeyByQuery;
 use PeeHaa\Migres\Action\AddPrimaryKey;
 use PeeHaa\Migres\Action\AddUniqueConstraint;
+use PeeHaa\Migres\Action\AddUniqueConstraintByQuery;
 use PeeHaa\Migres\Action\ChangeColumn;
 use PeeHaa\Migres\Action\CreateTable;
 use PeeHaa\Migres\Action\DropCheck;
@@ -394,8 +396,8 @@ class RetrospectorTest extends TestCase
 
         $statement
             ->expects($this->once())
-            ->method('fetchAll')
-            ->willReturn([])
+            ->method('fetchColumn')
+            ->willReturn(false)
         ;
 
         $this->dbConnection
@@ -422,12 +424,8 @@ class RetrospectorTest extends TestCase
 
         $statement
             ->expects($this->once())
-            ->method('fetchAll')
-            ->willReturn([
-                [
-                    'column_name' => 'column_name',
-                ],
-            ])
+            ->method('fetchColumn')
+            ->willReturn('definition')
         ;
 
         $this->dbConnection
@@ -440,7 +438,7 @@ class RetrospectorTest extends TestCase
             new DropPrimaryKey(new Label('table_name'), new Label('table_name_pkey')),
         );
 
-        $this->assertInstanceOf(AddPrimaryKey::class, $reverseAction);
+        $this->assertInstanceOf(AddNamedPrimaryKeyByQuery::class, $reverseAction);
     }
 
     public function testGetReverseActionForRenamePrimaryKey(): void
@@ -472,8 +470,8 @@ class RetrospectorTest extends TestCase
 
         $statement
             ->expects($this->once())
-            ->method('fetchAll')
-            ->willReturn([])
+            ->method('fetchColumn')
+            ->willReturn(false)
         ;
 
         $this->dbConnection
@@ -498,12 +496,8 @@ class RetrospectorTest extends TestCase
 
         $statement
             ->expects($this->once())
-            ->method('fetchAll')
-            ->willReturn([
-                [
-                    'column_name' => 'column_name',
-                ],
-            ])
+            ->method('fetchColumn')
+            ->willReturn('definition')
         ;
 
         $this->dbConnection
@@ -516,7 +510,7 @@ class RetrospectorTest extends TestCase
             new DropUniqueConstraint(new Label('table_name'), new Label('unique')),
         );
 
-        $this->assertInstanceOf(AddUniqueConstraint::class, $reverseAction);
+        $this->assertInstanceOf(AddUniqueConstraintByQuery::class, $reverseAction);
     }
 
     public function testGetReverseActionForAddIndex(): void
