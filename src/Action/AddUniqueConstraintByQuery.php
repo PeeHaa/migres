@@ -5,7 +5,7 @@ namespace PeeHaa\Migres\Action;
 use PeeHaa\Migres\Migration\Queries;
 use PeeHaa\Migres\Specification\Label;
 
-final class AddForeignByQuery extends TableAction implements Action
+final class AddUniqueConstraintByQuery extends TableAction implements Action
 {
     private Label $name;
 
