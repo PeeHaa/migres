@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Foreign key constraints can now be rolled back properly
+- Creating indexes now works again with fixes after the refactoring to Label objects
 
 ### Security
 

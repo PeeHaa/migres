@@ -153,27 +153,66 @@ final class Table
 
     public function addIndex(string $name, string $column, string ...$columns): void
     {
-        $this->actions[] = new AddIndex($this->name, new Index(new Label($name), $this->name, array_merge([$column], $columns)));
+        $this->actions[] = new AddIndex(
+            $this->name,
+            new Index(
+                new Label($name),
+                $this->name,
+                array_map(fn (string $column) => new Label($column), array_merge([$column], $columns)),
+            ),
+        );
     }
 
     public function addBtreeIndex(string $name, string $column, string ...$columns): void
     {
-        $this->actions[] = new AddIndex($this->name, new Index(new Label($name), $this->name, array_merge([$column], $columns), 'btree'));
+        $this->actions[] = new AddIndex(
+            $this->name,
+            new Index(
+                new Label($name),
+                $this->name,
+                array_map(fn (string $column) => new Label($column), array_merge([$column], $columns)),
+                'btree',
+            ),
+        );
     }
 
     public function addHashIndex(string $name, string $column, string ...$columns): void
     {
-        $this->actions[] = new AddIndex($this->name, new Index(new Label($name), $this->name, array_merge([$column], $columns), 'hash'));
+        $this->actions[] = new AddIndex(
+            $this->name,
+            new Index(
+                new Label($name),
+                $this->name,
+                array_map(fn (string $column) => new Label($column), array_merge([$column], $columns)),
+                'hash',
+            ),
+        );
     }
 
     public function addGistIndex(string $name, string $column, string ...$columns): void
     {
-        $this->actions[] = new AddIndex($this->name, new Index(new Label($name), $this->name, array_merge([$column], $columns), 'gist'));
+        $this->actions[] = new AddIndex(
+            $this->name,
+            new Index(
+                new Label($name),
+                $this->name,
+                array_map(fn (string $column) => new Label($column), array_merge([$column], $columns)),
+                'gist',
+            ),
+        );
     }
 
     public function addGinIndex(string $name, string $column, string ...$columns): void
     {
-        $this->actions[] = new AddIndex($this->name, new Index(new Label($name), $this->name, array_merge([$column], $columns), 'gin'));
+        $this->actions[] = new AddIndex(
+            $this->name,
+            new Index(
+                new Label($name),
+                $this->name,
+                array_map(fn (string $column) => new Label($column), array_merge([$column], $columns)),
+                'gin',
+            ),
+        );
     }
 
     public function dropIndex(string $name): void
@@ -193,7 +232,10 @@ final class Table
 
     public function addForeignKey(string $name, string $column, string ...$columns): ForeignKey
     {
-        $foreignKey = new ForeignKey(new Label($name), ...array_merge([$column], $columns));
+        $foreignKey = new ForeignKey(
+            new Label($name),
+            ...array_map(fn (string $column) => new Label($column), array_merge([$column], $columns)),
+        );
 
         $this->actions[] = new AddForeignKey($this->name, $foreignKey);
 
