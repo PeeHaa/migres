@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-*None*
+- Foreign key constraints can now be rolled back properly
 
 ### Security
 
