@@ -11,6 +11,7 @@ use PeeHaa\Migres\Action\AddIndex;
 use PeeHaa\Migres\Action\AddIndexByQuery;
 use PeeHaa\Migres\Action\AddNamedPrimaryKeyByQuery;
 use PeeHaa\Migres\Action\AddPrimaryKey;
+use PeeHaa\Migres\Action\AddTableComment;
 use PeeHaa\Migres\Action\AddUniqueConstraint;
 use PeeHaa\Migres\Action\AddUniqueConstraintByQuery;
 use PeeHaa\Migres\Action\ChangeColumn;
@@ -22,6 +23,7 @@ use PeeHaa\Migres\Action\DropIndex;
 use PeeHaa\Migres\Action\DropPrimaryKey;
 use PeeHaa\Migres\Action\DropTable;
 use PeeHaa\Migres\Action\DropUniqueConstraint;
+use PeeHaa\Migres\Action\RemoveTableComment;
 use PeeHaa\Migres\Action\RenameColumn;
 use PeeHaa\Migres\Action\RenamePrimaryKey;
 use PeeHaa\Migres\Action\RenameTable;
@@ -33,6 +35,7 @@ use PeeHaa\Migres\Constraint\Unique;
 use PeeHaa\Migres\DataType\IntegerType;
 use PeeHaa\Migres\Exception\CheckDefinitionNotFound;
 use PeeHaa\Migres\Exception\ColumnDefinitionNotFound;
+use PeeHaa\Migres\Exception\CommentDefinitionNotFound;
 use PeeHaa\Migres\Exception\ForeignKeyDefinitionNotFound;
 use PeeHaa\Migres\Exception\IndexDefinitionNotFound;
 use PeeHaa\Migres\Exception\IrreversibleAction;
@@ -730,5 +733,173 @@ class RetrospectorTest extends TestCase
         $this->expectException(IrreversibleAction::class);
 
         $this->retrospector->getReverseAction($irreversibleAction);
+    }
+
+    public function testGetReverseActionForAddTableCommentWhenCommentExists(): void
+    {
+        $statement = $this->createMock(\PDOStatement::class);
+
+        $statement
+            ->expects($this->once())
+            ->method('execute')
+        ;
+
+        $statement
+            ->expects($this->once())
+            ->method('fetchColumn')
+            ->willReturn('The comment')
+        ;
+
+        $this->dbConnection
+            ->expects($this->once())
+            ->method('prepare')
+            ->willReturn($statement)
+        ;
+
+        $reverseAction = $this->retrospector->getReverseAction(
+            new AddTableComment(new Label('table_name'), 'The new comment'),
+        );
+
+        $this->assertInstanceOf(AddTableComment::class, $reverseAction);
+    }
+
+    public function testGetReverseActionForAddTableCommentWhenCommentDoesNotExist(): void
+    {
+        $statement = $this->createMock(\PDOStatement::class);
+
+        $statement
+            ->expects($this->once())
+            ->method('execute')
+        ;
+
+        $statement
+            ->expects($this->once())
+            ->method('fetchColumn')
+            ->willReturn(null)
+        ;
+
+        $this->dbConnection
+            ->expects($this->once())
+            ->method('prepare')
+            ->willReturn($statement)
+        ;
+
+        $reverseAction = $this->retrospector->getReverseAction(
+            new AddTableComment(new Label('table_name'), 'The new comment'),
+        );
+
+        $this->assertInstanceOf(RemoveTableComment::class, $reverseAction);
+    }
+
+    public function testGetReverseActionForAddTableCommentThrowsWhenCommentDefinitionCanNotBeFound(): void
+    {
+        $statement = $this->createMock(\PDOStatement::class);
+
+        $statement
+            ->expects($this->once())
+            ->method('execute')
+        ;
+
+        $statement
+            ->expects($this->once())
+            ->method('fetchColumn')
+            ->willReturn(false)
+        ;
+
+        $this->dbConnection
+            ->expects($this->once())
+            ->method('prepare')
+            ->willReturn($statement)
+        ;
+
+        $this->expectException(CommentDefinitionNotFound::class);
+
+        $this->retrospector->getReverseAction(
+            new AddTableComment(new Label('table_name'), 'The new comment'),
+        );
+    }
+
+    public function testGetReverseActionForRemoveTableCommentWhenCommentExists(): void
+    {
+        $statement = $this->createMock(\PDOStatement::class);
+
+        $statement
+            ->expects($this->once())
+            ->method('execute')
+        ;
+
+        $statement
+            ->expects($this->once())
+            ->method('fetchColumn')
+            ->willReturn('The comment')
+        ;
+
+        $this->dbConnection
+            ->expects($this->once())
+            ->method('prepare')
+            ->willReturn($statement)
+        ;
+
+        $reverseAction = $this->retrospector->getReverseAction(
+            new RemoveTableComment(new Label('table_name')),
+        );
+
+        $this->assertInstanceOf(AddTableComment::class, $reverseAction);
+    }
+
+    public function testGetReverseActionForRemoveTableCommentWhenCommentDoesNotExist(): void
+    {
+        $statement = $this->createMock(\PDOStatement::class);
+
+        $statement
+            ->expects($this->once())
+            ->method('execute')
+        ;
+
+        $statement
+            ->expects($this->once())
+            ->method('fetchColumn')
+            ->willReturn(null)
+        ;
+
+        $this->dbConnection
+            ->expects($this->once())
+            ->method('prepare')
+            ->willReturn($statement)
+        ;
+
+        $reverseAction = $this->retrospector->getReverseAction(
+            new RemoveTableComment(new Label('table_name')),
+        );
+
+        $this->assertInstanceOf(RemoveTableComment::class, $reverseAction);
+    }
+
+    public function testGetReverseActionForRemoveTableCommentThrowsWhenCommentDefinitionCanNotBeFound(): void
+    {
+        $statement = $this->createMock(\PDOStatement::class);
+
+        $statement
+            ->expects($this->once())
+            ->method('execute')
+        ;
+
+        $statement
+            ->expects($this->once())
+            ->method('fetchColumn')
+            ->willReturn(false)
+        ;
+
+        $this->dbConnection
+            ->expects($this->once())
+            ->method('prepare')
+            ->willReturn($statement)
+        ;
+
+        $this->expectException(CommentDefinitionNotFound::class);
+
+        $this->retrospector->getReverseAction(
+            new RemoveTableComment(new Label('table_name')),
+        );
     }
 }

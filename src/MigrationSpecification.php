@@ -5,6 +5,7 @@ namespace PeeHaa\Migres;
 use PeeHaa\Migres\Migration\TableActions;
 use PeeHaa\Migres\Specification\Label;
 use PeeHaa\Migres\Specification\Table;
+use PeeHaa\Migres\Specification\TableOptions;
 
 abstract class MigrationSpecification
 {
@@ -13,22 +14,30 @@ abstract class MigrationSpecification
 
     abstract public function change(): void;
 
-    public function createTable(string $name, callable $callback): void
+    public function createTable(string $name, callable $callback): TableOptions
     {
-        $table = Table::fromCreateTable(new Label($name));
+        $tableOptions = new TableOptions(new Label($name));
+
+        $table = Table::fromCreateTable(new Label($name), $tableOptions);
 
         $callback($table);
 
         $this->migrationSteps[] = $table;
+
+        return $tableOptions;
     }
 
-    public function changeTable(string $name, callable $callback): void
+    public function changeTable(string $name, callable $callback): TableOptions
     {
-        $table = Table::fromChangeTable(new Label($name));
+        $tableOptions = new TableOptions(new Label($name));
+
+        $table = Table::fromChangeTable(new Label($name), $tableOptions);
 
         $callback($table);
 
         $this->migrationSteps[] = $table;
+
+        return $tableOptions;
     }
 
     public function renameTable(string $oldName, string $newName): void
