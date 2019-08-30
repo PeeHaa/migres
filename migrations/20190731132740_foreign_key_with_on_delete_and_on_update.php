@@ -20,8 +20,7 @@ class ForeignKeyWithOnDeleteAndOnUpdate extends MigrationSpecification
             $table->addColumn('id', new BigSerial());
             $table->addColumn('foreign_id', new BigInt())->notNull();
             $table->primaryKey('id');
-            $table->addForeignKey('on_fkey', 'foreign_id')
-                ->references('foreign_key_on_1', 'id')
+            $table->addForeignKey('on_fkey', ['foreign_id'], 'foreign_key_on_1', ['id'])
                 ->onDeleteCascade()
                 ->onUpdateCascade()
             ;

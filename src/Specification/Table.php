@@ -230,11 +230,13 @@ final class Table
         $this->actions[] = new DropCheck($this->name, new Label($name));
     }
 
-    public function addForeignKey(string $name, string $column, string ...$columns): ForeignKey
+    public function addForeignKey(string $name, array $columns, string $referencedTableName, array $referencedColumns): ForeignKey
     {
         $foreignKey = new ForeignKey(
             new Label($name),
-            ...array_map(fn (string $column) => new Label($column), array_merge([$column], $columns)),
+            ...array_map(fn (string $column) => new Label($column), $columns),
+            new Label($referencedTableName),
+            ...array_map(fn (string $column) => new Label($column), $referencedColumns),
         );
 
         $this->actions[] = new AddForeignKey($this->name, $foreignKey);
