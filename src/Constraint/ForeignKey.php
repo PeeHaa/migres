@@ -9,7 +9,7 @@ final class ForeignKey extends NamedConstraint implements Constraint
     /** @var array<Label> */
     private array $columns;
 
-    private ?Label $referencedTable;
+    private Label $referencedTable;
 
     /** @var array<Label> */
     private ?array $referencedColumns;
@@ -18,19 +18,55 @@ final class ForeignKey extends NamedConstraint implements Constraint
 
     private string $onUpdate = 'NO ACTION';
 
-    public function __construct(Label $name, Label ...$columns)
+    /**
+     * @param array<string> $columns
+     * @param array<string> $referencedColumns
+     */
+    public function __construct(Label $name, array $columns, Label $referencedTableName, array $referencedColumns)
     {
-        $this->columns = $columns;
+        foreach ($columns as $column) {
+            if (!$column instanceof Label) {
+                throw new \TypeError($this->getTypeErrorMessage(2, $column));
+            }
+
+            $this->columns[] = $column;
+        }
+
+        foreach ($referencedColumns as $column) {
+            if (!$column instanceof Label) {
+                throw new \TypeError($this->getTypeErrorMessage(4, $column));
+            }
+
+            $this->referencedColumns[] = $column;
+        }
+
+        if (count($this->columns) !== count($this->referencedColumns)) {
+            throw new \Exception('Column count in foreign key constraint must match referenced column count');
+        }
+
+        $this->referencedTable = $referencedTableName;
 
         parent::__construct($name);
     }
 
-    public function references(string $referenceTableName, string $column, string ...$columns): self
+    /**
+     * @param mixed $argument
+     */
+    private function getTypeErrorMessage(int $argumentNumber, $argument): string
     {
-        $this->referencedTable   = new Label($referenceTableName);
-        $this->referencedColumns = array_map(fn (string $column) => new Label($column), array_merge([$column], $columns));
+        $type = gettype($argument);
 
-        return $this;
+        if ($type === 'object') {
+            $type = get_class($type);
+        }
+
+        return sprintf(
+            'Uncaught TypeError: Argument %d passed to %s must be of an array of %s, %s given',
+            $argumentNumber,
+            __CLASS__ . '::__construct()',
+            Label::class,
+            $type,
+        );
     }
 
     public function onDeleteCascade(): self

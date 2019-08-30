@@ -22,9 +22,7 @@ class ForeignKeyMultipleColumnTest extends MigrationSpecification
             $table->addColumn('id', new BigSerial());
             $table->addColumn('foreign_id', new BigInt())->notNull();
             $table->primaryKey('id');
-            $table->addForeignKey('multiple_fkey', 'id', 'foreign_id')
-                ->references('foreign_key_multiple_1', 'id1', 'id2')
-            ;
+            $table->addForeignKey('multiple_fkey', ['id', 'foreign_id'], 'foreign_key_multiple_1', ['id1', 'id2']);
         });
     }
 }

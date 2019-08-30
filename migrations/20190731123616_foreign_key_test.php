@@ -20,9 +20,7 @@ class ForeignKeyTest extends MigrationSpecification
             $table->addColumn('id', new BigSerial());
             $table->addColumn('foreign_id', new BigInt())->notNull();
             $table->primaryKey('id');
-            $table->addForeignKey('foreign_key_test_2_foreign_key_test_1_fkey', 'foreign_id')
-                ->references('foreign_key_test_1', 'id')
-            ;
+            $table->addForeignKey('foreign_key_test_2_foreign_key_test_1_fkey', ['foreign_id'], 'foreign_key_test_1', ['id']);
             $table->dropForeignKey('foreign_key_test_2_foreign_key_test_1_fkey');
         });
     }

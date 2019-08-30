@@ -29,7 +29,7 @@ class Test2ConstraintRefector extends MigrationSpecification
 
         $this->createTable('drop_reference', function (Table $table) {
             $table->addColumn('id', new BigSerial());
-            $table->addForeignKey('named_fkey', 'id')->references('fkey_link', 'id');
+            $table->addForeignKey('named_fkey', ['id'], 'fkey_link', ['id']);
             $table->dropForeignKey('named_fkey');
         });
     }
