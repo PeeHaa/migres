@@ -187,7 +187,7 @@ final class Retrospector
 
         $dataType = $this->dataTypeResolver->resolve($columnInformation);
 
-        $column = new Column($columnName, $dataType);
+        $column = new Column($tableName, $columnName, $dataType);
 
         $columnOptions = $this->columnOptionsResolver->resolve($columnInformation);
 

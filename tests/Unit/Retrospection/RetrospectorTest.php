@@ -95,6 +95,7 @@ class RetrospectorTest extends TestCase
     public function testGetReverseActionForAddColumn(): void
     {
         $reverseAction = $this->retrospector->getReverseAction(new AddColumn(new Label('table_name'), new Column(
+            new Label('table_name'),
             new Label('column_name'),
             new IntegerType(),
         )));
@@ -268,6 +269,7 @@ class RetrospectorTest extends TestCase
         $this->expectException(ColumnDefinitionNotFound::class);
 
         $this->retrospector->getReverseAction(new ChangeColumn(new Label('table_name'), new Column(
+            new Label('table_name'),
             new Label('column_name'),
             new IntegerType(),
         )));
@@ -302,6 +304,7 @@ class RetrospectorTest extends TestCase
         ;
 
         $reverseAction = $this->retrospector->getReverseAction(new ChangeColumn(new Label('table_name'), new Column(
+            new Label('table_name'),
             new Label('column_name'),
             new IntegerType(),
         )));
@@ -338,6 +341,7 @@ class RetrospectorTest extends TestCase
         ;
 
         $reverseAction = $this->retrospector->getReverseAction(new ChangeColumn(new Label('table_name'), new Column(
+            new Label('table_name'),
             new Label('column_name'),
             new IntegerType(),
         )));
@@ -374,6 +378,7 @@ class RetrospectorTest extends TestCase
         ;
 
         $reverseAction = $this->retrospector->getReverseAction(new ChangeColumn(new Label('table_name'), new Column(
+            new Label('table_name'),
             new Label('column_name'),
             new IntegerType(),
         )));

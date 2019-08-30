@@ -12,7 +12,7 @@ class ChangeColumnTest extends TestCase
 {
     public function testGetName(): void
     {
-        $column = new Column(new Label('column_name'), new IntegerType());
+        $column = new Column(new Label('table_name'), new Label('column_name'), new IntegerType());
 
         $action = new ChangeColumn(new Label('table_name'), $column);
 
@@ -21,7 +21,7 @@ class ChangeColumnTest extends TestCase
 
     public function testToQueriesNullableNoDefault(): void
     {
-        $column  = new Column(new Label('column_name'), new IntegerType());
+        $column  = new Column(new Label('table_name'), new Label('column_name'), new IntegerType());
         $queries = (new ChangeColumn(new Label('table_name'), $column))->toQueries();
 
         $queries = iterator_to_array($queries);
@@ -46,7 +46,7 @@ class ChangeColumnTest extends TestCase
 
     public function testToQueriesNotNullNoDefault(): void
     {
-        $column  = (new Column(new Label('column_name'), new IntegerType()))->notNull();
+        $column  = (new Column(new Label('table_name'), new Label('column_name'), new IntegerType()))->notNull();
         $queries = (new ChangeColumn(new Label('table_name'), $column))->toQueries();
 
         $queries = iterator_to_array($queries);
@@ -71,7 +71,7 @@ class ChangeColumnTest extends TestCase
 
     public function testToQueriesNullableWithDefault(): void
     {
-        $column  = (new Column(new Label('column_name'), new IntegerType()))->default(42);
+        $column  = (new Column(new Label('table_name'), new Label('column_name'), new IntegerType()))->default(42);
         $queries = (new ChangeColumn(new Label('table_name'), $column))->toQueries();
 
         $queries = iterator_to_array($queries);
@@ -96,7 +96,7 @@ class ChangeColumnTest extends TestCase
 
     public function testToQueriesNotNullableWithDefault(): void
     {
-        $column  = (new Column(new Label('column_name'), new IntegerType()))->notNull()->default(42);
+        $column  = (new Column(new Label('table_name'), new Label('column_name'), new IntegerType()))->notNull()->default(42);
         $queries = (new ChangeColumn(new Label('table_name'), $column))->toQueries();
 
         $queries = iterator_to_array($queries);

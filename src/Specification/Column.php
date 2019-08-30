@@ -6,17 +6,20 @@ use PeeHaa\Migres\DataType\Type;
 
 final class Column
 {
+    private Label $tableName;
+
     private Label $name;
 
     private Type $type;
 
     private ColumnOptions $options;
 
-    public function __construct(Label $name, Type $type)
+    public function __construct(Label $tableName, Label $name, Type $type)
     {
-        $this->name    = $name;
-        $this->type    = $type;
-        $this->options = new ColumnOptions();
+        $this->tableName = $tableName;
+        $this->name      = $name;
+        $this->type      = $type;
+        $this->options   = new ColumnOptions($name);
     }
 
     public function getName(): Label
@@ -48,6 +51,20 @@ final class Column
 
     public function getOptions(): ColumnOptions
     {
+        return $this->options;
+    }
+
+    public function comment(string $comment): ColumnOptions
+    {
+        $this->options->comment($comment);
+
+        return $this->options;
+    }
+
+    public function removeComment(): ColumnOptions
+    {
+        $this->options->removeComment();
+
         return $this->options;
     }
 

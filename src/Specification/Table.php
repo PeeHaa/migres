@@ -78,7 +78,7 @@ final class Table
 
     public function addColumn(string $name, Type $dataType): Column
     {
-        $column = new Column(new Label($name), $dataType);
+        $column = new Column($this->name, new Label($name), $dataType);
 
         $this->actions[] = new AddColumn($this->name, $column);
 
@@ -97,7 +97,7 @@ final class Table
 
     public function changeColumn(string $name, Type $dataType): Column
     {
-        $column = new Column(new Label($name), $dataType);
+        $column = new Column($this->name, new Label($name), $dataType);
 
         $this->actions[] = new ChangeColumn($this->name, $column);
 
