@@ -5,6 +5,8 @@ namespace PeeHaa\MigresTest\Unit\Retrospection;
 use PeeHaa\Migres\Action\Action;
 use PeeHaa\Migres\Action\AddCheck;
 use PeeHaa\Migres\Action\AddColumn;
+use PeeHaa\Migres\Action\AddForeignByQuery;
+use PeeHaa\Migres\Action\AddForeignKey;
 use PeeHaa\Migres\Action\AddIndex;
 use PeeHaa\Migres\Action\AddIndexByQuery;
 use PeeHaa\Migres\Action\AddNamedPrimaryKeyByQuery;
@@ -15,6 +17,7 @@ use PeeHaa\Migres\Action\ChangeColumn;
 use PeeHaa\Migres\Action\CreateTable;
 use PeeHaa\Migres\Action\DropCheck;
 use PeeHaa\Migres\Action\DropColumn;
+use PeeHaa\Migres\Action\DropForeignKey;
 use PeeHaa\Migres\Action\DropIndex;
 use PeeHaa\Migres\Action\DropPrimaryKey;
 use PeeHaa\Migres\Action\DropTable;
@@ -23,12 +26,14 @@ use PeeHaa\Migres\Action\RenameColumn;
 use PeeHaa\Migres\Action\RenamePrimaryKey;
 use PeeHaa\Migres\Action\RenameTable;
 use PeeHaa\Migres\Constraint\Check;
+use PeeHaa\Migres\Constraint\ForeignKey;
 use PeeHaa\Migres\Constraint\Index;
 use PeeHaa\Migres\Constraint\PrimaryKey;
 use PeeHaa\Migres\Constraint\Unique;
 use PeeHaa\Migres\DataType\IntegerType;
 use PeeHaa\Migres\Exception\CheckDefinitionNotFound;
 use PeeHaa\Migres\Exception\ColumnDefinitionNotFound;
+use PeeHaa\Migres\Exception\ForeignKeyDefinitionNotFound;
 use PeeHaa\Migres\Exception\IndexDefinitionNotFound;
 use PeeHaa\Migres\Exception\IrreversibleAction;
 use PeeHaa\Migres\Exception\PrimaryKeyDefinitionNotFound;
@@ -644,6 +649,72 @@ class RetrospectorTest extends TestCase
         );
 
         $this->assertInstanceOf(AddCheck::class, $reverseAction);
+    }
+
+    public function testGetReverseActionForAddForeignKey(): void
+    {
+        $reverseAction = $this->retrospector->getReverseAction(
+            new AddForeignKey(new Label('table_name'), new ForeignKey(new Label('name_fkey'), [new Label('referenced_column')], new Label('referenced_table'), [new Label('id')])),
+        );
+
+        $this->assertInstanceOf(DropForeignKey::class, $reverseAction);
+    }
+
+    public function testGetReverseActionForDropForeignKey(): void
+    {
+        $statement = $this->createMock(\PDOStatement::class);
+
+        $statement
+            ->expects($this->once())
+            ->method('execute')
+        ;
+
+        $statement
+            ->expects($this->once())
+            ->method('fetchColumn')
+            ->willReturn('REFERENCES referenced_table (id) CONSTRAINT name_fkey FOREIGN KEY (customer_id) REFERENCES customers (id)')
+        ;
+
+        $this->dbConnection
+            ->expects($this->once())
+            ->method('prepare')
+            ->willReturn($statement)
+        ;
+
+        $reverseAction = $this->retrospector->getReverseAction(
+            new DropForeignKey(new Label('table_name'), new Label('name_fkey')),
+        );
+
+        $this->assertInstanceOf(AddForeignByQuery::class, $reverseAction);
+    }
+
+    public function testGetReverseActionForDropForeignKeyThrowsWhenDefinitionCanNotBeFound(): void
+    {
+        $statement = $this->createMock(\PDOStatement::class);
+
+        $statement
+            ->expects($this->once())
+            ->method('execute')
+        ;
+
+        $statement
+            ->expects($this->once())
+            ->method('fetchColumn')
+            ->willReturn(false)
+        ;
+
+        $this->dbConnection
+            ->expects($this->once())
+            ->method('prepare')
+            ->willReturn($statement)
+        ;
+
+        $this->expectException(ForeignKeyDefinitionNotFound::class);
+        $this->expectExceptionMessage('Could not find definition of foreign key `name_fkey`');
+
+        $this->retrospector->getReverseAction(
+            new DropForeignKey(new Label('table_name'), new Label('name_fkey')),
+        );
     }
 
     public function testGetReverseActionThrowsWhenActionCanNotBeReversed(): void

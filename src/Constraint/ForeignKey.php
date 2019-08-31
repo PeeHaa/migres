@@ -2,6 +2,7 @@
 
 namespace PeeHaa\Migres\Constraint;
 
+use PeeHaa\Migres\Exception\ForeignKeyColumnMismatch;
 use PeeHaa\Migres\Specification\Label;
 
 final class ForeignKey extends NamedConstraint implements Constraint
@@ -41,7 +42,7 @@ final class ForeignKey extends NamedConstraint implements Constraint
         }
 
         if (count($this->columns) !== count($this->referencedColumns)) {
-            throw new \Exception('Column count in foreign key constraint must match referenced column count');
+            throw new ForeignKeyColumnMismatch(count($this->columns), count($this->referencedColumns));
         }
 
         $this->referencedTable = $referencedTableName;
@@ -57,7 +58,7 @@ final class ForeignKey extends NamedConstraint implements Constraint
         $type = gettype($argument);
 
         if ($type === 'object') {
-            $type = get_class($type);
+            $type = get_class($argument);
         }
 
         return sprintf(
