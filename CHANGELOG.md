@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Constraint rollbacks are now being introspected based on the `pg_constraint` table
+- Implemented new API for foreign key constraints
 
 ### Deprecated
 
