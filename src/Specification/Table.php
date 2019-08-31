@@ -234,9 +234,9 @@ final class Table
     {
         $foreignKey = new ForeignKey(
             new Label($name),
-            ...array_map(fn (string $column) => new Label($column), $columns),
+            array_map(fn (string $column) => new Label($column), $columns),
             new Label($referencedTableName),
-            ...array_map(fn (string $column) => new Label($column), $referencedColumns),
+            array_map(fn (string $column) => new Label($column), $referencedColumns),
         );
 
         $this->actions[] = new AddForeignKey($this->name, $foreignKey);

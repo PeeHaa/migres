@@ -4,6 +4,7 @@ namespace PeeHaa\MigresTest\Unit\Specification;
 
 use PeeHaa\Migres\Action\AddCheck;
 use PeeHaa\Migres\Action\AddColumn;
+use PeeHaa\Migres\Action\AddForeignKey;
 use PeeHaa\Migres\Action\AddIndex;
 use PeeHaa\Migres\Action\AddPrimaryKey;
 use PeeHaa\Migres\Action\AddUniqueConstraint;
@@ -11,6 +12,7 @@ use PeeHaa\Migres\Action\ChangeColumn;
 use PeeHaa\Migres\Action\CreateTable;
 use PeeHaa\Migres\Action\DropCheck;
 use PeeHaa\Migres\Action\DropColumn;
+use PeeHaa\Migres\Action\DropForeignKey;
 use PeeHaa\Migres\Action\DropIndex;
 use PeeHaa\Migres\Action\DropPrimaryKey;
 use PeeHaa\Migres\Action\DropTable;
@@ -296,6 +298,32 @@ class TableTest extends TestCase
 
         foreach ($table->getActions() as $action) {
             $this->assertInstanceOf(DropCheck::class, $action);
+        }
+    }
+
+    public function testAddForeignKey(): void
+    {
+        $table = Table::fromChangeTable(new Label('table_name'));
+
+        $table->addForeignKey('name_fkey', ['column_name'], 'referenced_table', ['id']);
+
+        $this->assertCount(1, $table->getActions());
+
+        foreach ($table->getActions() as $action) {
+            $this->assertInstanceOf(AddForeignKey::class, $action);
+        }
+    }
+
+    public function testDropForeignKey(): void
+    {
+        $table = Table::fromChangeTable(new Label('table_name'));
+
+        $table->dropForeignKey('name_fkey');
+
+        $this->assertCount(1, $table->getActions());
+
+        foreach ($table->getActions() as $action) {
+            $this->assertInstanceOf(DropForeignKey::class, $action);
         }
     }
 }
