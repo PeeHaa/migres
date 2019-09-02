@@ -15,7 +15,7 @@ final class ColumnOptionsResolver
 
     public function resolve(ColumnInformation $columnInformation): ColumnOptions
     {
-        $columnOptions = new ColumnOptions();
+        $columnOptions = new ColumnOptions($columnInformation->getColumnName());
 
         if (!$columnInformation->getColumnDefinition()->isNullable()) {
             $columnOptions->notNull();

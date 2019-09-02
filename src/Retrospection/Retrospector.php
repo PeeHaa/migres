@@ -12,6 +12,7 @@ use PeeHaa\Migres\Action\AddIndexByQuery;
 use PeeHaa\Migres\Action\AddNamedPrimaryKeyByQuery;
 use PeeHaa\Migres\Action\AddPrimaryKey;
 use PeeHaa\Migres\Action\AddPrimaryKeyByQuery;
+use PeeHaa\Migres\Action\AddTableComment;
 use PeeHaa\Migres\Action\AddUniqueConstraint;
 use PeeHaa\Migres\Action\AddUniqueConstraintByQuery;
 use PeeHaa\Migres\Action\ChangeColumn;
@@ -23,6 +24,7 @@ use PeeHaa\Migres\Action\DropIndex;
 use PeeHaa\Migres\Action\DropPrimaryKey;
 use PeeHaa\Migres\Action\DropTable;
 use PeeHaa\Migres\Action\DropUniqueConstraint;
+use PeeHaa\Migres\Action\RemoveTableComment;
 use PeeHaa\Migres\Action\RenameColumn;
 use PeeHaa\Migres\Action\RenamePrimaryKey;
 use PeeHaa\Migres\Action\RenameTable;
@@ -31,6 +33,7 @@ use PeeHaa\Migres\Constraint\PrimaryKey;
 use PeeHaa\Migres\Constraint\Unique;
 use PeeHaa\Migres\Exception\CheckDefinitionNotFound;
 use PeeHaa\Migres\Exception\ColumnDefinitionNotFound;
+use PeeHaa\Migres\Exception\CommentDefinitionNotFound;
 use PeeHaa\Migres\Exception\ForeignKeyDefinitionNotFound;
 use PeeHaa\Migres\Exception\IndexDefinitionNotFound;
 use PeeHaa\Migres\Exception\IrreversibleAction;
@@ -143,6 +146,14 @@ final class Retrospector
             return $this->getCurrentForeignKeyDefinition($action->getTableName(), $action->getName());
         }
 
+        if ($action instanceof AddTableComment) {
+            return $this->getCurrentTableCommentDefinition($action->getTableName());
+        }
+
+        if ($action instanceof RemoveTableComment) {
+            return $this->getCurrentTableCommentDefinition($action->getTableName());
+        }
+
         throw new IrreversibleAction(get_class($action));
     }
 
@@ -176,7 +187,7 @@ final class Retrospector
 
         $dataType = $this->dataTypeResolver->resolve($columnInformation);
 
-        $column = new Column($columnName, $dataType);
+        $column = new Column($tableName, $columnName, $dataType);
 
         $columnOptions = $this->columnOptionsResolver->resolve($columnInformation);
 
@@ -321,5 +332,36 @@ final class Retrospector
         }
 
         return new AddForeignByQuery($tableName, $name, $constraintInfo);
+    }
+
+    /**
+     * @return AddTableComment|RemoveTableComment
+     */
+    private function getCurrentTableCommentDefinition(Label $tableName): Action
+    {
+        $sql = '
+            SELECT obj_description(oid)
+            FROM pg_class
+            WHERE relkind = \'r\'
+                AND relname = :tableName
+        ';
+
+        $statement = $this->dbConnection->prepare($sql);
+
+        $statement->execute([
+            'tableName' => $tableName->toString(),
+        ]);
+
+        $comment = $statement->fetchColumn(0);
+
+        if ($comment === false) {
+            throw new CommentDefinitionNotFound($tableName->toString());
+        }
+
+        if ($comment === null) {
+            return new RemoveTableComment($tableName);
+        }
+
+        return new AddTableComment($tableName, $comment);
     }
 }

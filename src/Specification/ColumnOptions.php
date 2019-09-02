@@ -2,6 +2,11 @@
 
 namespace PeeHaa\Migres\Specification;
 
+use PeeHaa\Migres\Action\Action;
+use PeeHaa\Migres\Action\AddColumnComment;
+use PeeHaa\Migres\Action\AddTableComment;
+use PeeHaa\Migres\Action\RemoveColumnComment;
+use PeeHaa\Migres\Action\RemoveTableComment;
 use PeeHaa\Migres\Constraint\NotNull;
 use PeeHaa\Migres\DataType\Bit;
 use PeeHaa\Migres\DataType\BitVarying;
@@ -9,12 +14,22 @@ use PeeHaa\Migres\Exception\InvalidDefaultValue;
 
 final class ColumnOptions
 {
+    private Label $name;
+
     private bool $defaultValueSet = false;
 
     /** @var mixed */
     private $defaultValue;
 
     private bool $nullable = true;
+
+    /** @var AddTableComment|RemoveTableComment|null */
+    private ?Action $commentAction = null;
+
+    public function __construct(Label $name)
+    {
+        $this->name = $name;
+    }
 
     /**
      * @param mixed $default
@@ -93,6 +108,20 @@ final class ColumnOptions
         return $this->nullable === false || $this->defaultValueSet;
     }
 
+    public function comment(string $comment): self
+    {
+        $this->commentAction = new AddColumnComment($this->tableName, $this->name, $comment);
+
+        return $this;
+    }
+
+    public function removeComment(): self
+    {
+        $this->commentAction = new RemoveColumnComment($this->tableName, $this->name);
+
+        return $this;
+    }
+
     public function toSql(Column $column): string
     {
         $sqlParts = [];
@@ -106,5 +135,20 @@ final class ColumnOptions
         }
 
         return implode(' ', $sqlParts);
+    }
+
+    /**
+     * @internal
+     * @return array<Action>
+     */
+    public function getActions(): array
+    {
+        $actions = [];
+
+        if ($this->commentAction !== null) {
+            $actions[] = $this->commentAction;
+        }
+
+        return $actions;
     }
 }

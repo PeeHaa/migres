@@ -33,31 +33,34 @@ final class Table
 {
     private Label $name;
 
+    private TableOptions $tableOptions;
+
     /** @var array<Action> */
     private array $actions = [];
 
-    private function __construct(Label $name)
+    private function __construct(Label $name, TableOptions $tableOptions)
     {
-        $this->name = $name;
+        $this->name         = $name;
+        $this->tableOptions = $tableOptions;
     }
 
-    public static function fromCreateTable(Label $name): self
+    public static function fromCreateTable(Label $name, TableOptions $tableOptions): self
     {
-        $table = new self($name);
+        $table = new self($name, $tableOptions);
 
         $table->actions[] = new CreateTable($name);
 
         return $table;
     }
 
-    public static function fromChangeTable(Label $name): self
+    public static function fromChangeTable(Label $name, TableOptions $tableOptions): self
     {
-        return new self($name);
+        return new self($name, $tableOptions);
     }
 
     public static function fromRenameTable(Label $oldName, Label $newName): self
     {
-        $table = new self($newName);
+        $table = new self($newName, new TableOptions($oldName));
 
         $table->actions[] = new RenameTable($oldName, $newName);
 
@@ -66,7 +69,7 @@ final class Table
 
     public static function fromDropTable(Label $name): self
     {
-        $table = new self($name);
+        $table = new self($name, new TableOptions($name));
 
         $table->actions[] = new DropTable($name);
 
@@ -75,7 +78,7 @@ final class Table
 
     public function addColumn(string $name, Type $dataType): Column
     {
-        $column = new Column(new Label($name), $dataType);
+        $column = new Column($this->name, new Label($name), $dataType);
 
         $this->actions[] = new AddColumn($this->name, $column);
 
@@ -94,7 +97,7 @@ final class Table
 
     public function changeColumn(string $name, Type $dataType): Column
     {
-        $column = new Column(new Label($name), $dataType);
+        $column = new Column($this->name, new Label($name), $dataType);
 
         $this->actions[] = new ChangeColumn($this->name, $column);
 
@@ -251,6 +254,6 @@ final class Table
 
     public function getActions(): TableActions
     {
-        return new TableActions($this->name->toString(), ...$this->actions);
+        return new TableActions($this->name->toString(), ...$this->actions, ...$this->tableOptions->getActions());
     }
 }

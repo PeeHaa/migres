@@ -12,7 +12,7 @@ class AddColumnTest extends TestCase
 {
     public function testGetColumn(): void
     {
-        $column = new Column(new Label('column_name'), new IntegerType());
+        $column = new Column(new Label('table_name'), new Label('column_name'), new IntegerType());
 
         $action = new AddColumn(new Label('table_name'), $column);
 
@@ -21,7 +21,8 @@ class AddColumnTest extends TestCase
 
     public function testToQueries(): void
     {
-        $column  = new Column(new Label('column_name'), new IntegerType());
+        $column  = new Column(new Label('table_name'), new Label('column_name'), new IntegerType());
+
         $queries = (new AddColumn(new Label('table_name'), $column))->toQueries();
 
         $queries = iterator_to_array($queries);
@@ -36,7 +37,8 @@ class AddColumnTest extends TestCase
 
     public function testToQueriesWithOptions(): void
     {
-        $column  = (new Column(new Label('column_name'), new IntegerType()))->notNull();
+        $column  = (new Column(new Label('table_name'), new Label('column_name'), new IntegerType()))->notNull();
+
         $queries = (new AddColumn(new Label('table_name'), $column))->toQueries();
 
         $queries = iterator_to_array($queries);

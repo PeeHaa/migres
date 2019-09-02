@@ -16,168 +16,168 @@ class ColumnOptionsTest extends TestCase
 {
     public function testSetDefault(): void
     {
-        $options = (new ColumnOptions())->setDefault('TheDefault');
+        $options = (new ColumnOptions(new Label('column_name')))->setDefault('TheDefault');
 
         $this->assertSame(
             "'TheDefault'",
-            $options->getDefaultValue(new Column(new Label('column_name'), new CharacterVarying())),
+            $options->getDefaultValue(new Column(new Label('table_name'), new Label('column_name'), new CharacterVarying())),
         );
     }
 
     public function testHasDefaultWhenDefaultIsSet(): void
     {
-        $options = (new ColumnOptions())->setDefault('TheDefault');
+        $options = (new ColumnOptions(new Label('column_name')))->setDefault('TheDefault');
 
         $this->assertTrue($options->hasDefault());
     }
 
     public function testHasDefaultWhenDefaultIsNotSet(): void
     {
-        $options = new ColumnOptions();
+        $options = new ColumnOptions(new Label('column_name'));
 
         $this->assertFalse($options->hasDefault());
     }
 
     public function testGetDefaultReturnsDefaultAsIsWhenItContainsACast(): void
     {
-        $options = (new ColumnOptions())->setDefault("'TheDefault'::string");
+        $options = (new ColumnOptions(new Label('column_name')))->setDefault("'TheDefault'::string");
 
         $this->assertSame(
             "'TheDefault'::string",
-            $options->getDefaultValue(new Column(new Label('column_name'), new CharacterVarying())),
+            $options->getDefaultValue(new Column(new Label('table_name'), new Label('column_name'), new CharacterVarying())),
         );
     }
 
     public function testGetDefaultReturnsDefaultAsIsWhenItContainsTheBinaryPrefix(): void
     {
-        $options = (new ColumnOptions())->setDefault("B'100011'");
+        $options = (new ColumnOptions(new Label('column_name')))->setDefault("B'100011'");
 
         $this->assertSame(
             "B'100011'",
-            $options->getDefaultValue(new Column(new Label('column_name'), new Bit())),
+            $options->getDefaultValue(new Column(new Label('table_name'), new Label('column_name'), new Bit())),
         );
     }
 
     public function testGetDefaultReturnsConvertedToBinaryDefault(): void
     {
-        $options = (new ColumnOptions())->setDefault('100011');
+        $options = (new ColumnOptions(new Label('column_name')))->setDefault('100011');
 
         $this->assertSame(
             "B'100011'",
-            $options->getDefaultValue(new Column(new Label('column_name'), new Bit())),
+            $options->getDefaultValue(new Column(new Label('table_name'), new Label('column_name'), new Bit())),
         );
     }
 
     public function testGetDefaultThrowsOnInvalidBinaryDefault(): void
     {
-        $options = (new ColumnOptions())->setDefault('x100011');
+        $options = (new ColumnOptions(new Label('column_name')))->setDefault('x100011');
 
         $this->expectException(InvalidDefaultValue::class);
 
-        $options->getDefaultValue(new Column(new Label('column_name'), new Bit()));
+        $options->getDefaultValue(new Column(new Label('table_name'), new Label('column_name'), new Bit()));
     }
 
     public function testGetDefaultReturnsFormattedStringWhenTypeIsString(): void
     {
-        $options = (new ColumnOptions())->setDefault('TheDefault');
+        $options = (new ColumnOptions(new Label('column_name')))->setDefault('TheDefault');
 
         $this->assertSame(
             "'TheDefault'",
-            $options->getDefaultValue(new Column(new Label('column_name'), new CharacterVarying())),
+            $options->getDefaultValue(new Column(new Label('table_name'), new Label('column_name'), new CharacterVarying())),
         );
     }
 
     public function testGetDefaultReturnsFormattedStringWhenTypeIsBooleanTrue(): void
     {
-        $options = (new ColumnOptions())->setDefault(true);
+        $options = (new ColumnOptions(new Label('column_name')))->setDefault(true);
 
         $this->assertSame(
             "'true'",
-            $options->getDefaultValue(new Column(new Label('column_name'), new CharacterVarying())),
+            $options->getDefaultValue(new Column(new Label('table_name'), new Label('column_name'), new CharacterVarying())),
         );
     }
 
     public function testGetDefaultReturnsFormattedStringWhenTypeIsBooleanFalse(): void
     {
-        $options = (new ColumnOptions())->setDefault(false);
+        $options = (new ColumnOptions(new Label('column_name')))->setDefault(false);
 
         $this->assertSame(
             "'false'",
-            $options->getDefaultValue(new Column(new Label('column_name'), new CharacterVarying())),
+            $options->getDefaultValue(new Column(new Label('table_name'), new Label('column_name'), new CharacterVarying())),
         );
     }
 
     public function testGetDefaultReturnsFormattedStringWhenTypeIsInteger(): void
     {
-        $options = (new ColumnOptions())->setDefault(12);
+        $options = (new ColumnOptions(new Label('column_name')))->setDefault(12);
 
         $this->assertSame(
             '12',
-            $options->getDefaultValue(new Column(new Label('column_name'), new IntegerType())),
+            $options->getDefaultValue(new Column(new Label('table_name'), new Label('column_name'), new IntegerType())),
         );
     }
 
     public function testGetDefaultReturnsFormattedStringWhenTypeIsDouble(): void
     {
-        $options = (new ColumnOptions())->setDefault(12.3);
+        $options = (new ColumnOptions(new Label('column_name')))->setDefault(12.3);
 
         $this->assertSame(
             '12.3',
-            $options->getDefaultValue(new Column(new Label('column_name'), new FloatType())),
+            $options->getDefaultValue(new Column(new Label('table_name'), new Label('column_name'), new FloatType())),
         );
     }
 
     public function testGetDefaultReturnsFormattedStringWhenTypeIsNull(): void
     {
-        $options = (new ColumnOptions())->setDefault(null);
+        $options = (new ColumnOptions(new Label('column_name')))->setDefault(null);
 
         $this->assertSame(
             'NULL',
-            $options->getDefaultValue(new Column(new Label('column_name'), new FloatType())),
+            $options->getDefaultValue(new Column(new Label('table_name'), new Label('column_name'), new FloatType())),
         );
     }
 
     public function testGetDefaultThrowsExceptionWhenValueIsOfAnUnSupportedType(): void
     {
-        $options = (new ColumnOptions())->setDefault(new \DateTimeImmutable());
+        $options = (new ColumnOptions(new Label('column_name')))->setDefault(new \DateTimeImmutable());
 
         $this->expectException(InvalidDefaultValue::class);
 
-        $options->getDefaultValue(new Column(new Label('column_name'), new FloatType()));
+        $options->getDefaultValue(new Column(new Label('table_name'), new Label('column_name'), new FloatType()));
     }
 
     public function testNotNull(): void
     {
-        $options = (new ColumnOptions())->notNull();
+        $options = (new ColumnOptions(new Label('column_name')))->notNull();
 
         $this->assertFalse($options->isNullable());
     }
 
     public function testHasOptionsReturnsFalseWhenNoOptionsHaveBeenSet(): void
     {
-        $this->assertFalse((new ColumnOptions())->hasOptions());
+        $this->assertFalse((new ColumnOptions(new Label('column_name')))->hasOptions());
     }
 
     public function testHasOptionsReturnsTrueWhenNullabilityHasBeenSet(): void
     {
-        $this->assertTrue((new ColumnOptions())->notNull()->hasOptions());
+        $this->assertTrue((new ColumnOptions(new Label('column_name')))->notNull()->hasOptions());
     }
 
     public function testHasOptionsReturnsTrueWhenDefaultHasBeenSet(): void
     {
-        $this->assertTrue((new ColumnOptions())->setDefault('TheDefault')->hasOptions());
+        $this->assertTrue((new ColumnOptions(new Label('column_name')))->setDefault('TheDefault')->hasOptions());
     }
 
     public function testHasOptionsReturnsTrueWhenBothNullabilityAndDefaultHaveBeenSet(): void
     {
-        $this->assertTrue((new ColumnOptions())->notNull()->setDefault('TheDefault')->hasOptions());
+        $this->assertTrue((new ColumnOptions(new Label('column_name')))->notNull()->setDefault('TheDefault')->hasOptions());
     }
 
     public function testToSqlWithoutOptions(): void
     {
         $this->assertSame(
             '',
-            (new ColumnOptions())->toSql(new Column(new Label('column_name'), new IntegerType())),
+            (new ColumnOptions(new Label('column_name')))->toSql(new Column(new Label('table_name'), new Label('column_name'), new IntegerType())),
         );
     }
 
@@ -185,7 +185,7 @@ class ColumnOptionsTest extends TestCase
     {
         $this->assertSame(
             'NOT NULL',
-            (new ColumnOptions())->notNull()->toSql(new Column(new Label('column_name'), new IntegerType())),
+            (new ColumnOptions(new Label('column_name')))->notNull()->toSql(new Column(new Label('table_name'), new Label('column_name'), new IntegerType())),
         );
     }
 
@@ -193,7 +193,7 @@ class ColumnOptionsTest extends TestCase
     {
         $this->assertSame(
             'DEFAULT 12',
-            (new ColumnOptions())->setDefault(12)->toSql(new Column(new Label('column_name'), new IntegerType())),
+            (new ColumnOptions(new Label('column_name')))->setDefault(12)->toSql(new Column(new Label('table_name'), new Label('column_name'), new IntegerType())),
         );
     }
 
@@ -201,7 +201,7 @@ class ColumnOptionsTest extends TestCase
     {
         $this->assertSame(
             'DEFAULT 12 NOT NULL',
-            (new ColumnOptions())->notNull()->setDefault(12)->toSql(new Column(new Label('column_name'), new IntegerType())),
+            (new ColumnOptions(new Label('column_name')))->notNull()->setDefault(12)->toSql(new Column(new Label('table_name'), new Label('column_name'), new IntegerType())),
         );
     }
 }
